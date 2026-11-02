@@ -6,7 +6,7 @@ Supporting material for the OzSec 2026 talk of the same name: the replica target
 harness, the exact prompts each arm was given, and the run evidence behind every number in
 the deck.
 
-Ryan Chaplin · Lead Penetration Tester, Raxis
+Ryan Chaplin · Lead Penetration Tester, [Raxis](https://raxis.com)
 
 ---
 
