@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="VulnBlazor.Client/VulnBlazor.Client.csproj" />
+  <Project Path="VulnBlazor.ServiceInterface/VulnBlazor.ServiceInterface.csproj" />
+  <Project Path="VulnBlazor.ServiceModel/VulnBlazor.ServiceModel.csproj" />
+  <Project Path="VulnBlazor.Tests/VulnBlazor.Tests.csproj" />
+  <Project Path="VulnBlazor/VulnBlazor.csproj" />
+</Solution>

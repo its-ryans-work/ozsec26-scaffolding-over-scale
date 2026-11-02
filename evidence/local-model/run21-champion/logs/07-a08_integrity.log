@@ -1,0 +1,566 @@
+Loaded playbook: a08_integrity
+Description: OWASP A08 Software or Data Integrity Failures: unsafe deserialization, unverified updates and assets, and trust placed in client-supplied or third-party data. 
+Mode: agent
+
+╭─────────────────────────────────────── Starting ───────────────────────────────────────╮
+│ PENTESTAGENT - Non-interactive Mode                                                    │
+│                                                                                        │
+│ Target: http://127.0.0.1:5000                                                          │
+│ Model: openai/qwen3.6-27b-fable                                                        │
+│ Mode: Agent                                                                            │
+│ Runtime: Local                                                                         │
+│ Max loops: 50                                                                          │
+│ Task: OWASP A08 Software or Data Integrity Failures: unsafe deserialization,           │
+│ unverified updates and assets, and trust placed in client-supplied or third-party      │
+│ data.                                                                                  │
+│                                                                                        │
+│ Phase: Find integrity assumptions                                                      │
+│ Objective: Locate where the application trusts data it should verify.                  │
+│ Techniques:                                                                            │
+│   1. Identify endpoints accepting serialized objects, type hints, polymorphic payloads │
+│ or object graphs, from recovered source where available.                               │
+│   2. Look for client-supplied values used in security decisions, pricing, identity or  │
+│ state transitions.                                                                     │
+│   3. Check whether third-party assets are loaded without integrity verification, and   │
+│ whether update or plugin mechanisms verify signatures.                                 │
+│                                                                                        │
+│ Phase: Test carefully and honestly                                                     │
+│ Objective: Deserialization claims are where reports most often overstate.              │
+│ Techniques:                                                                            │
+│   1. If a deserializer accepts a type discriminator, first read the recovered source   │
+│ to learn the exact discriminator and the types actually permitted. Guessing a          │
+│ discriminator produces an 'unknown type' error that proves nothing.                    │
+│   2. A type that merely exists is not a gadget: a gadget chain must INVOKE something.  │
+│ If you cannot demonstrate invocation, the finding is UNVERIFIED and must be reported   │
+│ that way.                                                                              │
+│   3. Presence of a vulnerable-looking component or version is not an integrity         │
+│ finding. Do not cite an advisory identifier unless you have executed it against this   │
+│ target and observed the effect.                                                        │
+│   4. Test tampering with client-supplied values that influence server-side decisions,  │
+│ and show the changed outcome.                                                          │
+│                                                                                        │
+│ Phase: Verify before reporting                                                         │
+│ Objective: Apply the same evidence standard to every finding, so results are           │
+│ comparable across categories.                                                          │
+│ Techniques:                                                                            │
+│   1. PROOF DISCIPLINE - label every finding DEMONSTRATED (you executed it and the      │
+│ response proves it, quote that response), INFERRED (follows from evidence but was not  │
+│ executed), or UNVERIFIED (suspected from a version, component or code pattern only).   │
+│ Identifying software is never a demonstration; never write 'confirmed' without having  │
+│ executed something.                                                                    │
+│   2. RUN THE CONTROL TEST. Before claiming any access or bypass, repeat the request    │
+│ WITHOUT the credential, token, header or material you believe is responsible. If the   │
+│ result is the same, you have proven nothing - the resource was already reachable.      │
+│ State the control result alongside the finding. This single omission is the most       │
+│ common source of false critical findings.                                              │
+│   3. BUDGET DISCIPLINE - rank leads by evidence strength (material in hand > observed  │
+│ behaviour > suspicion from a version string) and give each a step budget. STOP RULE:   │
+│ about 8-10 consecutive steps on one lead with no new evidence means move on, recording │
+│ what you tried.                                                                        │
+│   4. Record findings to notes as you go, with the endpoint, the request, the response  │
+│ and the control result, so later phases and the report can use them.                   │
+│   5. Stay non-destructive: prefer read-only proof, do not modify or delete data, do    │
+│ not lock accounts, and stop once the point is demonstrated.                            │
+│                                                                                        │
+│                                                                                        │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+[00:00] Initializing...
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Plan:                                                                                  │
+│                                                                                        │
+│  1 Enumerate endpoints accepting serialized objects, client-supplied security values,  │
+│    and third-party assets from recovered source and observed traffic                   │
+│  2 Test integrity assumptions by tampering with inputs (deserialization type           │
+│    discriminators, client values influencing decisions, asset signatures) and          │
+│    demonstrate observed effects with control comparisons to confirm impact             │
+│  3 Record findings with evidence labels (DEMONSTRATED/INFERRED/UNVERIFIED), endpoints, │
+│    requests, responses, and control test results while staying non-destructive         │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:15] $ notes (1)
+         [*] Notes (2 entries):  ## Credential    (medium...
+
+[00:15] $ terminal (2)
+         head -200 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyltacp.decom...
+         [+] OK
+
+[00:15] $ terminal (3)
+         head -200 
+/tmp/client-assets/decompiled/ACorpBlazor.Client/ACorpBlazor.Client.de...
+         [+] OK
+
+[00:22] $ terminal (4)
+         cat 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyltacp.decompiled....
+         [+] OK
+
+[00:36] $ browser (5)
+         [*] Navigated to: http://127.0.0.1:5000/ Title: ACorp...
+
+[00:43] $ terminal (6)
+         find /tmp/client-assets -name "*.cs" -o -name "*.json" -o -name "*.html" -o 
+-nam...
+         [+] OK
+
+[00:43] $ browser (7)
+         [*] Found links:   - [About] http://127.0.0.1:5000/about   - [De...
+
+[00:51] $ terminal (8)
+         grep -n 
+"batch\|Batch\|Serialize\|Deserialize\|JsonSerializer\|DataContractJson\...
+         [+] OK
+
+[00:51] $ browser (9)
+         [*] Navigated to: http://127.0.0.1:5000/api/batch Title: ...
+
+[01:00] $ terminal (10)
+         grep -n 
+"Route\|IPost\|IGet\|IPut\|IPatch\|IDelete\|Action\|Payload\|Data\|Type\...
+         [+] OK
+
+[01:07] $ terminal (11)
+         sed -n '27,100p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyltac...
+         [+] OK
+
+[01:07] $ terminal (12)
+         sed -n '512,600p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[01:07] $ terminal (13)
+         sed -n '600,700p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[01:16] $ terminal (14)
+         grep -n "BatchRequest\|BatchHandler\|BatchResponse\|BatchEnvelope" 
+/tmp/client-a...
+         [+] OK
+
+[01:16] $ terminal (15)
+         grep -n 
+"ServiceStack\|JsonSerializerSettings\|TypeNameHandling\|Deserialize\|Se...
+         [+] OK
+
+[01:16] $ terminal (16)
+         cat /tmp/client-assets/decompiled/ACorpBlazor/ilspycmd.decompiled.cs
+         [+] OK
+
+[01:24] $ terminal (17)
+         cat 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyltacp.decompiled....
+         [+] OK
+
+[01:35] $ terminal (18)
+         curl -s -X POST http://127.0.0.1:5000/api/batch -H "Content-Type: 
+application/js...
+         [+] OK
+
+[01:35] $ terminal (19)
+         curl -s http://127.0.0.1:5000/coupons | head -100
+         [+] OK
+
+[01:35] $ terminal (20)
+         curl -s http://127.0.0.1:5000/hello/test | head -100
+         [+] OK
+
+[02:29] $ terminal (21)
+         cat 
+/tmp/client-assets/decompiled/ACorpBlazor.Client/ACorpBlazor.Client.decompil...
+         [+] OK
+
+[02:29] $ terminal (22)
+         echo "test payload" | base64
+         [+] OK
+
+[03:31] $ terminal (23)
+         echo -n '{"Action":"QueryCoupons","Payload":""}' | base64
+         [+] OK
+
+[03:31] $ terminal (24)
+         curl -s -X POST http://127.0.0.1:5000/api/batch -H "Content-Type: 
+application/js...
+         [+] OK
+
+[03:31] $ terminal (25)
+         curl -s -X POST http://127.0.0.1:5000/api/batch -H "Content-Type: 
+application/js...
+         [+] OK
+
+[04:25] $ terminal (26)
+         python3 << 'PYEOF'
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import...
+         [+] OK
+
+[04:38] $ terminal (27)
+         curl -s -X POST http://127.0.0.1:5000/api/batch -H "Content-Type: 
+application/js...
+         [+] OK
+
+[04:38] $ terminal (28)
+         curl -s -X POST http://127.0.0.1:5000/api/batch -H "Content-Type: 
+application/js...
+         [+] OK
+
+[04:50] $ terminal (29)
+         grep -n "timestamp\|Timestamp\|time\|Time\|epoch\|Epoch\|utc\|Utc" 
+/tmp/client-a...
+         [+] OK
+
+[04:50] $ terminal (30)
+         sed -n '1,60p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyltacp....
+         [+] OK
+
+[05:00] $ terminal (31)
+         grep -n 
+"BatchEnvelope\|TelemetryCodec\|timestamp\|Timestamp\|BatchRequest\|Batc...
+         [+] OK
+
+[05:00] $ terminal (32)
+         sed -n '62,80p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyltacp...
+         [+] OK
+
+[05:03] $ terminal (33)
+         sed -n '62,90p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyltacp...
+         [+] OK
+
+[05:03] $ terminal (34)
+         sed -n '628,750p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[05:16] $ terminal (35)
+         grep -n "BatchEnvelope\|Ts\|Timestamp\|batch\|Batch" 
+/tmp/client-assets/decompil...
+         [+] OK
+
+[05:16] $ terminal (36)
+         grep -n "BatchRequest\|BatchResponse\|BatchEnvelope\|batch\|Batch" 
+/tmp/client-a...
+         [+] OK
+
+[05:20] $ terminal (37)
+         grep -n "BatchEnvelope\|BatchRequest\|BatchResponse\|api/batch\|Ts\|\.Ts" 
+/tmp/c...
+         [+] OK
+
+[05:20] $ terminal (38)
+         grep -rn "Batch\|batch\|Ts\|Timestamp" /tmp/client-assets/js/ | head -40
+         [+] OK
+
+[05:29] $ terminal (39)
+         cat /tmp/client-assets/js/servicestack-blazor.js
+         [+] OK
+
+[05:29] $ terminal (40)
+         cat /tmp/client-assets/js/reconnect-modal.js
+         [+] OK
+
+[07:00] $ terminal (41)
+         grep -n -A 30 "class BatchRequest" 
+/tmp/client-assets/decompiled/ACorpBlazor/ACo...
+         [+] OK
+
+[07:00] $ terminal (42)
+         grep -n -A 20 "class BatchResponse" 
+/tmp/client-assets/decompiled/ACorpBlazor/AC...
+         [+] OK
+
+[07:00] $ terminal (43)
+         grep -n -A 20 "class BatchEnvelope" 
+/tmp/client-assets/decompiled/ACorpBlazor/AC...
+         [+] OK
+
+[07:20] $ terminal (44)
+         python3 << 'PYEOF'
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import...
+         [+] OK
+
+[08:56] $ terminal (45)
+         curl -s -X POST http://127.0.0.1:5000/batch -H "Content-Type: application/json" 
+...
+         [+] OK
+
+[10:42] $ terminal (46)
+         grep -n -B 5 -A 30 "class BatchRouteHandler" 
+/tmp/client-assets/decompiled/ACorp...
+         [-] Exit 1
+
+[10:52] $ terminal (47)
+         cat 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyltacp.decompiled....
+         [+] OK
+
+[11:00] $ terminal (48)
+         grep -n 
+"BatchRouteHandler\|BatchRequest\|batch\|BatchEnvelope\|Sign\|sign\|HMAC...
+         [+] OK
+
+[11:11] $ terminal (49)
+         find /tmp/client-assets -name "*.cs" -exec wc -l {} \;
+         [+] OK
+
+[11:11] $ terminal (50)
+         grep -n "BatchRouteHandler\|BatchRequest\|Handle.*Batch\|class.*Batch" 
+/tmp/clie...
+         [+] OK
+
+[11:19] $ terminal (51)
+         curl -s http://127.0.0.1:5000/ | head -50
+         [+] OK
+
+[11:19] $ terminal (52)
+         curl -s -X POST http://127.0.0.1:5000/api/batch -H "Content-Type: text/json" -d 
+...
+         [+] OK
+
+[11:23] $ terminal (53)
+         grep -n 
+"BatchRouteHandler\|Handle.*Batch\|class.*Handler\|class.*Service\|OnPos...
+         [+] OK
+
+[11:31] $ terminal (54)
+         wc -c 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyltacp.decompile...
+         [+] OK
+
+[11:31] $ terminal (55)
+         cat 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyltacp.decompiled....
+         [+] OK
+
+[11:39] $ terminal (56)
+         grep -n "BatchRouteHandler\|class.*Batch\|HandleBatch\|ProcessBatch" 
+/tmp/client...
+         [+] OK
+
+[11:39] $ terminal (57)
+         curl -s -X POST http://127.0.0.1:5000/batch -H "Content-Type: text/json" -d 
+'{"A...
+         [+] OK
+
+[11:39] $ terminal (58)
+         curl -s -X POST http://127.0.0.1:5000/Booking -H "Content-Type: text/json" -d 
+'{...
+         [+] OK
+
+[11:45] $ terminal (59)
+         curl -s -X POST http://127.0.0.1:5000/api/batch -H "Content-Type: 
+application/js...
+         [+] OK
+
+[11:45] $ terminal (60)
+         curl -s http://127.0.0.1:5000/metadata/dtos | head -200
+         [+] OK
+
+[11:54] $ terminal (61)
+         python3 << 'PYEOF'
+with open('/tmp/client-assets/decompiled/ACorpBlazor/ACorpBla...
+         [+] OK
+
+[12:05] $ terminal (62)
+         python3 << 'PYEOF'
+with open('/tmp/client-assets/decompiled/ACorpBlazor/ACorpBla...
+         [+] OK
+
+[12:05] $ terminal (63)
+         grep -n "BatchRouteHandler" 
+/tmp/client-assets/decompiled/ServiceStack.Interface...
+         [+] OK
+
+[12:12] $ terminal (64)
+         strings /tmp/client-assets/assemblies/ACorpBlazor.6tqtyltacp.dll | grep -i 
+"batc...
+         [+] OK
+
+[12:12] $ terminal (65)
+         strings /tmp/client-assets/assemblies/ACorpBlazor.6tqtyltacp.dll | grep -i 
+"hand...
+         [+] OK
+
+[12:25] $ terminal (66)
+         python3 << 'PYEOF'
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import...
+         [+] OK
+
+[12:25] $ terminal (67)
+         curl -s -X POST http://127.0.0.1:5000/api/batch -H "Content-Type: 
+application/js...
+         [-] Exit 26
+
+[12:35] $ terminal (68)
+         python3 << 'PYEOF'
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import...
+         [+] OK
+
+[12:46] $ terminal (69)
+         strings /tmp/client-assets/wasm/ACorpBlazor.Client.wasm | grep -i 
+"batch\|BatchE...
+         [+] OK
+
+[12:46] $ terminal (70)
+         strings /tmp/client-assets/wasm/ACorpBlazor.wasm | grep -i 
+"batch\|BatchEnvelope...
+         [+] OK
+
+[13:02] $ terminal (71)
+         python3 << 'PYEOF'
+with open('/tmp/client-assets/decompiled/ACorpBlazor/ACorpBla...
+         [+] OK
+
+[13:02] $ terminal (72)
+         python3 << 'PYEOF'
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import...
+         [+] OK
+
+[13:17] $ terminal (73)
+         grep -n "class Booking\|Cost\|Price\|RoomType\|RoomNumber\|AuditBase" 
+/tmp/clien...
+         [+] OK
+
+[13:17] $ terminal (74)
+         grep -n "class Coupon\|Discount\|CouponCode\|ApplyCoupon" 
+/tmp/client-assets/dec...
+         [+] OK
+
+[13:17] $ terminal (75)
+         grep -n "class User\|IsAdmin\|Role\|Permission\|Authority" 
+/tmp/client-assets/de...
+         [+] OK
+
+[13:25] $ terminal (76)
+         sed -n '87,175p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyltac...
+         [+] OK
+
+[13:25] $ terminal (77)
+         sed -n '466,510p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[13:25] $ terminal (78)
+         sed -n '832,950p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[16:22] $ terminal (79)
+         grep -n "CreateBooking\|UpdateBooking\|DeleteBooking" 
+/tmp/client-assets/decompi...
+         [+] OK
+
+[16:22] $ terminal (80)
+         grep -n "CreateCoupon\|UpdateCoupon\|DeleteCoupon\|GetCoupons\|QueryCoupons" 
+/tm...
+         [+] OK
+
+[16:22] $ terminal (81)
+         grep -n "class.*Coupon\|Coupon.*Query\|Coupon.*Create\|Coupon.*Update" 
+/tmp/clie...
+         [+] OK
+
+[19:30] $ terminal (82)
+         sed -n '240,265p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[19:30] $ terminal (83)
+         sed -n '335,365p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[19:30] $ terminal (84)
+         sed -n '445,470p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[22:29] $ terminal (85)
+         sed -n '468,540p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[22:29] $ terminal (86)
+         grep -n 
+"Route\|IGet\|IPost\|IPut\|IPatch\|IDelete\|ICreate\|IPatchDb\|ICreateDb...
+         [+] OK
+
+[25:41] $ terminal (87)
+         sed -n '580,620p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[25:41] $ terminal (88)
+         sed -n '700,800p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[25:41] $ terminal (89)
+         sed -n '900,950p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[28:56] $ terminal (90)
+         grep -n 
+"class.*Handler\|public.*Any\|public.*Get\|public.*Post\|public.*Put\|pu...
+         [+] OK
+
+[28:56] $ terminal (91)
+         sed -n '620,700p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[32:23] $ terminal (92)
+         sed -n '27,60p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyltacp...
+         [+] OK
+
+[32:23] $ terminal (93)
+         sed -n '228,280p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[35:57] $ terminal (94)
+         grep -rn "BatchRequest\|BatchHandler\|batch" 
+/tmp/client-assets/decompiled/ACorp...
+         [+] OK
+
+[35:57] $ terminal (95)
+         ls -la /tmp/client-assets/decompiled/ACorpBlazor/
+         [+] OK
+
+[39:33] $ terminal (96)
+         ls -la /tmp/client-assets/decompiled/
+         [+] OK
+
+[39:33] $ terminal (97)
+         grep -rn "BatchRequest\|BatchHandler\|class.*Handler" 
+/tmp/client-assets/decompi...
+         [+] OK
+
+[39:33] Max loops limit reached (50)
+[39:33] Synthesising report from notes...
+
+╭───────────────────────────────────── Interrupted ──────────────────────────────────────╮
+│ STOPPED (max loops reached)                                                            │
+│                                                                                        │
+│ Duration: 40m 19s                                                                      │
+│ Loops: 50/50                                                                           │
+│ Tools: 97                                                                              │
+│ Tokens: 826,070                                                                        │
+│ Findings: 1                                                                            │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+Report saved: 
+loot/assessments/20260802_100431_http_127.0.0.1_5000/draft_playbook_reports/20260802_13024
+7_http_127.0.0.1_5000_a08_integrity.md

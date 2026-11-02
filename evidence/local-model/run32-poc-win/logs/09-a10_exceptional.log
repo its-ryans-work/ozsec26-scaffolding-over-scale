@@ -1,0 +1,285 @@
+Loaded playbook: a10_exceptional
+Description: OWASP A10 Mishandling of Exceptional Conditions: behaviour under malformed, oversized, wrong-type, boundary and empty input, including whether failures open rather than close access. 
+Mode: agent
+
+╭───────────────────────────────────────────── Starting ─────────────────────────────────────────────╮
+│ PENTESTAGENT - Non-interactive Mode                                                                │
+│                                                                                                    │
+│ Target: http://127.0.0.1:5000                                                                      │
+│ Model: openai/qwen3.6-27b-fable                                                                    │
+│ Mode: Agent                                                                                        │
+│ Runtime: Local                                                                                     │
+│ Max loops: 25                                                                                      │
+│ Task: OWASP A10 Mishandling of Exceptional Conditions: behaviour under malformed, oversized,       │
+│ wrong-type, boundary and empty input, including whether failures open rather than close access.    │
+│                                                                                                    │
+│ Phase: Probe boundaries and malformed input                                                        │
+│ Objective: Find where the application stops handling input gracefully.                             │
+│ Techniques:                                                                                        │
+│   1. For representative endpoints, submit wrong types, empty values, missing required fields,      │
+│ extra unexpected fields, boundary numbers, and structurally malformed bodies.                      │
+│   2. Try oversized values within reason - enough to test a limit, not enough to exhaust resources. │
+│ Do not pursue denial of service.                                                                   │
+│   3. Record unhandled exceptions, stack traces, inconsistent status codes, and any response that   │
+│ discloses internal structure.                                                                      │
+│                                                                                                    │
+│ Phase: Does failure open or close?                                                                 │
+│ Objective: The security-relevant question.                                                         │
+│ Techniques:                                                                                        │
+│   1. Determine whether an error path skips a control - whether a malformed request reaches a       │
+│ handler that a well-formed one could not, or whether a failed check results in access rather than  │
+│ denial.                                                                                            │
+│   2. Where an error reveals interpreter or framework detail, record it as an oracle for injection  │
+│ and integrity testing.                                                                             │
+│   3. Run the control test: the same request well-formed, reported alongside.                       │
+│                                                                                                    │
+│ Phase: Verify before reporting                                                                     │
+│ Objective: Apply the same evidence standard to every finding, so results are comparable across     │
+│ categories.                                                                                        │
+│ Techniques:                                                                                        │
+│   1. PROOF DISCIPLINE - label every finding DEMONSTRATED (you executed it and the response proves  │
+│ it, quote that response), INFERRED (follows from evidence but was not executed), or UNVERIFIED     │
+│ (suspected from a version, component or code pattern only). Identifying software is never a        │
+│ demonstration; never write 'confirmed' without having executed something.                          │
+│   2. RUN THE CONTROL TEST. Before claiming any access or bypass, repeat the request WITHOUT the    │
+│ credential, token, header or material you believe is responsible. If the result is the same, you   │
+│ have proven nothing - the resource was already reachable. State the control result alongside the   │
+│ finding. This single omission is the most common source of false critical findings.                │
+│   3. BUDGET DISCIPLINE - rank leads by evidence strength (material in hand > observed behaviour >  │
+│ suspicion from a version string) and give each a step budget. STOP RULE: about 8-10 consecutive    │
+│ steps on one lead with no new evidence means move on, recording what you tried.                    │
+│   4. Record findings to notes as you go, with the endpoint, the request, the response and the      │
+│ control result, so later phases and the report can use them.                                       │
+│   5. Stay non-destructive: prefer read-only proof, do not modify or delete data, do not lock       │
+│ accounts, and stop once the point is demonstrated.                                                 │
+│                                                                                                    │
+│                                                                                                    │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+[MCP] Connected to kali with 24 tools
+MCP: 24 tool(s) from 1 server(s)
+[00:00] Initializing...
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Plan:                                                                                              │
+│                                                                                                    │
+│  1 Submit malformed input (wrong types, empty values, missing/extra fields, boundary values) to    │
+│    representative endpoints and record responses including status codes and error details          │
+│  2 Send oversized inputs within reasonable limits and capture any unhandled exceptions, stack      │
+│    traces, or framework disclosures                                                                │
+│  3 For each error response, run a control test with well-formed input to determine if failure      │
+│    opens or closes access compared to normal behavior                                              │
+│  4 Document findings with DEMONSTRATED/INFERRED/UNVERIFIED labels, including endpoint, request,    │
+│    response, and control test results                                                              │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Starting OWASP A10 assessment. I'll systematically probe malformed input handling across           │
+│ representative endpoints. Let me begin with boundary/malformed input tests.                        │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:36] $ terminal (tool 1, iter 3/25)
+         # Step 1: Test malformed input on GET endpoints with wrong types in path parameters
+         echo "=== Test 1: Wrong types in path parameters ==="
+         
+         # Test /users/info/{id} with invalid UUID formats
+         echo "--- GET /users/info with string instead of UUID ---"
+         curl -s -w "\nHTTP_CODE:%{http_code}\n" "http://127.0.0.1:5000/users/info/not-a-uuid"
+         
+         echo ""
+         echo "--- GET /users/info with empty string ---"
+         curl -s   ... [+724 chars]
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Good - I'm seeing verbose error disclosure already. Let me continue testing malformed input on     │
+│ POST/PUT endpoints with wrong types and missing fields.                                            │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:49] $ terminal (tool 2, iter 5/25)
+         echo "=== Test 2: Malformed POST/PUT bodies ==="
+         
+         # Test POST /api/CreateTodo with missing required fields
+         echo "--- POST /api/CreateTodo with empty body ---"
+         curl -s -w "\nHTTP_CODE:%{http_code}\n" -X POST "http://127.0.0.1:5000/api/CreateTodo" -H "Content-Type: application/json" -d ""
+         
+         echo ""
+         echo "--- POST /api/CreateTodo with wrong type for text field (number instead of string) ---"
+         curl -s -  ... [+1743 chars]
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Excellent findings - stack traces are being exposed. Let me continue testing PUT endpoints,        │
+│ boundary values, and more endpoints.                                                               │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[01:05] $ terminal (tool 3, iter 7/25)
+         echo "=== Test 3: PUT /todos/{id}.json with malformed input ==="
+         
+         # Test PUT with wrong type for id
+         echo "--- PUT /todos with string id instead of number ---"
+         curl -s -w "\nHTTP_CODE:%{http_code}\n" -X PUT "http://127.0.0.1:5000/todos/notanumber.json" -H "Content-Type: application/json" -d '{"id":1,"text":"test","isFinished":false}'
+         
+         echo ""
+         echo "--- PUT /todos with negative id ---"
+         curl -s -w "\  ... [+1447 chars]
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Excellent findings so far - stack traces exposed, boundary values accepted. Let me continue with   │
+│ more endpoints and oversized input tests.                                                          │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[01:22] $ terminal (tool 4, iter 9/25)
+         echo "=== Test 4: Query endpoints with malformed parameters ==="
+         
+         # Test /api/QueryTodos with malformed filters
+         echo "--- GET /api/QueryTodos with empty filter ---"
+         curl -s -w "\nHTTP_CODE:%{http_code}\n" "http://127.0.0.1:5000/api/QueryTodos?filter="
+         
+         echo ""
+         echo "--- GET /api/QueryTodos with wrong type for limit ---"
+         curl -s -w "\nHTTP_CODE:%{http_code}\n" "http://127.0.0.1:5000/api/QueryTodos?  ... [+1396 chars]
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Good progress on malformed input testing. Now I'll continue with oversized inputs and then control │
+│ tests. Let me proceed with Step 2 of the plan.                                                     │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[02:18] $ terminal (tool 5, iter 11/25)
+         echo "=== Step 2: Oversized inputs ==="
+         
+         # Generate a large text value (10KB)
+         LARGE_TEXT=$(python3 -c "print('A' * 10000)")
+         
+         echo "--- POST /api/CreateTodo with 10KB text field ---"
+         curl -s -w "\nHTTP_CODE:%{http_code}\n" -X POST "http://127.0.0.1:5000/api/CreateTodo" -H "Content-Type: application/json" -d "{\"text\": \"$(echo $LARGE_TEXT | head -c 10000)\"}" | head -c 2000
+         
+         echo ""
+         echo "--- POST  ... [+1903 chars]
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Good progress. Steps 1 and 2 are well covered. Let me mark them complete and proceed with control  │
+│ tests (step 3).                                                                                    │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[02:59] $ finish (tool 6, iter 13/25)
+         [*] Step 1 complete Result: Submitted malformed input to multipl...
+
+[03:45] $ finish (tool 7, iter 14/25)
+         [*] Step 2 complete Result: Sent oversized inputs: 10KB text fie...
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Now proceeding with Step 3: control tests to determine if error conditions open or close access.   │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[04:45] $ terminal (tool 8, iter 16/25)
+         echo "=== Step 3: Control Tests - Malformed vs Well-formed Input ==="
+         
+         echo ""
+         echo "--- Control Test 1: POST /api/CreateTodo ---"
+         echo "Malformed (wrong type for text):"
+         curl -s -w "\nHTTP:%{http_code}" -X POST "http://127.0.0.1:5000/api/CreateTodo" -H "Content-Type: application/json" -d '{"text": 12345}'
+         echo ""
+         echo "Well-formed (correct type):"
+         curl -s -w "\nHTTP:%{http_code}" -X POST "http://  ... [+3311 chars]
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Let me run a few more targeted control tests on the most interesting behaviors discovered.         │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[05:11] $ terminal (tool 9, iter 18/25)
+         echo "=== Step 3 continued: Additional Control Tests ==="
+         
+         echo ""
+         echo "--- Control Test 8: PUT /todos with negative ID (boundary value) ---"
+         echo "Malformed (negative ID -1):"
+         curl -s -w "\nHTTP:%{http_code}" -X PUT "http://127.0.0.1:5000/todos/-1.json" -H "Content-Type: application/json" -d '{"id":-1,"text":"test","isFinished":false}'
+         echo ""
+         echo "ANALYSIS: Negative ID accepted=200. Can create  ... [+2306 chars]
+         [+] OK
+
+[05:53] $ finish (tool 10, iter 19/25)
+         [*] Step 3 complete Result: Ran 14 control tests comparing malfo...
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Now proceeding with Step 4: Document findings with proper evidence labels.                         │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[06:59] $ notes (tool 11, iter 21/25)
+         [*] Created note 'input_validation_opens_access' (vulnerability,...
+
+[07:56] $ finish (tool 12, iter 22/25)
+         [*] Step 4 complete Result: Documented input validation findings...
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ 1. What did these steps establish?                                                                 │
+│                                                                                                    │
+│ The control tests established concrete evidence of where malformed input OPENS vs CLOSES access:   │
+│                                                                                                    │
+│  • PUT /todos/{id}.json OPENS: creates on non-existent IDs (200), accepts negative IDs, silently   │
+│    uses path ID over body ID                                                                       │
+│  • Content-Type validation OPENS: accepts text/plain and form-urlencoded for JSON endpoints        │
+│  • Stack traces OPENS: internal class names, file paths, line numbers in error responses           │
+│  • Most other malformed input CLOSES: wrong types=400, missing fields=400, invalid JSON=400        │
+│                                                                                                    │
+│ This is new - I now have a clear security-relevant map of which failures are dangerous.            │
+│                                                                                                    │
+│ 2. Continue or move on?                                                                            │
+│                                                                                                    │
+│ With 3 iterations left and all findings documented in notes, I should finish this lead             │
+│ efficiently. The input validation probing is complete - I've covered type errors, missing fields,  │
+│ oversized input, negative boundaries, Content-Type mismatches, prototype pollution, and extra      │
+│ parameters. No additional probing will reveal materially new findings.                             │
+│                                                                                                    │
+│ 2b. Checklist refinement:                                                                          │
+│                                                                                                    │
+│ Items 1-3 are too coarse to ever tick. Replacing them:                                             │
+│                                                                                                    │
+│                                                                                                    │
+│  # TODO - a10_exceptional                                                                          │
+│                                                                                                    │
+│  - [x] 1a. Test type coercion (wrong types in expected fields)                                     │
+│  - [x] 1b. Test missing required fields                                                            │
+│  - [x] 1c. Test oversized inputs (10KB+)                                                           │
+│  - [x] 1d. Test boundary values (negative IDs, zero-length strings)                                │
+│  - [x] 1e. Test Content-Type mismatches                                                            │
+│  - [x] 2. Determine open vs close for each failure mode                                            │
+│  - [x] 3. Document findings with evidence labels (DEMONSTRATED/INFERRED/UNVERIFIED)                │
+│                                                                                                    │
+│                                                                                                    │
+│ 3. Proven but not yet noted:                                                                       │
+│                                                                                                    │
+│ All demonstrated findings are in note input_validation_opens_access. Nothing else proven since     │
+│ last checkpoint.                                                                                   │
+│                                                                                                    │
+│ Moving to tick off completed items and close out this phase efficiently.                           │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+[08:58] Synthesising report from notes...
+
+╭───────────────────────────────────────────── Finished ─────────────────────────────────────────────╮
+│ COMPLETE                                                                                           │
+│                                                                                                    │
+│ Duration: 10m 2s                                                                                   │
+│ Loops: 23/25                                                                                       │
+│ Tools: 12                                                                                          │
+│ Tokens: 561,158                                                                                    │
+│ Findings: 1                                                                                        │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+Report saved: 
+loot/assessments/20260805_091525_http_127.0.0.1_5000/draft_playbook_reports/20260805_120608_http_127.0
+.0.1_5000_a10_exceptional.md

@@ -1,0 +1,338 @@
+{
+  "tech_stack": {
+    "content": "ASP.NET Core application running on Kestrel server with Blazor UI framework. Swagger UI v5.32.6 for API docs. Development environment exposed.",
+    "category": "finding",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000",
+      "technologies": [
+        {
+          "name": "ASP.NET Core",
+          "version": ""
+        },
+        {
+          "name": "Kestrel",
+          "version": ""
+        },
+        {
+          "name": "Blazor",
+          "version": ""
+        },
+        {
+          "name": "Swagger UI",
+          "version": "5.32.6"
+        }
+      ]
+    }
+  },
+  "api_schema_discovery": {
+    "content": "API Schema Discovery complete for http://127.0.0.1:5000. Found: ServiceStack metadata at /metadata with 15 operations (detailed schemas saved). OpenAPI 3.0.4 spec at /swagger/v1/swagger.json with 31 paths and 55 component schemas. GraphQL endpoints tested - none are actual GraphQL servers (Blazor SPA fallback). All schema documents saved to /tmp/discovery/api-docs/.",
+    "category": "artifact",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "url": "http://127.0.0.1:5000"
+    }
+  },
+  "auth_bypass_query_endpoints": {
+    "content": "Multiple API endpoints accessible without authentication: /api/GetUserId returns user ID, /api/QueryTodos returns all todos, /api/QueryBookings returns booking data with employee info, /api/QueryCoupons returns all coupons. No auth required for data access.",
+    "category": "vulnerability",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000",
+      "url": "http://127.0.0.1:5000/api/QueryTodos",
+      "weaknesses": [
+        {
+          "id": "CWE-306",
+          "description": "Missing Authentication for Critical Function - QueryTodos accessible without auth"
+        }
+      ]
+    }
+  },
+  "first_pass_inventory": {
+    "content": "FINAL FIRST PASS INVENTORY - http://127.0.0.1:5000 - VulnBlazor Application\n\n=== TECHNOLOGY STACK ===\n- Server: Kestrel (ASP.NET Core development server)\n- Framework: ASP.NET Core (antiforgery cookie present)\n- UI: Blazor WebAssembly (blazor-enhanced-nav header, SPA routing)\n- Backend API: ServiceStack v10.08 (X-Powered-By: ServiceStack/10.08)\n- API Docs: Swagger UI v5.32.6 (/swagger)\n- OpenAPI Spec: OpenAPI 3.0.4 at /swagger/v1/swagger.json\n- Frontend libs: Vue.js, Tailwind CSS, Highlight.js\n- Database: SQLite (inferred from data patterns)\n- Environment: Development mode exposed\n\n=== AUTH MECHANISM ===\n- Cookie-based authentication (antiforgery cookie set)\n- Login: POST /Account/Login (302 redirect for unauthenticated users)\n- Register: /Account/Register\n- Logout: POST /Account/Logout\n- External auth: POST /Account/PerformExternalLogin, POST /Account/Manage/LinkExternalLogin\n- Role-based access: Employee, Manager, Admin roles observed\n- Auth endpoints: POST /auth/{provider}, POST /auth, POST /api/Authenticate\n- ServiceStack auth: Authenticate operation\n\n=== API ENDPOINTS (OpenAPI 3.0.4 - 36 operations) ===\n\n[PUBLIC - No Auth Required]\n1.  GET /hello/{Name} - Hello endpoint\n2.  GET /todos - Query todos (params: Id, Ids, TextContains, Skip, Take, OrderBy, OrderByDesc, Include, Fields, Meta)\n3.  GET /users/id/{Id} - Get user by ID\n4.  GET /users/info/{UserId} - Get user info by ID\n5.  GET /auth - Auth info\n6.  GET /bookings - Find bookings (params: Id, Skip, Take, OrderBy, OrderByDesc, Include, Fields, Meta)\n7.  GET /bookings/{Id} - Find booking by ID\n8.  GET /coupons - Find coupons (params: Id, Skip, Take, OrderBy, OrderByDesc, Include, Fields, Meta)\n9.  GET /api/Hello - Hello endpoint\n10. GET /api/QueryTodos - Query all todos\n11. GET /api/GetUserId - Get current user ID\n12. GET /api/GetUserInfo - Get current user info\n13. GET /api/QueryBookings - Query all bookings\n14. GET /api/QueryCoupons - Query all coupons\n15. GET /api/QueryUsers - Query all users\n16. POST /auth/{provider} - Sign in (AuthProvider)\n17. POST /auth - Sign in (default provider)\n18. POST /api/Authenticate - Authenticate endpoint\n19. POST /Account/PerformExternalLogin - External login\n\n[AUTH REQUIRED]\n20. POST /todos - Create todo (requires auth)\n21. DELETE /todos - Delete todos by Ids (requires auth)\n22. PUT /todos/{Id} - Update todo (requires auth)\n23. POST /bookings - Create booking (requires auth)\n24. PATCH /booking/{Id} - Update booking (requires auth)\n25. DELETE /booking/{Id} - Delete booking (requires auth)\n26. POST /api/batch - Batch request (requires auth)\n27. POST /api/BatchRequest - Batch request (requires auth)\n28. POST /api/CreateTodo - Create todo (requires auth)\n29. PUT /api/UpdateTodo - Update todo (requires auth)\n30. DELETE /api/DeleteTodos - Delete todos (requires auth)\n31. POST /api/CreateBooking - Create booking (401 without auth)\n32. PATCH /api/UpdateBooking - Update booking (requires auth)\n33. DELETE /api/DeleteBooking - Delete booking (requires auth)\n34. POST /Account/Logout - Logout (requires auth)\n35. POST /Account/Manage/LinkExternalLogin - Link external login (requires auth)\n36. POST /Account/Manage/DownloadPersonalData - Download personal data (requires auth)\n\n=== SERVICESTACK ENDPOINTS (15 operations) ===\nRoute pattern: /{format}/{operation} (format: json, xml, html)\n\n[PUBLIC]\n1.  POST /json/GetUserId - Get current user ID\n2.  POST /json/GetUserInfo - Get user info\n3.  POST /json/Hello - Hello endpoint\n4.  POST /json/QueryTodos - Query all todos (no auth)\n5.  POST /json/QueryBookings - Query all bookings (no auth)\n6.  POST /json/QueryCoupons - Query all coupons (no auth)\n7.  POST /json/QueryUsers - Query all users (Admin role in metadata, but publicly accessible)\n8.  POST /json/Authenticate - Authentication endpoint\n\n[AUTH REQUIRED]\n9.  POST /json/CreateTodo - Create todo (requires auth)\n10. POST /json/DeleteTodos - Delete todos (requires auth)\n11. POST /json/UpdateTodo - Update todo (requires auth)\n12. POST /json/CreateBooking - Create booking (Employee role required)\n13. POST /json/UpdateBooking - Update booking (Employee role required)\n14. POST /json/DeleteBooking - Delete booking (Manager role required)\n15. POST /json/BatchRequest - Batch request\n\n=== BLAZOR SPA ROUTES ===\n\n[PUBLIC - No Auth]\n- / (home)\n- /about\n- /deploy\n- /privacy\n- /counter\n- /weather\n- /todomvc\n\n[AUTH REQUIRED - 302 to /Account/Login]\n- /secure/bookings\n- /secure/coupons\n- /profile\n\n[AUTH MANAGEMENT]\n- /Account/Login (login form)\n- /Account/Register (registration form)\n\n=== CLIENT ASSETS ===\n- /servicestack-blazor.js - Blazor ServiceStack client (DOM utilities, cookie handling, breakpoints)\n- /servicestack-client.mjs - ESM ServiceStack client (module loader)\n- /css/ - Application stylesheets\n- /js/ - JavaScript assets\n- /img/profiles/ - User profile images (accessible)\n\n=== DATA EXPOSED WITHOUT AUTHENTICATION ===\n- Employee identifiers: UUIDs, usernames, first names, last names, display names\n- Employee profile URLs and image paths\n- Full booking records: room types, room numbers, dates, costs, employee assignments\n- Coupon data: discount values, expiry dates, codes\n- Todo items: text content (includes stored XSS payloads from testing)\n- User directory via /api/QueryUsers and /users/id/{Id}\n- Complete API schemas: /swagger/v1/swagger.json, /metadata, /metadata/js\n- ServiceStack operation metadata with role requirements exposed\n\n=== PLAYBOOK CANDIDATES (Flagged for Testing) ===\n\n[AUTHORIZATION BYPASS]\n- GET query endpoints return all data without authentication (QueryTodos, QueryBookings, QueryUsers, GetUserId, GetUserInfo)\n- ServiceStack /json/ endpoints mirror OpenAPI auth bypass\n- Role-based endpoints (QueryUsers=Admin, DeleteBooking=Manager) accessible without auth\n- /api/QueryUsers exposes full user directory publicly\n\n[STORED XSS]\n- Todo text field returns unescaped HTML/script tags in API responses\n- Payloads visible in /api/QueryTodos and /todos responses\n- Blazor rendering of untrusted todo content\n\n[INFORMATION DISCLOSURE]\n- Swagger UI publicly accessible at /swagger with full API documentation\n- ServiceStack metadata at /metadata exposes operation names, parameters, and role requirements\n- /metadata/js exposes JavaScript client generation metadata\n- Development environment running with debug features\n- User profile images publicly accessible at /img/profiles/\n\n[ACCOUNT MANAGEMENT]\n- /Account/Register allows unauthenticated user registration\n- /Account/Manage/DownloadPersonalData endpoint (auth required but worth testing)\n- External login integration endpoints exposed\n\n[API ABUSE]\n- BatchRequest endpoints available for bulk operations\n- No rate limiting observed\n- Pagination parameters (Skip, Take) allow data enumeration",
+    "category": "info",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "url": "http://127.0.0.1:5000",
+      "technologies": [
+        {
+          "name": "ASP.NET Core",
+          "version": "unknown"
+        },
+        {
+          "name": "Kestrel",
+          "version": "unknown"
+        },
+        {
+          "name": "Blazor",
+          "version": "unknown"
+        },
+        {
+          "name": "ServiceStack",
+          "version": "10.08"
+        },
+        {
+          "name": "Swagger UI",
+          "version": "5.32.6"
+        },
+        {
+          "name": "OpenAPI",
+          "version": "3.0.4"
+        }
+      ],
+      "endpoints": [
+        {
+          "path": "/api/QueryTodos",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/QueryBookings",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/QueryCoupons",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/QueryUsers",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/GetUserId",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/GetUserInfo",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/CreateBooking",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/api/CreateTodo",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/api/Authenticate",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/todos",
+          "methods": [
+            "GET",
+            "POST",
+            "DELETE"
+          ]
+        },
+        {
+          "path": "/bookings",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/coupons",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/auth",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/Account/Login",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/Account/Register",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/swagger/v1/swagger.json",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/metadata",
+          "methods": [
+            "GET"
+          ]
+        }
+      ]
+    }
+  },
+  "blazor_manifest_found": {
+    "content": "Blazor WASM boot manifest at /_framework/blazor.boot.json. Main assembly: ACorpBlazor.Client.0txltpxuvt.dll. Shared library (high-value): ACorpBlazor.6tqtyltacp.dll. ~200+ assemblies shipped to client with content-hashed filenames under /_framework/",
+    "category": "artifact",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "url": "http://127.0.0.1:5000/_framework/blazor.boot.json"
+    }
+  },
+  "idor_getuserinfo_password_hash_leak": {
+    "content": "CRITICAL: GetUserInfo endpoint returns full user profile including passwordHash without any authentication. DEMONSTRATED: Anonymous GET request to /users/info/029d65c2-bd85-483f-8ef2-6f5f87e9bf84.json returned: {\"userId\":\"029d65c2-bd85-483f-8ef2-6f5f87e9bf84\",\"userName\":\"employee@email.com\",\"email\":\"employee@email.com\",\"emailConfirmed\":true,\"lastSeenToken\":\"jN/UHW7jw8/jGEykgwZhWSidf/DfnIJkvk2RRkoYnK4=\",\"passwordHash\":\"AQAAAAIAAYagAAAAECFk0FWL5Rh81XaVdZ+HWn7B7JYVLk18PvGnEkcoHQ77CVIED3ANpQa+yyW8yLGD0g==\",\"firstName\":\"Test\",\"lastName\":\"Employee\",\"displayName\":\"Test Employee\",\"profileUrl\":\"/img/profiles/user2.svg\"}. Control test: Same request without any session/cookies returned identical data. Manager UUID returns empty response {\"userId\":\"\",\"emailConfirmed\":false}. Hashcat failed to crack against rockyou.txt. LastSeenToken value: jN/UHW7jw8/jGEykgwZhWSidf/DfnIJkvk2RRkoYnK4= (base64, 20 bytes raw, possibly session identifier).",
+    "category": "info",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {}
+  },
+  "idor_put_todo_modification": {
+    "content": "CRITICAL: PUT /todos/{id}.json allows anonymous modification of any todo item without authentication. DEMONSTRATED: PUT request to /todos/1.json with body {\"id\":1,\"text\":\"HACKED BY ANONYMOUS\",\"isFinished\":false} returned 200 with response: {\"id\":1,\"text\":\"HACKED BY ANONYMOUS\",\"isFinished\":false}. Control test: Same request without any session/cookies worked identically - anonymous access confirmed. PATCH method returns 405 (not supported). This allows any anonymous user to modify any other user's todo items. Field mapping: id (int), text (string), isFinished (bool).",
+    "category": "info",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {}
+  },
+  "auth_bypass_all_query_endpoints": {
+    "content": "HIGH: All data query endpoints accessible without authentication. DEMONSTRATED: Anonymous requests (no cookies/session) to: /api/QueryTodos returns 66 todos with all fields, /api/QueryBookings returns 3 bookings with employee info (createdBy, modifiedBy), /api/QueryCoupons returns 10 coupons, /api/GetUserId returns anonymous user UUID 029d65c2-bd85-483f-8ef2-6f5f87e9bf84. Control test: All endpoints return identical data with and without authentication. No rate limiting or access control on read operations.",
+    "category": "vulnerability",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000",
+      "url": "http://127.0.0.1:5000/api/QueryTodos",
+      "weaknesses": [
+        {
+          "id": "CWE-306",
+          "description": "Missing Authentication for Critical Function - All query endpoints accessible anonymously"
+        },
+        {
+          "id": "CWE-284",
+          "description": "Improper Access Control - No authorization checks on data access endpoints"
+        }
+      ]
+    }
+  },
+  "auth_no_default_credentials": {
+    "content": "INFO: Default/seeded credential tests against ServiceStack /auth endpoint all returned 401. Tested: employee@email.com (8 passwords), manager@email.com (5 passwords), admin@email.com (5 passwords) - total 18 attempts. Passwords tried: P@ssw0rd1, Employee123, Employee123!, employee123, password, Password123, TestEmployee1, Employee@, Employee@123, Manager123, Manager123!, manager123, Admin123, Admin123!, admin123. No successful authentication. /api/Authenticate also returns 401. /Account/Login requires antiforgery token.",
+    "category": "info",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000",
+      "url": "http://127.0.0.1:5000/auth"
+    }
+  },
+  "verbose_error_disclosure": {
+    "content": "ServiceStack returns verbose error page with internal request details (HttpMethod, PathInfo, QueryString, RawUrl) on invalid user ID path. Development error page exposed in production.",
+    "category": "vulnerability",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "url": "http://127.0.0.1:5000/users/info/invalid-uuid",
+      "evidence_path": "loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/a02_misconfiguration/tool-log.md",
+      "weaknesses": [
+        {
+          "description": "ServiceStack returns verbose error page with internal request details (HttpMethod, PathInfo, QueryString, RawUrl) on invalid user ID path"
+        },
+        {
+          "description": "Development error page exposed in production - reveals framework internals"
+        }
+      ]
+    }
+  },
+  "input_validation_opens_access": {
+    "content": "INPUT VALIDATION: PUT /todos/{id}.json OPENS ACCESS on malformed input\n\nDEMONSTRATED Findings:\n\n1. PUT creates on non-existent IDs (should be 404):\n   - Request: PUT /todos/99999.json body={\"id\":99999,\"text\":\"test\",\"isFinished\":false}\n   - Response: 200 OK with {\"id\":99999,\"text\":\"test\",\"isFinished\":false}\n   - Control: PUT /todos/1.json (existing) returns 200 update\n   - Impact: Unauthenticated resource creation via PUT; ID space pollution\n\n2. Negative IDs accepted (boundary validation missing):\n   - Request: PUT /todos/-1.json body={\"id\":-1,\"text\":\"test\",\"isFinished\":false}\n   - Response: 200 OK with {\"id\":-1,\"text\":\"test\",\"isFinished\":false}\n   - Impact: No lower bound validation on resource IDs\n\n3. Path ID silently overrides body ID:\n   - Request: PUT /todos/2.json body={\"id\":999,\"text\":\"test\",\"isFinished\":false}\n   - Response: 200 OK with {\"id\":2,\"text\":\"test\",\"isFinished\":false} (body ID=999 ignored)\n   - Impact: Confusing API behavior; potential race conditions\n\n4. Content-Type validation bypassed:\n   - Request: POST /api/CreateTodo with Content-Type: text/plain body={\"text\":\"test\"}\n   - Response: 200 OK with created item\n   - Request: POST /api/CreateTodo with Content-Type: application/x-www-form-urlencoded body=text=test\n   - Response: 200 OK with created item\n   - Impact: No Content-Type enforcement; potential for alternate parsing attacks\n\n5. Stack trace disclosure in error responses:\n   - Request: POST /api/CreateTodo body={\"text\":12345} (wrong type)\n   - Response: 400 with full stack trace including:\n     * Internal class: ACorpBlazor.ServiceModel.CreateTodo\n     * Framework paths: ServiceStack.Host.Handlers.ServiceStackHandlerBase.cs:line 232\n     * Full exception chain with line numbers\n   - Control: Well-formed request returns clean JSON\n   - Impact: Information disclosure aiding further attacks\n\nUNVERIFIED: Whether non-existent ID creation bypasses any authorization that might exist for authenticated endpoints.",
+    "category": "vulnerability",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000",
+      "url": "http://127.0.0.1:5000/todos/{id}.json",
+      "weaknesses": [
+        {
+          "description": "PUT creates new resources instead of updating existing ones; non-existent IDs return 200 and create items. Negative IDs accepted (-1). Path ID silently overrides body ID when mismatched. No validation on ID existence or format boundaries. DEMONSTRATED: PUT /todos/99999.json returns 200 with new item; PUT /todos/-1.json creates item with negative ID; PUT /todos/2.json with body id=999 uses path ID 2 silently."
+        },
+        {
+          "description": "Stack trace disclosure in JSON error responses exposes internal class names, file paths, and framework details. DEMONSTRATED: Wrong type in POST /api/CreateTodo returns full System.Text.Json.JsonException stack trace with ACorpBlazor.ServiceModel.CreateTodo, ServiceStack internal paths, and line numbers."
+        }
+      ]
+    }
+  },
+  "consolidate_file_inventory": {
+    "content": "File inventory for consolidation phase - http://127.0.0.1:5000\n\n=== DRAFT PLAYBOOK REPORTS (md + json pairs) ===\nweb_discovery: 12KB md + 12KB json (readable)\nblazor_wasm: 62KB md + 12KB json (md needs grep)\na01_a07_access_auth: 104KB md + 16KB json (md needs grep)\na02_misconfiguration: 55KB md + 17KB json (md needs grep)\na04_cryptographic: 54KB md + 17KB json (md needs grep)\na05_injection: 74KB md + 17KB json (md needs grep)\na08_integrity: 58KB md + 17KB json (md needs grep)\na09_logging_alerting: 32KB md + 17KB json (readable)\na10_exceptional: 50KB md + 20KB json (md needs grep)\n\n=== TOOL LOGS (large, grep only) ===\na01_a07_access_auth/tool-log.md: 223KB\na02_misconfiguration/tool-log.md: 175KB\na04_cryptographic/tool-log.md: 44KB\na05_injection/tool-log.md: 132KB\na08_integrity/tool-log.md: 53KB\na09_logging_alerting/tool-log.md: 56KB\na10_exceptional/tool-log.md: 193KB\nblazor_wasm/tool-log.md: 88KB\nconsolidate_findings/tool-log.md: 20KB\n\n=== SMALL SCRATCHPAD FILES (readable) ===\nweb_discovery/agent-0..6.md: 1-4KB each\nweb_discovery/inventory.md: 2KB\na02_misconfiguration/evidence.md: 3KB\n\n=== DECOMPILED SOURCE ===\nACorpBlazor.Client.0txltpxuvt.decompiled.cs: 11KB\nACorpBlazor.6tqtyltacp.decompiled.cs: 24KB\n\n=== BINARIES (already exist) ===\n/tmp/a04_blazor/ACorpBlazor.dll: 23KB\n/tmp/a04_blazor/ACorpBlazor.Client.dll: 10KB",
+    "category": "info",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1"
+    }
+  },
+  "aes_key_telemetrycodec": {
+    "content": "CRITICAL: Hardcoded AES-256 key in TelemetryCodec.DefaultProfile: \"Vu1nB1az0r$ecretKey!2026@@@@@@@@\"\n\nDEMONSTRATED: Key used in AES-CBC mode with random IV prepended to ciphertext. Successfully decrypted lastSeenToken from GetUserInfo endpoint.\n\nSource: ACorpBlazor.dll (decompiled), TelemetryCodec class, line ~630.\nAlgorithm: AES-256-CBC, PKCS7 padding, IV prepended to ciphertext, base64 encoded.",
+    "category": "credential",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "username": "TelemetryCodec",
+      "password": "Vu1nB1az0r$ecretKey!2026@@@@@@@@"
+    }
+  },
+  "creds_employee_authenticated": {
+    "content": "CONFIRMED AUTHENTICATED: employee@email.com:p@55wOrd - Password decrypted from lastSeenToken using TelemetryCodec AES key. POST /auth/login returns userId=029d65c2-bd85-483f-8ef2-6f5f87e9bf84, roles=[\"Employee\"]. Chain: GetUserInfo(id)\u2192lastSeenToken\u2192TelemetryCodec.Decrypt(key=\"Vu1nB1az0r$ecretKey!2026@@@@@@@@\")\u2192p@55wOrd\u2192auth success.",
+    "category": "credential",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "source": "127.0.0.1",
+      "target": "127.0.0.1",
+      "username": "employee@email.com",
+      "password": "p@55wOrd"
+    }
+  },
+  "adversarial_verdicts_status": {
+    "content": "Pipeline Gap Identified: adversarial_verdicts.md exists but is incomplete. Only 2 of ~11 claims verified (V1: AES key CONFIRMED, V2: Password decryption CONFIRMED). Phase interrupted after 16m 13s (max loops). Raw notes contain all findings with structured metadata - data preserved but adversarial verification verdicts missing for remaining 9+ claims. Draft report findings: 1. Missing Auth on Critical Endpoints, 2. Broken RBAC, 3. Hardcoded Key, 4. Plaintext Password Retrieval, 5. Stored XSS, 6. User Data/Hash Leak, 7. API Docs Exposure, 8. WASM Assembly Exposure, 9. Dev Environment Exposed, 10. Anonymous Todo Modification, 11. No Rate Limiting. Verdicts needed for claims 3-11 (V3-V11).",
+    "category": "info",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1"
+    }
+  }
+}

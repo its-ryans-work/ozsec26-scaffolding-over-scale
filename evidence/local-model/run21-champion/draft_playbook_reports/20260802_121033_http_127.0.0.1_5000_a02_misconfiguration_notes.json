@@ -1,0 +1,71 @@
+{
+  "secret_aes_key": {
+    "content": "Hardcoded AES-256 symmetric key in TelemetryCodec class: 'Vu1nB1az0r$ecretKey!2026@@@@@@@@' (32 bytes). Used for AES-CBC-2 encryption of telemetry data. Found in ACorpBlazor shared assembly.",
+    "category": "credential",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "username": "TelemetryCodec",
+      "password": "Vu1nB1az0r$ecretKey!2026@@@@@@@@"
+    }
+  },
+  "api_endpoints_from_decompile": {
+    "content": "API endpoints discovered from decompiled client assembly: BatchRequest POST /api/batch (Action+Payload), GET/POST /bookings, GET /bookings/{Id}, PATCH /booking/{Id}, DELETE /booking/{Id} [Manager], GET /coupons, GET /hello/{Name}, GET/POST/PUT/DELETE /todos, GET /users/id/{Id}, GET /users/info/{UserId}, SendEmail [InternalOnly]",
+    "category": "finding",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000",
+      "url": "http://127.0.0.1:5000/api/batch",
+      "endpoints": [
+        {
+          "path": "/api/batch",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/bookings",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/coupons",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/todos",
+          "methods": [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE"
+          ]
+        },
+        {
+          "path": "/users/info/{UserId}",
+          "methods": [
+            "GET"
+          ]
+        }
+      ]
+    }
+  },
+  "batch_endpoint_dispatch": {
+    "content": "BatchRequest endpoint (POST /api/batch) accepts Action (string) and Payload (string) fields. Likely dispatches to internal service handlers. Payload may need TelemetryCodec encryption or be JSON. SendEmail is marked InternalOnly but may be callable via this dispatch mechanism.",
+    "category": "finding",
+    "confidence": "high",
+    "status": "open",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000",
+      "url": "http://127.0.0.1:5000/api/batch"
+    }
+  }
+}

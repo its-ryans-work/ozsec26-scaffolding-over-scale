@@ -1,0 +1,465 @@
+Loaded playbook: a02_misconfiguration
+Description: OWASP A02 Security Misconfiguration: exposed interfaces and metadata, verbose errors, default content, permissive CORS, missing hardening, and debug functionality reachable in production. 
+Mode: agent
+
+╭─────────────────────────────────────── Starting ───────────────────────────────────────╮
+│ PENTESTAGENT - Non-interactive Mode                                                    │
+│                                                                                        │
+│ Target: http://127.0.0.1:5000                                                          │
+│ Model: openai/qwen3.6-27b-fable                                                        │
+│ Mode: Agent                                                                            │
+│ Runtime: Local                                                                         │
+│ Max loops: 60                                                                          │
+│ Task: OWASP A02 Security Misconfiguration: exposed interfaces and metadata, verbose    │
+│ errors, default content, permissive CORS, missing hardening, and debug functionality   │
+│ reachable in production.                                                               │
+│                                                                                        │
+│ Phase: Exposed interfaces and content                                                  │
+│ Objective: Find what should not be reachable.                                          │
+│ Techniques:                                                                            │
+│   1. Probe for administrative, debug, health, metrics, profiler and documentation      │
+│ interfaces, and determine whether each requires authentication.                        │
+│   2. Look for framework metadata, schema or introspection endpoints that disclose the  │
+│ full API surface to anonymous callers.                                                 │
+│   3. Check for default, sample or installer content left in place, and for directory   │
+│ listings.                                                                              │
+│   4. Look for backup, temporary, versioned or editor artifacts beside known paths.     │
+│                                                                                        │
+│ Phase: Response hardening and policy                                                   │
+│ Objective: Assess configuration visible in responses.                                  │
+│ Techniques:                                                                            │
+│   1. Review security-relevant response headers and cookie attributes, and report what  │
+│ is missing rather than assuming exploitability.                                        │
+│   2. Test CORS behaviour with unexpected and null origins, and check whether           │
+│ credentials are permitted cross-origin.                                                │
+│   3. Check whether errors return stack traces, framework versions, file paths or       │
+│ internal hostnames.                                                                    │
+│   4. Note TLS and transport configuration where observable.                            │
+│                                                                                        │
+│ Phase: Prove impact, not presence                                                      │
+│ Objective: Distinguish a hardening gap from an exploitable flaw.                       │
+│ Techniques:                                                                            │
+│   1. A missing header is a hardening finding, not a vulnerability, unless you          │
+│ demonstrate what it enables. Say which you are reporting.                              │
+│   2. For any exposed interface, show what it actually discloses or allows, and run the │
+│ control test against an unauthenticated baseline.                                      │
+│                                                                                        │
+│ Phase: Verify before reporting                                                         │
+│ Objective: Apply the same evidence standard to every finding, so results are           │
+│ comparable across categories.                                                          │
+│ Techniques:                                                                            │
+│   1. PROOF DISCIPLINE - label every finding DEMONSTRATED (you executed it and the      │
+│ response proves it, quote that response), INFERRED (follows from evidence but was not  │
+│ executed), or UNVERIFIED (suspected from a version, component or code pattern only).   │
+│ Identifying software is never a demonstration; never write 'confirmed' without having  │
+│ executed something.                                                                    │
+│   2. RUN THE CONTROL TEST. Before claiming any access or bypass, repeat the request    │
+│ WITHOUT the credential, token, header or material you believe is responsible. If the   │
+│ result is the same, you have proven nothing - the resource was already reachable.      │
+│ State the control result alongside the finding. This single omission is the most       │
+│ common source of false critical findings.                                              │
+│   3. BUDGET DISCIPLINE - rank leads by evidence strength (material in hand > observed  │
+│ behaviour > suspicion from a version string) and give each a step budget. STOP RULE:   │
+│ about 8-10 consecutive steps on one lead with no new evidence means move on, recording │
+│ what you tried.                                                                        │
+│   4. Record findings to notes as you go, with the endpoint, the request, the response  │
+│ and the control result, so later phases and the report can use them.                   │
+│   5. Stay non-destructive: prefer read-only proof, do not modify or delete data, do    │
+│ not lock accounts, and stop once the point is demonstrated.                            │
+│                                                                                        │
+│                                                                                        │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+[00:00] Initializing...
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Plan:                                                                                  │
+│                                                                                        │
+│  1 Probe for exposed interfaces including admin, debug, health, metrics, profiler,     │
+│    documentation, and API introspection endpoints                                      │
+│  2 Test security headers, CORS behavior with unexpected/null origins, and cookie       │
+│    attributes across responses                                                         │
+│  3 Trigger error responses and check for verbose disclosure of stack traces, framework │
+│    versions, file paths, and internal hostnames                                        │
+│  4 Run control tests on all findings against unauthenticated baseline to verify access │
+│    is not already open                                                                 │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Starting Step 1: Probe for exposed interfaces (admin, debug, health, metrics,          │
+│ profiler, documentation, API introspection).                                           │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:12] $ terminal (1)
+         curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5000/
+         [+] OK
+Error executing tool terminal: 'command'
+Traceback (most recent call last):
+  File "/home/ryan/pentestagent/pentestagent/agents/base_agent.py", line 826, in _execute_single
+    result = await tool.execute(arguments, self.runtime)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/registry.py", line 60, in execute
+    return await self.execute_fn(arguments, runtime)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/registry.py", line 151, in wrapper
+    return await fn(arguments, runtime)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/terminal/__init__.py", line 45, in terminal
+    command = arguments["command"]
+              ~~~~~~~~~^^^^^^^^^^^
+KeyError: 'command'
+Tool execution failed (terminal): 'command'
+
+[00:57] $ terminal (2)
+         [!] 'command'
+Error executing tool terminal: 'command'
+Traceback (most recent call last):
+  File "/home/ryan/pentestagent/pentestagent/agents/base_agent.py", line 826, in _execute_single
+    result = await tool.execute(arguments, self.runtime)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/registry.py", line 60, in execute
+    return await self.execute_fn(arguments, runtime)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/registry.py", line 151, in wrapper
+    return await fn(arguments, runtime)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/terminal/__init__.py", line 45, in terminal
+    command = arguments["command"]
+              ~~~~~~~~~^^^^^^^^^^^
+KeyError: 'command'
+Tool execution failed (terminal): 'command'
+
+[01:45] $ terminal (3)
+         [!] 'command'
+Error executing tool terminal: 'command'
+Traceback (most recent call last):
+  File "/home/ryan/pentestagent/pentestagent/agents/base_agent.py", line 826, in _execute_single
+    result = await tool.execute(arguments, self.runtime)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/registry.py", line 60, in execute
+    return await self.execute_fn(arguments, runtime)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/registry.py", line 151, in wrapper
+    return await fn(arguments, runtime)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/terminal/__init__.py", line 45, in terminal
+    command = arguments["command"]
+              ~~~~~~~~~^^^^^^^^^^^
+KeyError: 'command'
+Tool execution failed (terminal): 'command'
+
+[02:46] $ terminal (4)
+         [!] 'command'
+Error executing tool terminal: 'command'
+Traceback (most recent call last):
+  File "/home/ryan/pentestagent/pentestagent/agents/base_agent.py", line 826, in _execute_single
+    result = await tool.execute(arguments, self.runtime)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/registry.py", line 60, in execute
+    return await self.execute_fn(arguments, runtime)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/registry.py", line 151, in wrapper
+    return await fn(arguments, runtime)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/terminal/__init__.py", line 45, in terminal
+    command = arguments["command"]
+              ~~~~~~~~~^^^^^^^^^^^
+KeyError: 'command'
+Tool execution failed (terminal): 'command'
+
+[03:40] $ terminal (5)
+         [!] 'command'
+Error executing tool terminal: 'command'
+Traceback (most recent call last):
+  File "/home/ryan/pentestagent/pentestagent/agents/base_agent.py", line 826, in _execute_single
+    result = await tool.execute(arguments, self.runtime)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/registry.py", line 60, in execute
+    return await self.execute_fn(arguments, runtime)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/registry.py", line 151, in wrapper
+    return await fn(arguments, runtime)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ryan/pentestagent/pentestagent/tools/terminal/__init__.py", line 45, in terminal
+    command = arguments["command"]
+              ~~~~~~~~~^^^^^^^^^^^
+KeyError: 'command'
+Tool execution failed (terminal): 'command'
+
+[04:29] $ terminal (6)
+         [!] 'command'
+
+[04:38] $ terminal (7)
+         curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5000/health
+         [+] OK
+
+[04:41] $ terminal (8)
+         curl -s -w "\n%{http_code}" http://127.0.0.1:5000/health | head -20
+         [+] OK
+
+[04:45] $ terminal (9)
+         for ep in /healthcheck /status /ready /live /metrics /admin /debug /profiler 
+/tr...
+         [+] OK
+
+[04:49] $ terminal (10)
+         for ep in /api/health /api/status /api/docs /api/debug /api/metrics /api/admin 
+/...
+         [+] OK
+
+[04:54] $ terminal (11)
+         for ep in /api/actuator /api/actuator/health /api/actuator/info 
+/api/actuator/en...
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Excellent findings. Multiple sensitive endpoints returning 200 unauthenticated. Now    │
+│ examining their actual content to determine what's disclosed.                          │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[04:59] $ terminal (12)
+         curl -s http://127.0.0.1:5000/metrics | head -50
+         [+] OK
+
+[05:10] $ terminal (13)
+         for ep in /health /healthcheck /status /ready /live /metrics /debug /profiler 
+/t...
+         [+] OK
+
+[05:20] $ terminal (14)
+         curl -s http://127.0.0.1:5000/actuator | head -50
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ All those "sensitive" paths return the same HTML SPA shell (~21.9KB) - this is a       │
+│ Blazor SPA doing client-side routing, not real backend endpoints. Now checking for     │
+│ actual API endpoints and the interesting redirect responses.                           │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[05:31] $ terminal (15)
+         curl -s -I http://127.0.0.1:5000/admin | grep -iE 
+"location|content-type|content...
+         [-] Exit 1
+
+[05:43] $ terminal (16)
+         curl -s -I http://127.0.0.1:5000/admin
+         [+] OK
+
+[05:53] $ terminal (17)
+         curl -s -I http://127.0.0.1:5000/swagger
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good - I have decompiled assemblies from a previous session. Let me use those plus     │
+│ continue probing. First, check the actual API endpoints and see if swagger is real.    │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[05:59] $ terminal (18)
+         curl -s -o /dev/null -w "%{http_code}" 
+"http://127.0.0.1:5000/swagger/index.html...
+         [+] OK
+
+[06:05] $ terminal (19)
+         curl -s http://127.0.0.1:5000/swagger/index.html | head -30
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good - I have decompiled assemblies from previous work. Let me use those to understand │
+│ the API surface.                                                                       │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[06:13] $ terminal (20)
+         grep -n "Route\|Url\|api/\|HttpGet\|HttpPost\|Patch\|Delete\|batch" 
+/tmp/client-...
+         [+] OK
+
+[06:19] $ terminal (21)
+         curl -s -w "\n%{http_code}" "http://127.0.0.1:5000/api/batch"
+         [+] OK
+
+[06:25] $ terminal (22)
+         curl -s http://127.0.0.1:5000/swagger/index.js | head -50
+         [+] OK
+
+[06:29] $ terminal (23)
+         curl -s -w "\n%{http_code}" "http://127.0.0.1:5000/swagger/v1/swagger.json" | 
+he...
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Excellent findings. Swagger UI and full OpenAPI spec exposed unauthenticated. Let me   │
+│ continue probing and check the admin redirect behavior.                                │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[06:44] $ terminal (24)
+         curl -s -L -o /dev/null -w "%{http_code} %{redirect_url}" 
+"http://127.0.0.1:5000...
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good. Let me continue probing for real backend endpoints and check what the SPA shell  │
+│ endpoints actually serve.                                                              │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[06:57] $ terminal (25)
+         curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:5000/hello/TestUser"
+         [+] OK
+
+[07:03] $ terminal (26)
+         curl -s "http://127.0.0.1:5000/hello/TestUser"
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good - I have the decompiled assemblies. Let me continue probing for exposed           │
+│ interfaces and then save findings.                                                     │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[07:13] $ terminal (27)
+         grep -n "Route\|api/\|batch\|Hello\|todos\|bookings\|users" 
+/tmp/client-assets/d...
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good - I have the decompiled assemblies from previous work. Let me continue probing    │
+│ for exposed interfaces and then save findings.                                         │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[07:24] $ terminal (28)
+         curl -s "http://127.0.0.1:5000/hello/TestUser.json"
+         [+] OK
+
+[07:31] $ terminal (29)
+         for ep in /bookings /bookings/1 /coupons /todos /todos/1 /users/id/1 
+/users/info...
+         [+] OK
+
+[07:38] $ terminal (30)
+         curl -s "http://127.0.0.1:5000/bookings.json" | python3 -m json.tool | head -40
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good progress. I found Swagger UI + OpenAPI spec exposed, plus multiple API endpoints  │
+│ returning real data unauthenticated. Now continuing with security headers and CORS     │
+│ testing.                                                                               │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[07:46] $ terminal (31)
+         curl -s -I "http://127.0.0.1:5000/" | head -30
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good - I've found multiple exposed interfaces. Let me save findings and continue with  │
+│ security headers/CORS testing.                                                         │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[07:51] $ terminal (32)
+         curl -s -I "http://127.0.0.1:5000/hello/TestUser.json" | head -30
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Now continuing - security headers, CORS, and error response testing. Let me first      │
+│ check the full response headers on API responses.                                      │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[07:57] $ terminal (33)
+         curl -s -I "http://127.0.0.1:5000/bookings.json"
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good - I have the decompiled assemblies from previous work. Let me continue from where │
+│ I left off with security headers and CORS testing.                                     │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[08:03] $ terminal (34)
+         curl -sv "http://127.0.0.1:5000/bookings.json" 2>&1 | grep -E "< 
+|Server:|X-Powe...
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good. Let me continue from where I left off. I've already identified several exposed   │
+│ interfaces. Now I'll check the actual content of key endpoints and proceed with        │
+│ security headers/CORS testing.                                                         │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[08:12] $ terminal (35)
+         curl -s "http://127.0.0.1:5000/coupons.json" | python3 -m json.tool | head -30
+         [+] OK
+
+[08:18] $ terminal (36)
+         curl -s "http://127.0.0.1:5000/coupons.json" | python3 -m json.tool | head -30
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good - session state confirms decompiled source is already available. Let me continue  │
+│ with the security misconfiguration testing.                                            │
+│                                                                                        │
+│ First, let me examine the decompiled source for more endpoint patterns and then        │
+│ proceed with security headers/CORS/error testing.                                      │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[08:28] $ terminal (37)
+         grep -n "Route\|api/\|batch\|Hello\|todos\|bookings\|users\|coupons" 
+/tmp/client...
+         [+] OK
+
+[08:36] $ terminal (38)
+         grep -n "Route\|api/\|batch\|Hello\|todos\|bookings\|users\|coupons" 
+/tmp/client...
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good - session state confirms decompiled source is already available. Let me continue  │
+│ with security misconfiguration testing from where I left off.                          │
+│                                                                                        │
+│ I've already found:                                                                    │
+│                                                                                        │
+│  1 Swagger UI exposed at /swagger/index.html (200)                                     │
+│  2 OpenAPI spec exposed at /swagger/v1/swagger.json (200) - full API surface disclosed │
+│  3 Multiple API endpoints returning real data unauthenticated:                         │
+│     • /bookings.json - booking data (names, room types, dates, costs)                  │
+│     • /coupons.json - discount codes                                                   │
+│     • /hello/{Name} - returns JSON response                                            │
+│     • /todos - todo items                                                              │
+│     • /users/id/1 - user data                                                          │
+│  4 Server headers disclose: Kestrel, ServiceStack/10.08, NET10, macOS, net10           │
+│                                                                                        │
+│ Now completing Step 1 findings, then moving to Step 2 (security headers/CORS).         │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[08:47] $ terminal (39)
+         curl -s "http://127.0.0.1:5000/users/id/1.json" | python3 -m json.tool | head 
+-3...
+         [+] OK
+
+[08:47] Max loops limit reached (60)
+[08:47] Synthesising report from notes...
+
+╭───────────────────────────────────── Interrupted ──────────────────────────────────────╮
+│ STOPPED (max loops reached)                                                            │
+│                                                                                        │
+│ Duration: 9m 34s                                                                       │
+│ Loops: 60/60                                                                           │
+│ Tools: 39                                                                              │
+│ Tokens: 1,202,961                                                                      │
+│                                                                                        │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+Report saved: 
+loot/assessments/20260802_100431_http_127.0.0.1_5000/draft_playbook_reports/20260802_12103
+3_http_127.0.0.1_5000_a02_misconfiguration.md

@@ -1,0 +1,230 @@
+Loaded playbook: a10_exceptional
+Description: OWASP A10 Mishandling of Exceptional Conditions: behaviour under malformed, oversized, wrong-type, boundary and empty input, including whether failures open rather than close access. 
+Mode: agent
+
+╭─────────────────────────────────────── Starting ───────────────────────────────────────╮
+│ PENTESTAGENT - Non-interactive Mode                                                    │
+│                                                                                        │
+│ Target: http://127.0.0.1:5000                                                          │
+│ Model: openai/qwen3.6-27b-fable                                                        │
+│ Mode: Agent                                                                            │
+│ Runtime: Local                                                                         │
+│ Max loops: 25                                                                          │
+│ Task: OWASP A10 Mishandling of Exceptional Conditions: behaviour under malformed,      │
+│ oversized, wrong-type, boundary and empty input, including whether failures open       │
+│ rather than close access.                                                              │
+│                                                                                        │
+│ Phase: Probe boundaries and malformed input                                            │
+│ Objective: Find where the application stops handling input gracefully.                 │
+│ Techniques:                                                                            │
+│   1. For representative endpoints, submit wrong types, empty values, missing required  │
+│ fields, extra unexpected fields, boundary numbers, and structurally malformed bodies.  │
+│   2. Try oversized values within reason - enough to test a limit, not enough to        │
+│ exhaust resources. Do not pursue denial of service.                                    │
+│   3. Record unhandled exceptions, stack traces, inconsistent status codes, and any     │
+│ response that discloses internal structure.                                            │
+│                                                                                        │
+│ Phase: Does failure open or close?                                                     │
+│ Objective: The security-relevant question.                                             │
+│ Techniques:                                                                            │
+│   1. Determine whether an error path skips a control - whether a malformed request     │
+│ reaches a handler that a well-formed one could not, or whether a failed check results  │
+│ in access rather than denial.                                                          │
+│   2. Where an error reveals interpreter or framework detail, record it as an oracle    │
+│ for injection and integrity testing.                                                   │
+│   3. Run the control test: the same request well-formed, reported alongside.           │
+│                                                                                        │
+│ Phase: Verify before reporting                                                         │
+│ Objective: Apply the same evidence standard to every finding, so results are           │
+│ comparable across categories.                                                          │
+│ Techniques:                                                                            │
+│   1. PROOF DISCIPLINE - label every finding DEMONSTRATED (you executed it and the      │
+│ response proves it, quote that response), INFERRED (follows from evidence but was not  │
+│ executed), or UNVERIFIED (suspected from a version, component or code pattern only).   │
+│ Identifying software is never a demonstration; never write 'confirmed' without having  │
+│ executed something.                                                                    │
+│   2. RUN THE CONTROL TEST. Before claiming any access or bypass, repeat the request    │
+│ WITHOUT the credential, token, header or material you believe is responsible. If the   │
+│ result is the same, you have proven nothing - the resource was already reachable.      │
+│ State the control result alongside the finding. This single omission is the most       │
+│ common source of false critical findings.                                              │
+│   3. BUDGET DISCIPLINE - rank leads by evidence strength (material in hand > observed  │
+│ behaviour > suspicion from a version string) and give each a step budget. STOP RULE:   │
+│ about 8-10 consecutive steps on one lead with no new evidence means move on, recording │
+│ what you tried.                                                                        │
+│   4. Record findings to notes as you go, with the endpoint, the request, the response  │
+│ and the control result, so later phases and the report can use them.                   │
+│   5. Stay non-destructive: prefer read-only proof, do not modify or delete data, do    │
+│ not lock accounts, and stop once the point is demonstrated.                            │
+│                                                                                        │
+│                                                                                        │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+[00:00] Initializing...
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Plan:                                                                                  │
+│                                                                                        │
+│  1 Submit malformed input (wrong types, empty values, boundary numbers, oversized      │
+│    data) to representative endpoints and record unhandled exceptions, stack traces,    │
+│    and status codes                                                                    │
+│  2 Test whether error paths bypass access controls by comparing malformed request      │
+│    behavior against well-formed requests to the same endpoint                          │
+│  3 Validate each finding with control tests (same request without credentials/tokens)  │
+│    and label as DEMONSTRATED, INFERRED, or UNVERIFIED                                  │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Starting OWASP A10 testing - Mishandling of Exceptional Conditions. Let me first       │
+│ explore the application endpoints and structure using the available decompiled code    │
+│ and live target.                                                                       │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:16] $ browser (1)
+         [*] Navigated to: http://127.0.0.1:5000/ Title: ACorp...
+
+[00:16] $ browser (2)
+         [*] Screenshot saved to: workspaces/vulnblazor/loot/artifacts/sc...
+
+[00:16] $ terminal (3)
+         grep -iE "endpoint|route|post|get|put|delete|api/" 
+/tmp/client-assets/decompiled...
+         [+] OK
+
+[00:23] $ terminal (4)
+         grep -E 'Route\(' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[00:28] $ browser (5)
+         [*] Navigated to: http://127.0.0.1:5000/ Title: ACorp...
+
+[00:28] $ browser (6)
+         [*] Screenshot saved to: workspaces/vulnblazor/loot/artifacts/sc...
+
+[00:28] $ terminal (7)
+         grep -E 'Route\(' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good - I can see the endpoints. Now I'll start Step 1: submitting malformed input      │
+│ across representative endpoints. Let me begin with malformed ID tests, boundary        │
+│ values, and then POST body manipulation.                                               │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:37] $ terminal (8)
+         echo "=== Test 1: Malformed ID types ===" && \
+echo "--- Empty ID ---" && \
+curl...
+         [+] OK
+
+[01:08] $ terminal (9)
+         echo "=== Test 2: Oversized / Injection inputs ===" && \
+echo "--- SQL injection...
+         [-] Exit 3
+
+[01:41] $ terminal (10)
+         echo "=== Test 2: Injection / oversized inputs ===" && \
+echo "--- SQL injection...
+         [+] OK
+
+[02:21] $ terminal (11)
+         echo "=== Test 3: More malformed inputs with JSON responses ===" && \
+echo "--- ...
+         [+] OK
+
+[03:11] $ notes (12)
+         [*] Error: At least one of 'services' or 'endpoints' or 'technol...
+
+[03:25] $ notes (13)
+         [*] Created note 'finding_stack_trace_leak' (artifact, confirmed...
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Now let me test malformed POST bodies and then move to Step 2 (failure open/close      │
+│ analysis).                                                                             │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[03:44] $ terminal (14)
+         echo "=== Test 4: Malformed POST bodies ===" && \
+echo "--- Booking with wrong t...
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good findings so far. Now Step 2: test whether error paths bypass access controls. Let │
+│ me find auth-protected endpoints and test malformed requests against them.             │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[03:56] $ terminal (15)
+         grep -iE "require|auth|admin|role|permission" 
+/tmp/client-assets/decompiled/ACor...
+         [+] OK
+
+[04:01] $ terminal (16)
+         grep -B5 -A10 'ValidateHasRole\|ValidateIsAdmin' 
+/tmp/client-assets/decompiled/A...
+         [+] OK
+
+[04:11] $ terminal (17)
+         echo "=== Test 5: Malformed inputs on todos and coupons ===" && \
+echo "--- Todo...
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good findings on Step 1. Now let me mark it complete and move to Step 2: testing       │
+│ whether error paths bypass access controls.                                            │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[04:23] $ finish (18)
+         [*] Step 1 complete Result: Tested malformed inputs across endpo...
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Step 2: Test whether error paths bypass access controls. Let me check the              │
+│ role-protected endpoints identified in the decompiled code: POST /bookings (Employee), │
+│ PATCH /booking/{Id} (Employee), DELETE /booking/{Id} (Manager), and QueryUsers         │
+│ (Admin).                                                                               │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[04:41] $ terminal (19)
+         echo "=== Step 2: Do error paths bypass access controls? ===" && \
+echo "--- Con...
+         [+] OK
+
+[04:52] $ terminal (20)
+         echo "=== Step 2: Test if malformed requests bypass auth on protected endpoints 
+...
+         [+] OK
+
+[05:07] $ terminal (21)
+         echo "=== Step 2 continued: Compare auth behavior on same endpoints ===" && \
+ec...
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Good progress on Step 1. Now Step 2: test whether error paths bypass access controls.  │
+│ Let me check the auth-protected endpoints identified in the decompiled code.           │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[05:25] Max loops limit reached (25)
+[05:25] Synthesising report from notes...
+
+╭───────────────────────────────────── Interrupted ──────────────────────────────────────╮
+│ STOPPED (max loops reached)                                                            │
+│                                                                                        │
+│ Duration: 6m 12s                                                                       │
+│ Loops: 25/25                                                                           │
+│ Tools: 21                                                                              │
+│ Tokens: 301,220                                                                        │
+│ Findings: 2                                                                            │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+Report saved: 
+loot/assessments/20260802_100431_http_127.0.0.1_5000/draft_playbook_reports/20260802_13125
+8_http_127.0.0.1_5000_a10_exceptional.md

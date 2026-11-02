@@ -1,0 +1,54 @@
+# gitleaks allowlist for this repository.
+#
+# This repository DELIBERATELY contains lab secrets. They are the exercise.
+# Every fingerprint below was reviewed by hand and is one of:
+#
+#   * the intentional hardcoded AES-256 key in
+#     target/VulnBlazor.ServiceModel/TelemetryCodec.cs -- the prize of the exercise;
+#   * a seeded lab account password, recovered by the agent runs and quoted as
+#     evidence in their reports;
+#   * an ASP.NET Identity PBKDF2 hash for one of those four seeded accounts;
+#   * a `lastSeenToken` / `EncryptedPassword` ciphertext from the lab target, or a
+#     lab account UUID.
+#
+# None of these has ever protected anything real. They were generated for a
+# disposable local target that no longer exists.
+#
+# Nothing else is allowlisted. If gitleaks reports a finding NOT in this file,
+# treat it as a genuine leak and investigate it.
+#
+# Regenerate after reviewing new findings:
+#   gitleaks dir . --no-banner -f json -r /tmp/leaks.json
+
+evidence/claude-code/bare/FINAL-REPORT.md:generic-api-key:159
+evidence/claude-code/bare/FINAL-REPORT.md:generic-api-key:160
+evidence/claude-code/bare/FINAL-REPORT.md:generic-api-key:236
+evidence/claude-code/bare/FINAL-REPORT.md:generic-api-key:50
+evidence/claude-code/bare/FINAL-REPORT.md:generic-api-key:51
+evidence/claude-code/playbook/FINAL-REPORT.md:generic-api-key:176
+evidence/claude-code/playbook/FINAL-REPORT.md:generic-api-key:413
+evidence/claude-code/playbook/FINAL-REPORT.md:generic-api-key:414
+evidence/claude-code/playbook/FINAL-REPORT.md:generic-api-key:415
+evidence/claude-code/playbook/FINAL-REPORT.md:generic-api-key:416
+evidence/claude-code/playbook/FINAL-REPORT.md:generic-api-key:92
+evidence/claude-code/source-leak-controls/run2-sonnet-read-the-source.md:generic-api-key:82
+evidence/claude-code/source-leak-controls/run2-sonnet-read-the-source.md:generic-api-key:83
+evidence/local-model/abc-replay-experiment/results/B-rep3/notes.json:generic-api-key:359
+evidence/local-model/run21-champion/draft_playbook_reports/20260802_120051_http_127.0.0.1_5000_a01_a07_access_auth.md:generic-api-key:1282
+evidence/local-model/run21-champion/draft_playbook_reports/20260802_120051_http_127.0.0.1_5000_a01_a07_access_auth.md:generic-api-key:1284
+evidence/local-model/run21-champion/draft_playbook_reports/20260802_134458_http_127.0.0.1_5000_chain_findings.md:generic-api-key:1723
+evidence/local-model/run21-champion/draft_playbook_reports/20260802_134458_http_127.0.0.1_5000_chain_findings.md:generic-api-key:1771
+evidence/local-model/run21-champion/draft_playbook_reports/20260802_134458_http_127.0.0.1_5000_chain_findings.md:generic-api-key:1809
+evidence/local-model/run21-champion/draft_playbook_reports/20260802_144800_http_127.0.0.1_5000_adversarial_review.md:generic-api-key:1035
+evidence/local-model/run21-champion/draft_playbook_reports/20260802_144800_http_127.0.0.1_5000_adversarial_review.md:generic-api-key:1048
+evidence/local-model/run21-champion/draft_playbook_reports/20260802_144800_http_127.0.0.1_5000_adversarial_review.md:generic-api-key:1070
+evidence/local-model/run21-champion/draft_playbook_reports/20260802_144800_http_127.0.0.1_5000_adversarial_review.md:generic-api-key:56
+evidence/local-model/run21-champion/final_deliverable/20260802_145715_http_127.0.0.1_5000_final_integrity_gate.md:generic-api-key:1683
+evidence/local-model/run21-champion/final_deliverable/20260802_145715_http_127.0.0.1_5000_final_integrity_gate.md:generic-api-key:1684
+evidence/local-model/run21-champion/final_deliverable/20260802_145715_http_127.0.0.1_5000_final_integrity_gate.md:generic-api-key:2077
+evidence/local-model/run21-champion/final_deliverable/20260802_145715_http_127.0.0.1_5000_final_integrity_gate.md:generic-api-key:2078
+evidence/local-model/run21-champion/final_deliverable/20260802_145715_http_127.0.0.1_5000_final_integrity_gate.md:generic-api-key:581
+evidence/local-model/run32-poc-win/logs/11-chain_findings.log:generic-api-key:465
+evidence/local-model/run32-poc-win/logs/11-chain_findings.log:generic-api-key:622
+evidence/local-model/run32-poc-win/logs/12-adversarial_review.log:generic-api-key:537
+evidence/local-model/run32-poc-win/notes.json:generic-api-key:214

@@ -1,0 +1,493 @@
+Loaded playbook: blazor_wasm
+Description: Assess a .NET application that ships assemblies to the client (Blazor WebAssembly and similar) for exposed secrets, and for server endpoints that trust client-derived material. The client download is unauthenticated: treat every assembly the browser receives as public, readable source. Decompile before analysing — searching raw binaries is not a substitute.
+Mode: agent
+
+╭───────────────────────────────────────────── Starting ─────────────────────────────────────────────╮
+│ PENTESTAGENT - Non-interactive Mode                                                                │
+│                                                                                                    │
+│ Target: http://127.0.0.1:5000                                                                      │
+│ Model: openai/qwen3.6-27b-fable                                                                    │
+│ Mode: Agent                                                                                        │
+│ Runtime: Local                                                                                     │
+│ Max loops: 60                                                                                      │
+│ Task: Assess a .NET application that ships assemblies to the client (Blazor WebAssembly and        │
+│ similar) for exposed secrets, and for server endpoints that trust client-derived material. The     │
+│ client download is unauthenticated: treat every assembly the browser receives as public, readable  │
+│ source. Decompile before analysing — searching raw binaries is not a substitute.                   │
+│                                                                                                    │
+│ Phase: Fingerprint the client-side .NET delivery                                                   │
+│ Objective: Decide whether .NET assemblies are shipped to the client, and find the manifest or      │
+│ loader that lists them. Filenames and layout vary by .NET version and by product — investigate     │
+│ what is actually served rather than assuming a fixed path.                                         │
+│ Techniques:                                                                                        │
+│   1. Read the site root and app host pages and look at how the app boots. A loader referencing     │
+│ WebAssembly means assemblies ship; a server-side render mode means they do not and this playbook   │
+│ does not apply. Newer unified loaders can mean either - determine which rather than guessing.      │
+│   2. Asset names are frequently fingerprinted with a content hash, so match on stems and patterns, │
+│ not exact filenames.                                                                               │
+│   3. Respect any <base href> - the framework directory is relative to it, so probe both the site   │
+│ root and the base path.                                                                            │
+│   4. Find the assembly inventory by whatever route exists: a boot manifest file, a boot config     │
+│ embedded in or fetched by the runtime JavaScript, or the loader script itself. If one route does   │
+│ not exist on this target, try the next; the loader must reference the assets somehow.              │
+│                                                                                                    │
+│ Phase: Prepare the decompilation toolchain                                                         │
+│ Objective: Get a working IL decompiler BEFORE analysing anything, then stop thinking about         │
+│ tooling. Skipping this produces false negatives; over-investing in it wastes the entire step       │
+│ budget.                                                                                            │
+│ Techniques:                                                                                        │
+│   1. Check what is already available in ONE compound command rather than a sequence of separate    │
+│ probes: look for common decompilers on PATH, in per-user tool directories, and for a .NET runtime. │
+│ Batch independent checks - you may also issue several tool calls in a single turn.                 │
+│   2. If a decompiler is present, immediately prove it actually runs (invoke its help or version).  │
+│ If it works, the toolchain is DONE: stop, record it, and move to the next phase. Do not install    │
+│ anything and do not evaluate alternatives. Toolchain hunting is the single largest time sink in    │
+│ this assessment.                                                                                   │
+│   3. Record the exact working invocation - including any environment prefix - both as a note and   │
+│ to a file on disk. THIS PHASE IS ONCE-ONLY: before any later tooling check or install, read that   │
+│ back and reuse it verbatim. A decompiler proven earlier in the session stays valid even if you no  │
+│ longer recall proving it.                                                                          │
+│   4. A .NET decompiler distributed as a managed tool needs a matching runtime. If it is found but  │
+│ refuses to launch complaining the runtime is missing, the runtime is usually present but           │
+│ undiscovered - set the appropriate environment variable to point at it and retry once before       │
+│ concluding it is unavailable.                                                                      │
+│   5. Only if nothing usable exists, install by the least invasive route available: an existing     │
+│ SDK's tool installer, the vendor's rootless install script, a distro package if the repo carries   │
+│ one, or a container image that already has the SDK. Stop at the first success.                     │
+│   6. NEVER GUESS A VERSION NUMBER. If an install fails, the usual cause is that the newest         │
+│ published release targets a newer runtime than the SDK installed here - so pinning an older        │
+│ release is right, but you must look up which releases exist instead of inventing one. Query the    │
+│ package feed for the actual version list, then choose from it. Version schemes vary and are not    │
+│ always three-part: a package may publish four-part versions, so a plausible-looking guess will     │
+│ simply not exist and every attempt will fail identically no matter how many you try.               │
+│   7. Check what runtime you actually have before choosing that version, and pick a release built   │
+│ for it rather than the newest one. Two failed installs of the same package mean your version       │
+│ string is wrong, not that the package is unavailable.                                              │
+│   8. HARD LIMIT: at most SIX install attempts across ALL routes for the entire assessment. Count   │
+│ them. On the sixth failure stop trying to install anything and go to the fallback below. A seventh │
+│ attempt has never once succeeded and the budget spent here is taken directly from finding          │
+│ vulnerabilities.                                                                                   │
+│   9. Two routes are forbidden because they cannot work and have wasted entire runs: (1) Python and │
+│ JavaScript package managers do not carry a .NET decompiler - `pip install` of anything             │
+│ decompiler-shaped is always wrong, whatever the name looks like; (2) do not clone or build a       │
+│ decompiler from source. If you have typed either, stop and go to the fallback.                     │
+│   10. REQUIRED FALLBACK, and it usually works: if no decompiler can be obtained, extract string    │
+│ literals directly from the assemblies as UTF-16. .NET stores literals in the #US metadata heap     │
+│ encoded UTF-16LE, so a default ASCII strings pass shows almost nothing and looks like the file     │
+│ holds no secrets - which is exactly the false negative that makes this step feel pointless. Use    │
+│ the little-endian 16-bit encoding option of your strings utility (on GNU binutils, the `-e l`      │
+│ flag). This is a last resort, not a substitute for decompiling: it recovers literal values but not │
+│ the code that uses them, so say in your findings that you could not decompile and note what that   │
+│ leaves unproven.                                                                                   │
+│   11. An IL disassembler is also an acceptable fallback if a C# decompiler cannot be obtained; say │
+│ so in your findings if you had to fall back.                                                       │
+│   12. Time-box this. Working decompiler: move on. Six failed install attempts: use the fallback,   │
+│ note the limitation, and CONTINUE THE ASSESSMENT - failing to obtain a tool is never a reason to   │
+│ end the run without analysing the assemblies you already hold.                                     │
+│                                                                                                    │
+│ Phase: Retrieve the shipped assemblies                                                             │
+│ Objective: Download what the browser actually receives.                                            │
+│ Techniques:                                                                                        │
+│   1. Read manifests with a real GET. A HEAD request returns headers only and tells you nothing     │
+│ about contents.                                                                                    │
+│   2. Prioritise application assemblies over framework/runtime ones. Shared libraries referenced by │
+│ both client and server are the highest-value targets, because developers often forget that half of │
+│ a shared project ships to the browser.                                                             │
+│   3. Verify each download is a real assembly and not an error page or empty file - check size and  │
+│ leading bytes. Keep everything in ONE working directory and do not re-download assemblies you      │
+│ already have; repeated downloads into new directories waste the budget.                            │
+│                                                                                                    │
+│ Phase: Decompile to source before searching                                                        │
+│ Objective: Convert retrieved assemblies to readable source. Do this first - analysis of raw        │
+│ binaries is unreliable.                                                                            │
+│ Techniques:                                                                                        │
+│   1. Decompile each assembly as the NEXT action after retrieving it. Do not search, grep or triage │
+│ the binaries first.                                                                                │
+│   2. Know whether your invocation produced a directory of sources or a single file, and remember   │
+│ which - later searching a path as if it were the other form silently returns nothing and looks     │
+│ like the decompile failed.                                                                         │
+│   3. Decompile EVERY application assembly retrieved, not just the first or the most obviously      │
+│ named. The entry-point client assembly often holds only UI code while the interesting material     │
+│ sits in a referenced shared library.                                                               │
+│                                                                                                    │
+│ Phase: Hunt secrets in the decompiled source                                                       │
+│ Objective: Find embedded credentials and sensitive material. Search along several INDEPENDENT axes │
+│ and iterate — no single pattern is sufficient, and you are expected to devise your own.            │
+│ Techniques:                                                                                        │
+│   1. Search the decompiled SOURCE, never the binaries, and always with line numbers so you can     │
+│ navigate to hits.                                                                                  │
+│   2. Cover these independent axes, designing patterns yourself and refining them as you learn what │
+│ this codebase looks like:                                                                          │
+│   - BY NAME: identifiers and comments suggesting credentials.                                      │
+│   - BY DECLARATION: compile-time constants and static readonly fields, which is where embedded     │
+│ values structurally live.                                                                          │
+│   - BY SHAPE: string literals that look like key material - long, unbroken, high-entropy,          │
+│ base64/hex-like, or padded/repeating.                                                              │
+│   - BY USE: cryptographic and auth APIs, and what gets passed to them.                             │
+│   - BY CONFIG: endpoints, hostnames and connection strings.                                        │
+│   3. TRACE INDIRECTION. A crypto call usually references an identifier rather than a literal. That │
+│ is a lead, not an answer: search for that identifier's definition and repeat until you reach the   │
+│ actual value. Expect several hops, and report the value, not the variable name.                    │
+│   4. Do not read whole decompiled files looking for secrets - they run to thousands of lines and   │
+│ output is truncated long before the interesting line. Search for candidates, then read only the    │
+│ surrounding lines of each hit.                                                                     │
+│   5. Record each finding with the assembly, namespace, type and member it came from, and note      │
+│ whether that assembly is referenced by the client directly or transitively - a secret in a shared  │
+│ library usually means nobody realised it shipped at all.                                           │
+│                                                                                                    │
+│ Phase: Exploit server trust in client material                                                     │
+│ Objective: Determine what the recovered material unlocks. A key is only a finding once you show    │
+│ what it grants.                                                                                    │
+│ Techniques:                                                                                        │
+│   1. Enumerate the API surface before choosing a target - the endpoint that trusts this material   │
+│ may not be the obvious one, and may appear in API metadata or a schema document you already have.  │
+│   2. Reimplement the client's routine from the decompiled source exactly; the client code is the   │
+│ specification.                                                                                     │
+│   3. Exercise the endpoint with attacker-controlled input protected by the recovered material, and │
+│ compare against what an unauthenticated caller gets without it.                                    │
+│   4. Inspect responses for data the public API does not otherwise expose - credentials, tokens,    │
+│ internal identifiers, or fields absent from the documented contract.                               │
+│                                                                                                    │
+│                                                                                                    │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+[MCP] Connected to kali with 24 tools
+MCP: 24 tool(s) from 1 server(s)
+[00:00] Initializing...
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Plan:                                                                                              │
+│                                                                                                    │
+│  1 Fingerprint client-side .NET delivery: examine site root, app host pages, and loader scripts to │
+│    determine if assemblies are shipped to the client and locate the assembly manifest or inventory │
+│  2 Prepare decompilation toolchain: check for existing IL decompiler on PATH and tool directories, │
+│    verify it runs, and record the exact working invocation; if none exists, install via least      │
+│    invasive route with hard limit of six attempts                                                  │
+│  3 Retrieve and decompile assemblies: download assemblies listed in manifest via real GET          │
+│    requests, verify they are valid assemblies, then decompile each to readable source before any   │
+│    analysis                                                                                        │
+│  4 Hunt secrets in decompiled source: search along multiple axes (by name, declaration, shape,     │
+│    use, config) for embedded credentials and sensitive material, tracing indirection to find       │
+│    actual values                                                                                   │
+│  5 Exploit server trust in client material: enumerate API surface, reimplement client routines     │
+│    from decompiled source, and test endpoints with recovered material to determine what it unlocks │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Starting Phase 1: Fingerprint the client-side .NET delivery. I'll examine the site root and app    │
+│ host pages to understand how the app boots.                                                        │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:32] $ mcp_kali_web_capture (tool 1, iter 3/60)
+         [*] {   "command": "webcapture http://127.0.0.1:5000 --browser c...
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Key finding: This is Blazor WebAssembly - assemblies ARE shipped to the client. I can see          │
+│ _framework/blazor.web.2i0r6wwb69.js (the Blazor WASM loader) and Blazor-enhanced-nav header. Now I │
+│ need to find the assembly manifest. Let me probe the _framework/ directory.                        │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:42] $ terminal (tool 2, iter 5/60)
+         curl -s http://127.0.0.1:5000/_framework/ 2>&1 | head -100
+         [+] OK
+
+[00:42] $ terminal (tool 3, iter 5/60)
+         curl -s http://127.0.0.1:5000/_framework/blazor.boot.json 2>&1
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Found the Blazor WASM boot manifest at _framework/blazor.boot.json. This confirms:                 │
+│                                                                                                    │
+│  • Main assembly: ACorpBlazor.Client.0txltpxuvt.dll                                                │
+│  • Shared library (high-value target): ACorpBlazor.6tqtyltacp.dll                                  │
+│  • ~200+ assemblies shipped to client with content-hashed filenames                                │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:58] $ finish (tool 4, iter 7/60)
+         [*] Step 1 complete Result: Fingerprinted client-side .NET deliv...
+
+[01:27] $ terminal (tool 5, iter 8/60)
+         sed -i 's/- [ \] 1. Fingerprint/- [x] 1. Fingerprint/' /home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/blazor_wasm/TODO.md && head -10 /home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/blazor_wasm/TODO.md
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Now Step 2: Prepare the decompilation toolchain. Let me check what IL decompilers are available on │
+│ this Kali system.                                                                                  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[02:01] $ terminal (tool 6, iter 10/60)
+         which ilspycmd ilspy dnspy dotpeek monodis ildasm csc dotnet 2>&1; echo "---"; dpkg -l | grep -iE 'ilspy|dnspy|dotpeek|mono-devel|dotnet-sdk' 2>&1 | tail -20; echo "---"; ls /usr/bin/*ilspy* /usr/bin/*dnspy* /usr/bin/*dotpeek* /usr/bin/*mono* /usr/bin/*ildasm* 2>&1 | head -20
+         [+] OK
+
+[02:32] $ terminal (tool 7, iter 11/60)
+         apt list --installed 2>/dev/null | grep -iE 'mono|dotnet|ildasm|ilspy|dnspy|decompiler' | head -20; echo "---"; ls /usr/lib/mono/ 2>&1 | head -20; echo "---"; mono --version 2>&1 | head -3
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Mono is installed but no IL decompiler found. Let me check if Ildasm is available through Mono and │
+│ look for other options.                                                                            │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[02:42] $ terminal (tool 8, iter 13/60)
+         find /usr -name "ildasm*" -o -name "ilspycmd*" -o -name "dnspy*" -o -name "dotpeek*" 2>/dev/null | head -10; echo "---"; ls /usr/share/mono*/ 2>&1 | head -20; echo "---"; find /usr -name "ildasm.exe" 2>/dev/null
+         [-] Exit 1
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ No decompiler installed. Let me search apt for available options (least invasive route).           │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[02:45] $ terminal (tool 9, iter 15/60)
+         apt-cache search -i "decompiler\|ilspy\|dnspy\|dotpeek\|ildasm" 2>&1 | head -20
+         [+] OK
+
+[02:52] $ terminal (tool 10, iter 16/60)
+         apt-cache search decompiler 2>&1 | head -20; echo "---"; apt-cache search ilspy 2>&1; echo "---"; apt-cache search mono-devel 2>&1 | head -5
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ No decompiler packages in apt. Let me check if dotnet tool route is viable or if I should go with  │
+│ the vendor's install script.                                                                       │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[03:00] $ terminal (tool 11, iter 18/60)
+         dotnet --version 2>&1; echo "---"; dotnet --list-runtimes 2>&1; echo "---"; dotnet --list-sdks 2>&1
+         [-] Exit 127
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ No dotnet CLI available. Let me check the Mono development tools that might include Ildasm, and    │
+│ also look for standalone decompiler binaries.                                                      │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[03:13] $ terminal (tool 12, iter 20/60)
+         find /usr/lib/mono -name "*.exe" | grep -iE 'ildasm|disasm|decompile' 2>/dev/null; echo "---"; ls /usr/lib/mono/4.5/*.exe 2>&1 | head -20
+         [+] OK
+
+[03:13] $ web_search (tool 13, iter 20/60)
+         [*] Error: TAVILY_API_KEY environment variable not set. Get a fr...
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ No dotnet CLI and no decompiler packages in apt. I need to install one. Let me try the ILSpy CLI   │
+│ tool - I'll look for the latest available version that works with Mono. Let me check what releases │
+│ exist.                                                                                             │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[03:22] $ terminal (tool 14, iter 22/60)
+         curl -s "https://api.github.com/repos/icsharpcode/ILSpy/releases/latest" | grep -oP '"tag_name":\s*"\K[^"]+' 2>&1
+         [+] OK
+
+[03:22] $ terminal (tool 15, iter 22/60)
+         curl -sL "https://api.github.com/repos/icsharpcode/ILSpy/releases" 2>&1 | grep -oP '"tag_name":\s*"\K[^"]+' | head -10
+         [+] OK
+
+[03:27] $ terminal (tool 16, iter 23/60)
+         apt-cache search dotnet | grep -iE 'runtime|sdk' | head -10
+         [+] OK
+
+[03:36] $ terminal (tool 17, iter 24/60)
+         curl -sL "https://packages.microsoft.com/config/debian/12/prod.list" 2>&1 | head -20
+         [+] OK
+
+[03:36] $ terminal (tool 18, iter 24/60)
+         cat /etc/os-release | grep -E 'ID|VERSION' | head -5
+         [+] OK
+
+[03:41] $ terminal (tool 19, iter 25/60)
+         mono --version 2>&1 | head -1; echo "---"; dpkg -l | grep mono | grep -E 'mono-runtime|mono-devel' | head -5
+         [+] OK
+
+[03:49] $ terminal (tool 20, iter 26/60)
+         which ilspycmd ilspy dnspy dotpeek ilasm ildasm mono-csc 2>&1; echo "---PATH---"; ls /usr/bin/*ilspy* /usr/bin/*dnspy* /usr/bin/*dotpeek* /usr/bin/*ildasm* 2>&1; echo "---HOME---"; ls ~/.local/bin/*ilspy* ~/.local/bin/*dnspy* ~/.local/bin/*dotpeek* 2>&1; echo "---TOOLS---"; ls ~/.dotnet/tools/*ilspy* ~/.dotnet/tools/*dnspy* 2>&1; echo "---MONO---"; mono --version 2>&1 | head -3
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Found ilspycmd at /home/ryan/.dotnet/tools/ilspycmd. Let me verify it runs.                        │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[03:52] $ terminal (tool 21, iter 28/60)
+         /home/ryan/.dotnet/tools/ilspycmd --version 2>&1; echo "---"; /home/ryan/.dotnet/tools/ilspycmd --help 2>&1 | head -30
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ ILSpy is installed but needs .NET 8 runtime. Let me install the runtime from Microsoft's repo.     │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[03:56] $ terminal (tool 22, iter 30/60)
+         curl -sL https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -o /tmp/packages-microsoft-prod.deb && dpkg -i /tmp/packages-microsoft-prod.deb && apt-get update -qq && apt-cache search dotnet | grep -iE 'runtime|sdk' | head -20 2>&1
+         [-] Exit 2
+
+[04:02] $ terminal (tool 23, iter 31/60)
+         find /usr -name "libhostfxr.so" 2>/dev/null; echo "---"; find /usr -name "libcoreclr.so" 2>/dev/null; echo "---"; find /usr -type d -name "dotnet" 2>/dev/null
+         [-] Exit 1
+
+[04:05] $ terminal (tool 24, iter 32/60)
+         ls -la /usr/share/dotnet/ 2>&1; echo "---"; /usr/share/dotnet/dotnet --list-runtimes 2>&1; echo "---"; /usr/share/dotnet/dotnet --version 2>&1
+         [-] Exit 127
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Checkpoint answers:                                                                                │
+│                                                                                                    │
+│  1 Established: ILSpy CLI exists at ~/.dotnet/tools/ilspycmd but needs .NET 8 runtime;             │
+│    /usr/share/dotnet/ is empty (no dotnet binary); dpkg requires sudo which I don't have. The      │
+│    existing ILSpy won't work without runtime.                                                      │
+│  2 Decision: Continue this lead ONE more attempt - try rootless .NET runtime install to $HOME      │
+│    (doesn't need sudo). If this fails, I immediately fall back to strings -e l on raw assemblies.  │
+│    This is attempt #1 of 6.                                                                        │
+│  3 Notes needed: Boot manifest and Blazor WASM confirmation not yet saved. Let me do that plus the │
+│    toolchain status.                                                                               │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[04:23] $ notes (tool 25, iter 34/60)
+         [*] Created note 'blazor_manifest_found' (artifact, confirmed)...
+
+[04:44] $ terminal (tool 26, iter 35/60)
+         export DOTNET_ROOT="$HOME/.dotnet" && mkdir -p "$DOTNET_ROOT" && curl -sSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh && chmod +x /tmp/dotnet-install.sh && /tmp/dotnet-install.sh --channel 8.0 --runtime dotnet --install-dir "$DOTNET_ROOT" --no-path --no-cdn --verbose 2>&1 | tail -30
+         [+] OK
+
+[04:48] $ terminal (tool 27, iter 36/60)
+         export DOTNET_ROOT="$HOME/.dotnet" && mkdir -p "$DOTNET_ROOT" && /tmp/dotnet-install.sh --channel 8.0 --runtime dotnet --install-dir "$DOTNET_ROOT" --no-path --verbose 2>&1 | tail -40
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ .NET 8 runtime is already installed. Now let me verify ilspycmd works with it.                     │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[04:51] $ terminal (tool 28, iter 38/60)
+         export DOTNET_ROOT="$HOME/.dotnet" && export PATH="$DOTNET_ROOT:$PATH" && ilspycmd --version 2>&1; echo "---"; ilspycmd --help 2>&1 | head -40
+         [+] OK
+
+[04:57] $ terminal (tool 29, iter 39/60)
+         tail -200 /home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/blazor_wasm/tool-log.md
+         [+] OK
+
+[05:04] $ terminal (tool 30, iter 40/60)
+         export DOTNET_ROOT="$HOME/.dotnet" && /home/ryan/.dotnet/tools/ilspycmd --version 2>&1
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ ILSpy works with DOTNET_ROOT set. Now I'll record the exact working invocation and mark step 2     │
+│ complete.                                                                                          │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[05:08] $ terminal (tool 31, iter 42/60)
+         export DOTNET_ROOT="$HOME/.dotnet" && /home/ryan/.dotnet/tools/ilspycmd --help 2>&1 | head -40
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Step 2 is complete - ILSpy works with DOTNET_ROOT. Let me record it and move on.                   │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[05:18] $ finish (tool 32, iter 44/60)
+         [*] Step 2 complete Result: Found ILSpy CLI at /home/ryan/.dotne...
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Good - Step 2 is complete. Moving to Step 3: Retrieve the shipped assemblies. I'll parse the boot  │
+│ manifest and download the high-value application assemblies.                                       │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[05:45] $ terminal (tool 33, iter 46/60)
+         mkdir -p /home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/blazor_wasm/assemblies && cd /home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/blazor_wasm/assemblies && curl -s http://127.0.0.1:5000/_framework/blazor.boot.json | python3 -c "import json,sys; d=json.load(sys.stdin); print('Main:', d['mainAssemblyName']); print(  ... [+88 chars]
+         [+] OK
+
+[05:52] $ terminal (tool 34, iter 47/60)
+         cd /home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/blazor_wasm/assemblies && curl -s http://127.0.0.1:5000/_framework/blazor.boot.json | python3 -c "import json,sys; d=json.load(sys.stdin); [print('/_framework/' + k) for k in d['resources']['assembly'].keys() if k.startswith('ACorpBlazor')]"
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Found exactly 2 application assemblies: ACorpBlazor.Client and ACorpBlazor (shared library -       │
+│ highest value). Let me download and verify them.                                                   │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[05:58] $ terminal (tool 35, iter 49/60)
+         cd /home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/blazor_wasm/assemblies && curl -sO http://127.0.0.1:5000/_framework/ACorpBlazor.Client.0txltpxuvt.dll && curl -sO http://127.0.0.1:5000/_framework/ACorpBlazor.6tqtyltacp.dll && ls -la *.dll && file *.dll && xxd ACorpBlazor.Client.0txltpxuvt.dll | head -2 && xxd ACorpBlazor.6tqtyltacp.dll | head -2
+         [+] OK
+
+[06:07] $ terminal (tool 36, iter 50/60)
+         cd /home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/blazor_wasm && export DOTNET_ROOT="$HOME/.dotnet" && mkdir -p decompiled/ACorpBlazor.Shared && /home/ryan/.dotnet/tools/ilspycmd -o decompiled/ACorpBlazor.Shared assemblies/ACorpBlazor.6tqtyltacp.dll 2>&1
+         [+] OK
+
+[06:11] $ finish (tool 37, iter 51/60)
+         [*] Step 3 complete Result: Downloaded 2 application assemblies ...
+
+[06:37] $ terminal (tool 38, iter 52/60)
+         cd /home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/blazor_wasm && sed -i 's/- [ \] 1. Fingerprint/- [x] 1. Fingerprint/' TODO.md && sed -i 's/- [ \] 2. Prepare/- [x] 2. Prepare/' TODO.md && sed -i 's/- [ \] 3. Retrieve/- [x] 3. Retrieve/' TODO.md && head -10 TODO.md
+         [+] OK
+
+[06:42] $ terminal (tool 39, iter 53/60)
+         cd /home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/blazor_wasm && ls -la decompiled/ACorpBlazor.Shared/*.cs 2>&1 | head -20
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Step 3 is complete (retrieve assemblies), and I've already started step 4 (decompile). Let me      │
+│ finish decompiling both assemblies and then mark step 4 complete before moving to secret hunting.  │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[06:51] $ terminal (tool 40, iter 55/60)
+         cd /home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/blazor_wasm && export DOTNET_ROOT="$HOME/.dotnet" && mkdir -p decompiled/ACorpBlazor.Client && /home/ryan/.dotnet/tools/ilspycmd -o decompiled/ACorpBlazor.Client assemblies/ACorpBlazor.Client.0txltpxuvt.dll 2>&1 && ls -la decompiled/ACorpBlazor.Client/*.cs 2>&1
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Checkpoint answers:                                                                                │
+│                                                                                                    │
+│  1 Established: ILSpy v9.0.0 works with DOTNET_ROOT. Both assemblies decompiled successfully to    │
+│    readable source: ACorpBlazor.Shared → single file (24KB), ACorpBlazor.Client → single file      │
+│    (11KB). Ready for secret hunting.                                                               │
+│  2 Move to step 5 immediately - decompilation done, secrets are the objective. Shared library      │
+│    ACorpBlazor.Shared is highest value target (developers forget it ships to browser).             │
+│                                                                                                    │
+│ 2b. Steps 5 and 6 are too coarse. Splitting now.                                                   │
+│                                                                                                    │
+│  3 Will save decompiled source info as note.                                                       │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[07:01] $ finish (tool 41, iter 57/60)
+         [*] Step 4 complete Result: Decompiled both assemblies with ILSp...
+
+[07:27] $ terminal (tool 42, iter 58/60)
+         cd /home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/blazor_wasm && grep -n -i 'password\|secret\|key\|token\|credential\|auth\|api_key\|apikey\|connection_string\|connstr\|db_password\|admin' decompiled/ACorpBlazor.Shared/ACorpBlazor.6tqtyltacp.decompiled.cs
+         [+] OK
+
+╭─────────────────────────────────────────── PentestAgent ───────────────────────────────────────────╮
+│ Found the secret! The shared library contains an embedded symmetric encryption key. Let me read    │
+│ the context around those lines.                                                                    │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[07:36] $ terminal (tool 43, iter 60/60)
+         cd /home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/blazor_wasm && sed -n '615,700p' decompiled/ACorpBlazor.Shared/ACorpBlazor.6tqtyltacp.decompiled.cs
+         [+] OK
+
+[07:36] Max loops limit reached (60)
+[07:36] Synthesising report from notes...
+
+╭─────────────────────────────────────────── Interrupted ────────────────────────────────────────────╮
+│ STOPPED (max loops reached)                                                                        │
+│                                                                                                    │
+│ Duration: 8m 37s                                                                                   │
+│ Loops: 60/60                                                                                       │
+│ Tools: 43                                                                                          │
+│ Tokens: 1,536,999                                                                                  │
+│ Findings: 1                                                                                        │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+Report saved: 
+loot/assessments/20260805_091525_http_127.0.0.1_5000/draft_playbook_reports/20260805_105251_http_127.0
+.0.1_5000_blazor_wasm.md

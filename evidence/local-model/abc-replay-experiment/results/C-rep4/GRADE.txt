@@ -1,0 +1,11 @@
+variant        : C
+rep            : 4
+elapsed_s      : 3464
+iterations     : iter 80/80
+DECRYPTED      : 0
+accounts_decrypted: 
+key_6at        : 0
+key_8at        : 0
+reread_literal : 0
+hashcat_effort : 52
+notes_written  : 24

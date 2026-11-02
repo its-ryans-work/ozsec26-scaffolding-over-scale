@@ -1,0 +1,219 @@
+[
+ {
+  "playbook": "a01_a07_access_auth",
+  "phase": "Authentication and session handling",
+  "idx": 3,
+  "words": 20,
+  "runs": 7
+ },
+ {
+  "playbook": "a04_cryptographic",
+  "phase": "Assess how cryptography is used",
+  "idx": 3,
+  "words": 30,
+  "runs": 7
+ },
+ {
+  "playbook": "a04_cryptographic",
+  "phase": "Join the key to the material",
+  "idx": 1,
+  "words": 41,
+  "runs": 7
+ },
+ {
+  "playbook": "a04_cryptographic",
+  "phase": "Join the key to the material",
+  "idx": 6,
+  "words": 20,
+  "runs": 7
+ },
+ {
+  "playbook": "a08_integrity",
+  "phase": "Test carefully and honestly",
+  "idx": 3,
+  "words": 30,
+  "runs": 7
+ },
+ {
+  "playbook": "a09_logging_alerting",
+  "phase": "Observable reaction to security events",
+  "idx": 3,
+  "words": 21,
+  "runs": 7
+ },
+ {
+  "playbook": "adversarial_review",
+  "phase": "Attempt to refute each claim",
+  "idx": 4,
+  "words": 33,
+  "runs": 7
+ },
+ {
+  "playbook": "blazor_wasm",
+  "phase": "Decompile to source before searching",
+  "idx": 2,
+  "words": 42,
+  "runs": 7
+ },
+ {
+  "playbook": "blazor_wasm",
+  "phase": "Decompile to source before searching",
+  "idx": 4,
+  "words": 32,
+  "runs": 7
+ },
+ {
+  "playbook": "blazor_wasm",
+  "phase": "Decompile to source before searching",
+  "idx": 5,
+  "words": 78,
+  "runs": 7
+ },
+ {
+  "playbook": "blazor_wasm",
+  "phase": "Exploit server trust in client material",
+  "idx": 4,
+  "words": 19,
+  "runs": 7
+ },
+ {
+  "playbook": "blazor_wasm",
+  "phase": "Exploit server trust in client material",
+  "idx": 6,
+  "words": 15,
+  "runs": 7
+ },
+ {
+  "playbook": "blazor_wasm",
+  "phase": "Fingerprint the client-side .NET delivery",
+  "idx": 5,
+  "words": 33,
+  "runs": 7
+ },
+ {
+  "playbook": "blazor_wasm",
+  "phase": "Hunt secrets in the decompiled source",
+  "idx": 3,
+  "words": 62,
+  "runs": 7
+ },
+ {
+  "playbook": "blazor_wasm",
+  "phase": "Hunt secrets in the decompiled source",
+  "idx": 4,
+  "words": 59,
+  "runs": 7
+ },
+ {
+  "playbook": "blazor_wasm",
+  "phase": "Hunt secrets in the decompiled source",
+  "idx": 5,
+  "words": 47,
+  "runs": 7
+ },
+ {
+  "playbook": "blazor_wasm",
+  "phase": "Retrieve the shipped assemblies",
+  "idx": 3,
+  "words": 17,
+  "runs": 7
+ },
+ {
+  "playbook": "blazor_wasm",
+  "phase": "Retrieve the shipped assemblies",
+  "idx": 4,
+  "words": 23,
+  "runs": 7
+ },
+ {
+  "playbook": "chain_findings",
+  "phase": "Chain findings into higher severity",
+  "idx": 4,
+  "words": 32,
+  "runs": 7
+ },
+ {
+  "playbook": "chain_findings",
+  "phase": "Chain findings into higher severity",
+  "idx": 7,
+  "words": 25,
+  "runs": 7
+ },
+ {
+  "playbook": "chain_findings",
+  "phase": "Inventory what is already known",
+  "idx": 6,
+  "words": 14,
+  "runs": 7
+ },
+ {
+  "playbook": "chain_findings",
+  "phase": "Inventory what is already known",
+  "idx": 7,
+  "words": 53,
+  "runs": 7
+ },
+ {
+  "playbook": "chain_findings",
+  "phase": "Inventory what is already known",
+  "idx": 8,
+  "words": 36,
+  "runs": 7
+ },
+ {
+  "playbook": "chain_findings",
+  "phase": "Inventory what is already known",
+  "idx": 12,
+  "words": 27,
+  "runs": 7
+ },
+ {
+  "playbook": "consolidate_findings",
+  "phase": "Normalise into one list",
+  "idx": 1,
+  "words": 27,
+  "runs": 7
+ },
+ {
+  "playbook": "consolidate_findings",
+  "phase": "Normalise into one list",
+  "idx": 3,
+  "words": 25,
+  "runs": 7
+ },
+ {
+  "playbook": "consolidate_findings",
+  "phase": "Process one source, record, then move on",
+  "idx": 3,
+  "words": 57,
+  "runs": 7
+ },
+ {
+  "playbook": "consolidate_findings",
+  "phase": "Process one source, record, then move on",
+  "idx": 4,
+  "words": 35,
+  "runs": 7
+ },
+ {
+  "playbook": "consolidate_findings",
+  "phase": "Record to notes",
+  "idx": 3,
+  "words": 46,
+  "runs": 7
+ },
+ {
+  "playbook": "consolidate_findings",
+  "phase": "Record to notes",
+  "idx": 4,
+  "words": 26,
+  "runs": 7
+ },
+ {
+  "playbook": "web_discovery",
+  "phase": "Enumerate the surface",
+  "idx": 4,
+  "words": 19,
+  "runs": 7
+ }
+]

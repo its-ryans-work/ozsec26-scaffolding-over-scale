@@ -1,0 +1,11 @@
+variant        : B
+rep            : 2
+elapsed_s      : 4681
+iterations     : iter 79/80
+DECRYPTED      : 15
+accounts_decrypted: admin employee 
+key_6at        : 0
+key_8at        : 4
+reread_literal : 0
+hashcat_effort : 1
+notes_written  : 23

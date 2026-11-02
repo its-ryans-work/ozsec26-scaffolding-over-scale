@@ -1,0 +1,11 @@
+variant        : C
+rep            : 2
+elapsed_s      : 2347
+iterations     : iter 80/80
+DECRYPTED      : 6
+accounts_decrypted: employee 
+key_6at        : 0
+key_8at        : 5
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 23

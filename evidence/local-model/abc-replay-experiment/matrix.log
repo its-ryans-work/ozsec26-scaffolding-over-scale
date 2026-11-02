@@ -1,0 +1,431 @@
+[2026-08-05 23:28:28] skip A-rep1 (already graded)
+[2026-08-05 23:28:28] skip B-rep1 (already graded)
+[2026-08-05 23:28:28] === C-rep1 ===
+  variant C: chain_findings=44 techniques (want 44), checkpoint_item4=True (want True)  OK
+[23:28:28] C rep1 - inputs restored (22 notes)
+variant        : C
+rep            : 1
+elapsed_s      : 3732
+iterations     : iter 79/80
+DECRYPTED      : 6
+accounts_decrypted: admin 
+key_6at        : 0
+key_8at        : 1
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 25
+[2026-08-06 00:30:40] --- round 1 complete ---
+    A-rep1    decrypted=19   key8=1   key6=2   reread=2   hashcat=0    618s
+    B-rep1    decrypted=0    key8=1   key6=0   reread=1   hashcat=16   3615s
+    C-rep1    decrypted=6    key8=1   key6=0   reread=0   hashcat=0    3732s
+[2026-08-06 00:30:40] === A-rep2 ===
+  variant A: chain_findings=44 techniques (want 44), checkpoint_item4=False (want False)  OK
+[00:30:40] A rep2 - inputs restored (22 notes)
+variant        : A
+rep            : 2
+elapsed_s      : 4160
+iterations     : iter 80/80
+DECRYPTED      : 2
+accounts_decrypted: 
+key_6at        : 5
+key_8at        : 3
+reread_literal : 1
+hashcat_effort : 6
+notes_written  : 22
+[2026-08-06 01:40:00] === B-rep2 ===
+  variant B: chain_findings=43 techniques (want 43), checkpoint_item4=False (want False)  OK
+[01:40:01] B rep2 - inputs restored (22 notes)
+variant        : B
+rep            : 2
+elapsed_s      : 4681
+iterations     : iter 79/80
+DECRYPTED      : 15
+accounts_decrypted: admin employee 
+key_6at        : 0
+key_8at        : 4
+reread_literal : 0
+hashcat_effort : 1
+notes_written  : 23
+[2026-08-06 02:58:02] === C-rep2 ===
+  variant C: chain_findings=44 techniques (want 44), checkpoint_item4=True (want True)  OK
+[02:58:02] C rep2 - inputs restored (22 notes)
+variant        : C
+rep            : 2
+elapsed_s      : 2347
+iterations     : iter 80/80
+DECRYPTED      : 6
+accounts_decrypted: employee 
+key_6at        : 0
+key_8at        : 5
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 23
+[2026-08-06 03:37:09] --- round 2 complete ---
+    A-rep1    decrypted=19   key8=1   key6=2   reread=2   hashcat=0    618s
+    A-rep2    decrypted=2    key8=3   key6=5   reread=1   hashcat=6    4160s
+    B-rep1    decrypted=0    key8=1   key6=0   reread=1   hashcat=16   3615s
+    B-rep2    decrypted=15   key8=4   key6=0   reread=0   hashcat=1    4681s
+    C-rep1    decrypted=6    key8=1   key6=0   reread=0   hashcat=0    3732s
+    C-rep2    decrypted=6    key8=5   key6=0   reread=0   hashcat=0    2347s
+[2026-08-06 03:37:09] === A-rep3 ===
+  variant A: chain_findings=44 techniques (want 44), checkpoint_item4=False (want False)  OK
+[03:37:09] A rep3 - inputs restored (22 notes)
+variant        : A
+rep            : 3
+elapsed_s      : 4991
+iterations     : iter 80/80
+DECRYPTED      : 0
+accounts_decrypted: 
+key_6at        : 2
+key_8at        : 2
+reread_literal : 1
+hashcat_effort : 14
+notes_written  : 26
+[2026-08-06 05:00:20] === B-rep3 ===
+  variant B: chain_findings=43 techniques (want 43), checkpoint_item4=False (want False)  OK
+[05:00:20] B rep3 - inputs restored (22 notes)
+variant        : B
+rep            : 3
+elapsed_s      : 2705
+iterations     : iter 78/80
+DECRYPTED      : 6
+accounts_decrypted: employee 
+key_6at        : 0
+key_8at        : 2
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 24
+[2026-08-06 05:45:25] === C-rep3 ===
+  variant C: chain_findings=44 techniques (want 44), checkpoint_item4=True (want True)  OK
+[05:45:25] C rep3 - inputs restored (22 notes)
+variant        : C
+rep            : 3
+elapsed_s      : 1085
+iterations     : iter 53/80
+DECRYPTED      : 5
+accounts_decrypted: 
+key_6at        : 0
+key_8at        : 3
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 23
+[2026-08-06 06:03:30] --- round 3 complete ---
+    A-rep1    decrypted=19   key8=1   key6=2   reread=2   hashcat=0    618s
+    A-rep2    decrypted=2    key8=3   key6=5   reread=1   hashcat=6    4160s
+    A-rep3    decrypted=0    key8=2   key6=2   reread=1   hashcat=14   4991s
+    B-rep1    decrypted=0    key8=1   key6=0   reread=1   hashcat=16   3615s
+    B-rep2    decrypted=15   key8=4   key6=0   reread=0   hashcat=1    4681s
+    B-rep3    decrypted=6    key8=2   key6=0   reread=0   hashcat=0    2705s
+    C-rep1    decrypted=6    key8=1   key6=0   reread=0   hashcat=0    3732s
+    C-rep2    decrypted=6    key8=5   key6=0   reread=0   hashcat=0    2347s
+    C-rep3    decrypted=5    key8=3   key6=0   reread=0   hashcat=0    1085s
+[2026-08-06 06:03:30] === A-rep4 ===
+  variant A: chain_findings=44 techniques (want 44), checkpoint_item4=False (want False)  OK
+[06:03:30] A rep4 - inputs restored (22 notes)
+variant        : A
+rep            : 4
+elapsed_s      : 3205
+iterations     : iter 79/80
+DECRYPTED      : 9
+accounts_decrypted: admin 
+key_6at        : 0
+key_8at        : 0
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 27
+[2026-08-06 06:56:55] === B-rep4 ===
+  variant B: chain_findings=43 techniques (want 43), checkpoint_item4=False (want False)  OK
+[06:56:56] B rep4 - inputs restored (22 notes)
+variant        : B
+rep            : 4
+elapsed_s      : 3307
+iterations     : iter 79/80
+DECRYPTED      : 27
+accounts_decrypted: admin employee 
+key_6at        : 1
+key_8at        : 2
+reread_literal : 1
+hashcat_effort : 0
+notes_written  : 23
+[2026-08-06 07:52:03] === C-rep4 ===
+  variant C: chain_findings=44 techniques (want 44), checkpoint_item4=True (want True)  OK
+[07:52:03] C rep4 - inputs restored (22 notes)
+variant        : C
+rep            : 4
+elapsed_s      : 3464
+iterations     : iter 80/80
+DECRYPTED      : 0
+accounts_decrypted: 
+key_6at        : 0
+key_8at        : 0
+reread_literal : 0
+hashcat_effort : 52
+notes_written  : 24
+[2026-08-06 08:49:47] --- round 4 complete ---
+    A-rep1    decrypted=19   key8=1   key6=2   reread=2   hashcat=0    618s
+    A-rep2    decrypted=2    key8=3   key6=5   reread=1   hashcat=6    4160s
+    A-rep3    decrypted=0    key8=2   key6=2   reread=1   hashcat=14   4991s
+    A-rep4    decrypted=9    key8=0   key6=0   reread=0   hashcat=0    3205s
+    B-rep1    decrypted=0    key8=1   key6=0   reread=1   hashcat=16   3615s
+    B-rep2    decrypted=15   key8=4   key6=0   reread=0   hashcat=1    4681s
+    B-rep3    decrypted=6    key8=2   key6=0   reread=0   hashcat=0    2705s
+    B-rep4    decrypted=27   key8=2   key6=1   reread=1   hashcat=0    3307s
+    C-rep1    decrypted=6    key8=1   key6=0   reread=0   hashcat=0    3732s
+    C-rep2    decrypted=6    key8=5   key6=0   reread=0   hashcat=0    2347s
+    C-rep3    decrypted=5    key8=3   key6=0   reread=0   hashcat=0    1085s
+    C-rep4    decrypted=0    key8=0   key6=0   reread=0   hashcat=52   3464s
+[2026-08-06 08:49:48] === A-rep5 ===
+  variant A: chain_findings=44 techniques (want 44), checkpoint_item4=False (want False)  OK
+[08:49:48] A rep5 - inputs restored (22 notes)
+variant        : A
+rep            : 5
+elapsed_s      : 3831
+iterations     : iter 80/80
+DECRYPTED      : 20
+accounts_decrypted: admin manager 
+key_6at        : 0
+key_8at        : 5
+reread_literal : 0
+hashcat_effort : 1
+notes_written  : 23
+[2026-08-06 09:53:39] === B-rep5 ===
+  variant B: chain_findings=43 techniques (want 43), checkpoint_item4=False (want False)  OK
+[09:53:40] B rep5 - inputs restored (22 notes)
+variant        : B
+rep            : 5
+elapsed_s      : 3730
+iterations     : iter 79/80
+DECRYPTED      : 16
+accounts_decrypted: admin employee 
+key_6at        : 5
+key_8at        : 1
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 25
+[2026-08-06 10:55:50] === C-rep5 ===
+  variant C: chain_findings=44 techniques (want 44), checkpoint_item4=True (want True)  OK
+[10:55:51] C rep5 - inputs restored (22 notes)
+variant        : C
+rep            : 5
+elapsed_s      : 273
+iterations     : iter 12/80
+DECRYPTED      : 0
+accounts_decrypted: 
+key_6at        : 0
+key_8at        : 0
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 23
+[2026-08-06 11:00:24] --- round 5 complete ---
+    A-rep1    decrypted=19   key8=1   key6=2   reread=2   hashcat=0    618s
+    A-rep2    decrypted=2    key8=3   key6=5   reread=1   hashcat=6    4160s
+    A-rep3    decrypted=0    key8=2   key6=2   reread=1   hashcat=14   4991s
+    A-rep4    decrypted=9    key8=0   key6=0   reread=0   hashcat=0    3205s
+    A-rep5    decrypted=20   key8=5   key6=0   reread=0   hashcat=1    3831s
+    B-rep1    decrypted=0    key8=1   key6=0   reread=1   hashcat=16   3615s
+    B-rep2    decrypted=15   key8=4   key6=0   reread=0   hashcat=1    4681s
+    B-rep3    decrypted=6    key8=2   key6=0   reread=0   hashcat=0    2705s
+    B-rep4    decrypted=27   key8=2   key6=1   reread=1   hashcat=0    3307s
+    B-rep5    decrypted=16   key8=1   key6=5   reread=0   hashcat=0    3730s
+    C-rep1    decrypted=6    key8=1   key6=0   reread=0   hashcat=0    3732s
+    C-rep2    decrypted=6    key8=5   key6=0   reread=0   hashcat=0    2347s
+    C-rep3    decrypted=5    key8=3   key6=0   reread=0   hashcat=0    1085s
+    C-rep4    decrypted=0    key8=0   key6=0   reread=0   hashcat=52   3464s
+    C-rep5    decrypted=0    key8=0   key6=0   reread=0   hashcat=0    273s
+
+[2026-08-06 11:00:24] MATRIX COMPLETE
+--- A-rep1 ---
+variant        : A
+rep            : 1
+elapsed_s      : 618
+iterations     : iter 80/80
+DECRYPTED      : 19
+accounts_decrypted: employee 
+key_6at        : 2
+key_8at        : 1
+reread_literal : 2
+hashcat_effort : 0
+notes_written  : 24
+
+--- A-rep2 ---
+variant        : A
+rep            : 2
+elapsed_s      : 4160
+iterations     : iter 80/80
+DECRYPTED      : 2
+accounts_decrypted: 
+key_6at        : 5
+key_8at        : 3
+reread_literal : 1
+hashcat_effort : 6
+notes_written  : 22
+
+--- A-rep3 ---
+variant        : A
+rep            : 3
+elapsed_s      : 4991
+iterations     : iter 80/80
+DECRYPTED      : 0
+accounts_decrypted: 
+key_6at        : 2
+key_8at        : 2
+reread_literal : 1
+hashcat_effort : 14
+notes_written  : 26
+
+--- A-rep4 ---
+variant        : A
+rep            : 4
+elapsed_s      : 3205
+iterations     : iter 79/80
+DECRYPTED      : 9
+accounts_decrypted: admin 
+key_6at        : 0
+key_8at        : 0
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 27
+
+--- A-rep5 ---
+variant        : A
+rep            : 5
+elapsed_s      : 3831
+iterations     : iter 80/80
+DECRYPTED      : 20
+accounts_decrypted: admin manager 
+key_6at        : 0
+key_8at        : 5
+reread_literal : 0
+hashcat_effort : 1
+notes_written  : 23
+
+--- B-rep1 ---
+variant        : B
+rep            : 1
+elapsed_s      : 3615
+iterations     : iter 80/80
+DECRYPTED      : 0
+accounts_decrypted: 
+key_6at        : 0
+key_8at        : 1
+reread_literal : 1
+hashcat_effort : 16
+notes_written  : 22
+
+--- B-rep2 ---
+variant        : B
+rep            : 2
+elapsed_s      : 4681
+iterations     : iter 79/80
+DECRYPTED      : 15
+accounts_decrypted: admin employee 
+key_6at        : 0
+key_8at        : 4
+reread_literal : 0
+hashcat_effort : 1
+notes_written  : 23
+
+--- B-rep3 ---
+variant        : B
+rep            : 3
+elapsed_s      : 2705
+iterations     : iter 78/80
+DECRYPTED      : 6
+accounts_decrypted: employee 
+key_6at        : 0
+key_8at        : 2
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 24
+
+--- B-rep4 ---
+variant        : B
+rep            : 4
+elapsed_s      : 3307
+iterations     : iter 79/80
+DECRYPTED      : 27
+accounts_decrypted: admin employee 
+key_6at        : 1
+key_8at        : 2
+reread_literal : 1
+hashcat_effort : 0
+notes_written  : 23
+
+--- B-rep5 ---
+variant        : B
+rep            : 5
+elapsed_s      : 3730
+iterations     : iter 79/80
+DECRYPTED      : 16
+accounts_decrypted: admin employee 
+key_6at        : 5
+key_8at        : 1
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 25
+
+--- C-rep1 ---
+variant        : C
+rep            : 1
+elapsed_s      : 3732
+iterations     : iter 79/80
+DECRYPTED      : 6
+accounts_decrypted: admin 
+key_6at        : 0
+key_8at        : 1
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 25
+
+--- C-rep2 ---
+variant        : C
+rep            : 2
+elapsed_s      : 2347
+iterations     : iter 80/80
+DECRYPTED      : 6
+accounts_decrypted: employee 
+key_6at        : 0
+key_8at        : 5
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 23
+
+--- C-rep3 ---
+variant        : C
+rep            : 3
+elapsed_s      : 1085
+iterations     : iter 53/80
+DECRYPTED      : 5
+accounts_decrypted: 
+key_6at        : 0
+key_8at        : 3
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 23
+
+--- C-rep4 ---
+variant        : C
+rep            : 4
+elapsed_s      : 3464
+iterations     : iter 80/80
+DECRYPTED      : 0
+accounts_decrypted: 
+key_6at        : 0
+key_8at        : 0
+reread_literal : 0
+hashcat_effort : 52
+notes_written  : 24
+
+--- C-rep5 ---
+variant        : C
+rep            : 5
+elapsed_s      : 273
+iterations     : iter 12/80
+DECRYPTED      : 0
+accounts_decrypted: 
+key_6at        : 0
+key_8at        : 0
+reread_literal : 0
+hashcat_effort : 0
+notes_written  : 23
+

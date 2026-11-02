@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <DebugType>portable</DebugType>
+        <OutputType>Library</OutputType>
+        <RootNamespace>ACorpBlazor.Tests</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\VulnBlazor.ServiceInterface\VulnBlazor.ServiceInterface.csproj" />
+        <ProjectReference Include="..\VulnBlazor.ServiceModel\VulnBlazor.ServiceModel.csproj" />
+        <ProjectReference Include="..\VulnBlazor\VulnBlazor.csproj" />
+
+        <PackageReference Include="NUnit" Version="4.*" />
+        <PackageReference Include="NUnit3TestAdapter" Version="5.*" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.*" />
+        <PackageReference Include="ServiceStack" Version="10.*" />
+        <PackageReference Include="ServiceStack.Kestrel" Version="10.*" />
+    </ItemGroup>
+
+</Project>

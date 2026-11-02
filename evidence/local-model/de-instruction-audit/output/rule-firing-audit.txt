@@ -1,0 +1,730 @@
+techniques: 279 across 13 in-pipeline playbooks
+logs:       123 phase logs across 16 runs
+
+corpus:     186,298 words of agent output (banner stripped 105,754 words)
+logs per playbook: web_discovery=16, blazor_wasm=9, a01_a07_access_auth=9, a02_misconfiguration=9, a04_cryptographic=9, a05_injection=9, a08_integrity=9, a09_logging_alerting=9, a10_exceptional=9, consolidate_findings=9, chain_findings=9, adversarial_review=9, final_integrity_gate=8
+
+==============================================================================
+TIER SUMMARY
+==============================================================================
+  RESTATED   92  (33%)
+  TOPICAL    82  (29%)
+  NO-TRACE  105  (38%)
+
+==============================================================================
+BY PLAYBOOK
+==============================================================================
+playbook                  tot  rest  topi  none   dead%
+web_discovery              13     8     4     1      8%
+blazor_wasm                42    11    12    19     45%
+a01_a07_access_auth        18     6     8     4     22%
+a02_misconfiguration       15     7     4     4     27%
+a04_cryptographic          20     5     6     9     45%
+a05_injection              14     4     8     2     14%
+a08_integrity              12     4     3     5     42%
+a09_logging_alerting       12     4     2     6     50%
+a10_exceptional            11     3     3     5     45%
+consolidate_findings       21     8     7     6     29%
+chain_findings             50    14    10    26     52%
+adversarial_review         26     9     8     9     35%
+final_integrity_gate       25     9     7     9     36%
+
+==============================================================================
+PHASE POSITION OF DEAD RULES - unreached tail, or genuinely dead?
+==============================================================================
+
+web_discovery  (4 phases, 13 techniques)
+   1. Fingerprint the stack                          RRtt
+   2. Enumerate the surface                          RRR.
+   3. Collect the client payload                     Rtt
+   4. Write the inventory                            RR
+
+blazor_wasm  (6 phases, 42 techniques)
+   1. Fingerprint the client-side .NET delivery      RRtt.
+   2. Prepare the decompilation toolchain            RRRt........
+   3. Retrieve the shipped assemblies                Rtt..
+   4. Decompile to source before searching           ttt...
+   5. Hunt secrets in the decompiled source          RRRtt...
+   6. Exploit server trust in client material        RRtt..
+
+a01_a07_access_auth  (4 phases, 18 techniques)
+   1. Object and function level access               RRRtt
+   2. Authentication and session handling            Rttt.
+   3. Prove and bound the impact                     Rtt
+   4. Verify before reporting                        Rt...
+
+a02_misconfiguration  (4 phases, 15 techniques)
+   1. Exposed interfaces and content                 RRRt
+   2. Response hardening and policy                  RRtt
+   3. Prove impact, not presence                     Rt
+   4. Verify before reporting                        R....
+
+a04_cryptographic  (4 phases, 20 techniques)
+   1. Find embedded and exposed key material         Rt...
+   2. Assess how cryptography is used                Rtt.
+   3. Join the key to the material                   RRtt..
+   4. Verify before reporting                        Rt...
+
+a05_injection  (4 phases, 14 techniques)
+   1. Identify injection candidates                  Rtt
+   2. Confirm by differential behaviour              Rttt
+   3. Bound the impact                               Rt
+   4. Verify before reporting                        Rtt..
+
+a08_integrity  (3 phases, 12 techniques)
+   1. Find integrity assumptions                     RRR
+   2. Test carefully and honestly                    Rtt.
+   3. Verify before reporting                        t....
+
+a09_logging_alerting  (3 phases, 12 techniques)
+   1. Exposed logs and leaked material               RRt
+   2. Observable reaction to security events         RRt.
+   3. Verify before reporting                        .....
+
+a10_exceptional  (3 phases, 11 techniques)
+   1. Probe boundaries and malformed input           RRt
+   2. Does failure open or close?                    Rtt
+   3. Verify before reporting                        .....
+
+consolidate_findings  (4 phases, 21 techniques)
+   1. Inventory the sources                          RRttt
+   2. Process one source, record, then move on       RRtt..
+   3. Normalise into one list                        RRRt..
+   4. Record to notes                                Rt..
+
+chain_findings  (4 phases, 50 techniques)
+   1. Inventory what is already known                RRRRttt.....
+   2. Validate every finding against the live targ   RRRRtt.........
+   3. Chain findings into higher severity            RRRttt.....
+   4. Report chains with evidence and impact         RRRtt.......
+
+adversarial_review  (3 phases, 26 techniques)
+   1. Take the draft apart                           RRRRt
+   2. Attempt to refute each claim                   RRttt.
+   3. Return a verdict per claim                     RRRtttt........
+
+final_integrity_gate  (3 phases, 25 techniques)
+   1. Completeness check                             RRtt..
+   2. Evidence integrity check                       RRRtt.
+   3. Emit the final deliverable                     RRRRttt......
+
+  legend: R restated   t topical   . no trace
+
+==============================================================================
+NO-TRACE TECHNIQUES
+==============================================================================
+
+[a01_a07_access_auth / Authentication and session handling #3]  (20w, sig=['expires', 'reused', 'logout', 'survives', 'fixed', 'another'], cov=17%)
+  Test whether a session survives logout, whether it expires, and whether it can be fixed or reused from another context.
+
+[a01_a07_access_auth / Verify before reporting #1]  (49w, sig=['demonstration', 'identifying', 'software', 'follows', 'label', 'pattern'], cov=33%)
+  PROOF DISCIPLINE - label every finding DEMONSTRATED (you executed it and the response proves it, quote that response), INFERRED (follows from evidence but was not executed), or UNVERIFIED (suspected from a version, component or code pattern only). Identifying software is never a demonstration; never write 'confirmed' without having executed something.
+
+[a01_a07_access_auth / Verify before reporting #3]  (43w, sig=['suspicion', 'strength', 'consecutive', 'rule', '8-10', 'rank'], cov=17%)
+  BUDGET DISCIPLINE - rank leads by evidence strength (material in hand > observed behaviour > suspicion from a version string) and give each a step budget. STOP RULE: about 8-10 consecutive steps on one lead with no new evidence means move on, recording what you tried.
+
+[a01_a07_access_auth / Verify before reporting #4]  (27w, sig=[], cov=0%)
+  Record findings to notes as you go, with the endpoint, the request, the response and the control result, so later phases and the report can use them.
+
+[a02_misconfiguration / Verify before reporting #1]  (49w, sig=['demonstration', 'identifying', 'software', 'follows', 'label', 'pattern'], cov=17%)
+  PROOF DISCIPLINE - label every finding DEMONSTRATED (you executed it and the response proves it, quote that response), INFERRED (follows from evidence but was not executed), or UNVERIFIED (suspected from a version, component or code pattern only). Identifying software is never a demonstration; never write 'confirmed' without having executed something.
+
+[a02_misconfiguration / Verify before reporting #2]  (58w, sig=['omission', 'believe', 'false', 'responsible', 'alongside', 'claiming'], cov=17%)
+  RUN THE CONTROL TEST. Before claiming any access or bypass, repeat the request WITHOUT the credential, token, header or material you believe is responsible. If the result is the same, you have proven nothing - the resource was already reachable. State the control result alongside the finding. This single omission is the most common source of false critical findings.
+
+[a02_misconfiguration / Verify before reporting #4]  (27w, sig=[], cov=0%)
+  Record findings to notes as you go, with the endpoint, the request, the response and the control result, so later phases and the report can use them.
+
+[a02_misconfiguration / Verify before reporting #5]  (22w, sig=['non-destructive', 'delete', 'stay', 'lock', 'read-only', 'modify'], cov=33%)
+  Stay non-destructive: prefer read-only proof, do not modify or delete data, do not lock accounts, and stop once the point is demonstrated.
+
+[a04_cryptographic / Assess how cryptography is used #3]  (30w, sig=['adaptive', 'adequate', 'unsalted', 'hashing', 'modern', 'salted'], cov=17%)
+  For hashed material identify the algorithm and cost. Modern salted adaptive hashing should be reported as adequate; fast or unsalted hashing is a finding regardless of whether you crack it.
+
+[a04_cryptographic / Find embedded and exposed key material #1]  (16w, sig=['minified', 'bundles', 'hide', 'unpacked', 'raw', 'literals'], cov=17%)
+  Search decompiled or unpacked client artifacts - never the raw binaries or minified bundles, which hide literals.
+
+[a04_cryptographic / Find embedded and exposed key material #3]  (35w, sig=['name-based', 'obfuscated', 'declared', 'neutral', 'ignore', 'word'], cov=0%)
+  A name-based search is NOT evidence of absence: real secrets are often obfuscated so no dictionary word appears, and are declared under neutral names. The axes that ignore naming are the ones that find those.
+
+[a04_cryptographic / Find embedded and exposed key material #5]  (28w, sig=['mostly', 'provider', 'scanners', 'scanner', 'detect', 'running'], cov=33%)
+  Secret scanners are worth running as an extra signal but detect mostly known provider credential formats; a clean scanner result must never be reported as 'no secrets present'.
+
+[a04_cryptographic / Join the key to the material #1]  (40w, sig=['invalid', 'bug', 'whitespace', 'quotes', 'assert', 'strip'], cov=17%)
+  Before using a recovered secret: strip whitespace and quotes, print its length and bytes, and assert the length is valid for the algorithm. An invalid length means an extraction bug, not a wrong secret - go back and re-read the literal.
+
+[a04_cryptographic / Join the key to the material #6]  (19w, sig=['plaintext', 'testing', 'recovering', 'results', 'end', 'hand'], cov=33%)
+  If a plaintext credential results, hand it to authentication testing - recovering it is not the end of the chain.
+
+[a04_cryptographic / Verify before reporting #2]  (58w, sig=['omission', 'believe', 'false', 'responsible', 'alongside', 'claiming'], cov=0%)
+  RUN THE CONTROL TEST. Before claiming any access or bypass, repeat the request WITHOUT the credential, token, header or material you believe is responsible. If the result is the same, you have proven nothing - the resource was already reachable. State the control result alongside the finding. This single omission is the most common source of false critical findings.
+
+[a04_cryptographic / Verify before reporting #4]  (27w, sig=[], cov=0%)
+  Record findings to notes as you go, with the endpoint, the request, the response and the control result, so later phases and the report can use them.
+
+[a04_cryptographic / Verify before reporting #5]  (22w, sig=['non-destructive', 'delete', 'stay', 'lock', 'read-only', 'modify'], cov=33%)
+  Stay non-destructive: prefer read-only proof, do not modify or delete data, do not lock accounts, and stop once the point is demonstrated.
+
+[a05_injection / Verify before reporting #2]  (58w, sig=['omission', 'believe', 'false', 'responsible', 'alongside', 'claiming'], cov=33%)
+  RUN THE CONTROL TEST. Before claiming any access or bypass, repeat the request WITHOUT the credential, token, header or material you believe is responsible. If the result is the same, you have proven nothing - the resource was already reachable. State the control result alongside the finding. This single omission is the most common source of false critical findings.
+
+[a05_injection / Verify before reporting #4]  (27w, sig=[], cov=0%)
+  Record findings to notes as you go, with the endpoint, the request, the response and the control result, so later phases and the report can use them.
+
+[a08_integrity / Test carefully and honestly #3]  (30w, sig=['vulnerable-looking', 'presence', 'advisory', 'effect', 'unless', 'integrity'], cov=17%)
+  Presence of a vulnerable-looking component or version is not an integrity finding. Do not cite an advisory identifier unless you have executed it against this target and observed the effect.
+
+[a08_integrity / Verify before reporting #1]  (49w, sig=['demonstration', 'identifying', 'software', 'follows', 'label', 'pattern'], cov=33%)
+  PROOF DISCIPLINE - label every finding DEMONSTRATED (you executed it and the response proves it, quote that response), INFERRED (follows from evidence but was not executed), or UNVERIFIED (suspected from a version, component or code pattern only). Identifying software is never a demonstration; never write 'confirmed' without having executed something.
+
+[a08_integrity / Verify before reporting #2]  (58w, sig=['omission', 'believe', 'false', 'responsible', 'alongside', 'claiming'], cov=0%)
+  RUN THE CONTROL TEST. Before claiming any access or bypass, repeat the request WITHOUT the credential, token, header or material you believe is responsible. If the result is the same, you have proven nothing - the resource was already reachable. State the control result alongside the finding. This single omission is the most common source of false critical findings.
+
+[a08_integrity / Verify before reporting #3]  (43w, sig=['suspicion', 'strength', 'consecutive', 'rule', '8-10', 'rank'], cov=0%)
+  BUDGET DISCIPLINE - rank leads by evidence strength (material in hand > observed behaviour > suspicion from a version string) and give each a step budget. STOP RULE: about 8-10 consecutive steps on one lead with no new evidence means move on, recording what you tried.
+
+[a08_integrity / Verify before reporting #4]  (27w, sig=[], cov=0%)
+  Record findings to notes as you go, with the endpoint, the request, the response and the control result, so later phases and the report can use them.
+
+[a09_logging_alerting / Observable reaction to security events #3]  (20w, sig=['sufficient', 'alerting', 'generate', 'handful', 'events', 'volume'], cov=33%)
+  Do NOT generate volume to test alerting - a handful of events is sufficient and anything more risks denial of service.
+
+[a09_logging_alerting / Verify before reporting #1]  (49w, sig=['demonstration', 'identifying', 'software', 'follows', 'label', 'pattern'], cov=17%)
+  PROOF DISCIPLINE - label every finding DEMONSTRATED (you executed it and the response proves it, quote that response), INFERRED (follows from evidence but was not executed), or UNVERIFIED (suspected from a version, component or code pattern only). Identifying software is never a demonstration; never write 'confirmed' without having executed something.
+
+[a09_logging_alerting / Verify before reporting #2]  (58w, sig=['omission', 'believe', 'false', 'responsible', 'alongside', 'claiming'], cov=0%)
+  RUN THE CONTROL TEST. Before claiming any access or bypass, repeat the request WITHOUT the credential, token, header or material you believe is responsible. If the result is the same, you have proven nothing - the resource was already reachable. State the control result alongside the finding. This single omission is the most common source of false critical findings.
+
+[a09_logging_alerting / Verify before reporting #3]  (43w, sig=['suspicion', 'strength', 'consecutive', 'rule', '8-10', 'rank'], cov=17%)
+  BUDGET DISCIPLINE - rank leads by evidence strength (material in hand > observed behaviour > suspicion from a version string) and give each a step budget. STOP RULE: about 8-10 consecutive steps on one lead with no new evidence means move on, recording what you tried.
+
+[a09_logging_alerting / Verify before reporting #4]  (27w, sig=[], cov=0%)
+  Record findings to notes as you go, with the endpoint, the request, the response and the control result, so later phases and the report can use them.
+
+[a09_logging_alerting / Verify before reporting #5]  (22w, sig=['non-destructive', 'delete', 'stay', 'lock', 'read-only', 'modify'], cov=17%)
+  Stay non-destructive: prefer read-only proof, do not modify or delete data, do not lock accounts, and stop once the point is demonstrated.
+
+[a10_exceptional / Verify before reporting #1]  (49w, sig=['demonstration', 'identifying', 'software', 'follows', 'label', 'pattern'], cov=17%)
+  PROOF DISCIPLINE - label every finding DEMONSTRATED (you executed it and the response proves it, quote that response), INFERRED (follows from evidence but was not executed), or UNVERIFIED (suspected from a version, component or code pattern only). Identifying software is never a demonstration; never write 'confirmed' without having executed something.
+
+[a10_exceptional / Verify before reporting #2]  (58w, sig=['omission', 'believe', 'false', 'responsible', 'alongside', 'claiming'], cov=17%)
+  RUN THE CONTROL TEST. Before claiming any access or bypass, repeat the request WITHOUT the credential, token, header or material you believe is responsible. If the result is the same, you have proven nothing - the resource was already reachable. State the control result alongside the finding. This single omission is the most common source of false critical findings.
+
+[a10_exceptional / Verify before reporting #3]  (43w, sig=['suspicion', 'strength', 'consecutive', 'rule', '8-10', 'rank'], cov=17%)
+  BUDGET DISCIPLINE - rank leads by evidence strength (material in hand > observed behaviour > suspicion from a version string) and give each a step budget. STOP RULE: about 8-10 consecutive steps on one lead with no new evidence means move on, recording what you tried.
+
+[a10_exceptional / Verify before reporting #4]  (27w, sig=[], cov=0%)
+  Record findings to notes as you go, with the endpoint, the request, the response and the control result, so later phases and the report can use them.
+
+[a10_exceptional / Verify before reporting #5]  (22w, sig=['non-destructive', 'delete', 'stay', 'lock', 'read-only', 'modify'], cov=33%)
+  Stay non-destructive: prefer read-only proof, do not modify or delete data, do not lock accounts, and stop once the point is demonstrated.
+
+[adversarial_review / Attempt to refute each claim #4]  (33w, sig=['resting', 'regardless', 'require', 'otherwise', 'plausible', 'advisory'], cov=17%)
+  For any claim resting on a component, version or advisory identifier, require that it was executed against this target with the effect observed. Otherwise it is UNPROVEN regardless of how plausible it is.
+
+[adversarial_review / Return a verdict per claim #2]  (21w, sig=['occur', 'plus', 'requires', 'showing', 'yourself', 'obtained'], cov=33%)
+  CONFIRMED requires the request and response you obtained yourself, plus the control result showing it does not occur without the material.
+
+[adversarial_review / Return a verdict per claim #3]  (21w, sig=['typically', 'disproves', 'producing', 'reproduction', 'requires', 'fails'], cov=17%)
+  REFUTED requires the evidence that disproves it - typically a control test producing the same result, or a reproduction attempt that fails.
+
+[adversarial_review / Return a verdict per claim #9]  (64w, sig=['factor', 'lives', 'title', 'received', 'sections', 'below'], cov=17%)
+  Give every entry the same shape, one per claim: ID and short title; VERDICT (CONFIRMED / REFUTED / UNPROVEN); SEVERITY; the EVIDENCE quoted verbatim - the request sent, the response received, any value recovered - not a reference to where the evidence lives; CONTROL result; SCOPE (how many objects or accounts, and whether that was tested or inferred); REPRODUCTION steps; and the two factor section
+
+[adversarial_review / Return a verdict per claim #10]  (78w, sig=['combines', 'unlocks', 'combination', 'elsewhere', 'survives', 'neither'], cov=17%)
+  COMPOUNDING FACTORS - what this finding combines with. Name the other findings that make this one worse, and what the combination yields that neither gives alone. Material recovered here that unlocks a surface found elsewhere belongs here, quoting the recovered value. This is where a chain is recorded, and recording it against each part means it survives even if the phase that built the chain is c
+
+[adversarial_review / Return a verdict per claim #11]  (69w, sig=['achieved', 'attacker', 'attack', 'authenticating', 'precondition', 'mitigating'], cov=33%)
+  MITIGATING FACTORS - what this finding does NOT show. State the next step in the obvious attack that was not attempted or not achieved, any precondition an attacker still needs, and any control that limits it. Recovering a credential without authenticating with it, or reaching an endpoint without extracting from it, belongs here rather than being written up as though it were done. Write 'none iden
+
+[adversarial_review / Return a verdict per claim #12]  (37w, sig=['contains', 'pointer', 'long', 'open', 'full', 'even'], cov=33%)
+  Quote evidence in full even when it is long. The next phase can only report what this file contains, and a pointer to a file it will not open is the same as no evidence at all.
+
+[adversarial_review / Return a verdict per claim #14]  (48w, sig=['established', 'severities', 'assumption', 'inference', 'affects', 'labelled'], cov=33%)
+  State the SCOPE of every confirmed finding explicitly: how many objects, accounts or endpoints it affects, and whether you established that by testing or by inference. 'One account' and 'every account' are different findings at different severities, and an untested assumption about breadth must be labelled as one.
+
+[adversarial_review / Return a verdict per claim #15]  (46w, sig=['passing', 'four', 'validation', 'finishing', 'final', 'gate'], cov=33%)
+  Before finishing, verify each confirmed finding carries all four: scope, validation (including its control test), evidence (the actual request and response), and reproduction steps. Name any finding missing one of them rather than passing it through silently - the final gate cannot report what it cannot check.
+
+[blazor_wasm / Decompile to source before searching #2]  (42w, sig=['ascii-oriented', 'unreliable', 'raw-binary', 'inlined', 'tools', 'wide'], cov=17%)
+  Raw-binary searching is unreliable because .NET stores string literals in metadata in a wide encoding that ASCII-oriented tools miss, and because constants are inlined in ways raw bytes do not show. A clean result over a binary is NOT evidence of absence.
+
+[blazor_wasm / Decompile to source before searching #4]  (32w, sig=['redirected', 'really', 'exit', 'zero', 'leaving', 'place'], cov=33%)
+  Verify the output really is source before trusting it. A zero exit code can hide a failure when output was redirected into a file, leaving the error text in place of code.
+
+[blazor_wasm / Decompile to source before searching #5]  (76w, sig=['decompilation', 'abandoning', 'swallowed', 'exhausted', 'typical', 'causes'], cov=17%)
+  If a decompile appears to fail, FIX AND RETRY immediately rather than abandoning decompilation - typical causes are a missing output directory, an unset environment variable, or an error swallowed by a pipe. Do not settle for searching binaries INSTEAD of decompiling while a decompiler is still obtainable - but if every install route is exhausted, the UTF-16 literal extraction described in the too
+
+[blazor_wasm / Exploit server trust in client material #4]  (19w, sig=['authorisation', 'addressing', 'consider', 'signing', 'range', 'functionality'], cov=33%)
+  Consider the full range of trust a client secret can carry: authentication, authorisation, signing, encryption, or addressing internal functionality.
+
+[blazor_wasm / Exploit server trust in client material #6]  (15w, sig=['contrast', 'establish', 'impact', 'obtained', 'show', 'cannot'], cov=33%)
+  Establish impact by contrast: show the same result cannot be obtained without the recovered material.
+
+[blazor_wasm / Fingerprint the client-side .NET delivery #5]  (33w, sig=['build-output', 'frameworks', 'clickonce', 'delivery', 'archives', 'hybrid'], cov=33%)
+  The same exposure applies to other client-side .NET delivery (hybrid app web assets, WASM UI frameworks, ClickOnce, legacy plugin archives, or any exposed build-output directory). If IL is reachable by any route, continue.
+
+[blazor_wasm / Hunt secrets in the decompiled source #3]  (62w, sig=['hypothesis', 'constrain', 're-target', 'broaden', 'narrow', 'loosen'], cov=0%)
+  ITERATE. Treat each pass as a hypothesis: run it, look at what came back, then broaden, narrow or re-target based on the actual results. Keep going until a pass yields no new candidates. If an axis returns too much noise, constrain it (scope to application assemblies rather than large third-party ones); if it returns nothing, loosen it. One search is never enough.
+
+[blazor_wasm / Hunt secrets in the decompiled source #4]  (58w, sig=['profile', 'seed', 'name-based', 'obfuscated', 'declared', 'commonly'], cov=17%)
+  CRITICAL - a name-based search is NOT evidence of absence. Real embedded secrets are often obfuscated so that no dictionary word appears in the value, and are commonly declared under neutral names like Profile, Default, Config or Seed. The axes that ignore naming are the ones that find these, which is why you must not rely on naming alone.
+
+[blazor_wasm / Hunt secrets in the decompiled source #5]  (47w, sig=['purpose-built', 'providers', 'largely', 'bespoke', 'scanners', 'scanner'], cov=0%)
+  Purpose-built secret scanners may be available and are worth running as an extra signal, but they largely detect known credential formats belonging to known providers. They routinely report nothing for bespoke keys in decompiled code. A clean scanner result must never be reported as 'no secrets present'.
+
+[blazor_wasm / Prepare the decompilation toolchain #4]  (49w, sig=['undiscovered', 'distributed', 'complaining', 'appropriate', 'concluding', 'refuses'], cov=0%)
+  A .NET decompiler distributed as a managed tool needs a matching runtime. If it is found but refuses to launch complaining the runtime is missing, the runtime is usually present but undiscovered - set the appropriate environment variable to point at it and retry once before concluding it is unavailable.
+
+[blazor_wasm / Prepare the decompilation toolchain #5]  (46w, sig=['existing', 'invasive', 'rootless', 'distro', 'vendor', 'usable'], cov=33%)
+  Only if nothing usable exists, install by the least invasive route available: an existing SDK's tool installer, the vendor's rootless install script, a distro package if the repo carries one, or a container image that already has the SDK. Stop at the first success.
+
+[blazor_wasm / Prepare the decompilation toolchain #6]  (93w, sig=['plausible-looking', 'identically', 'three-part', 'installed', 'inventing', 'four-part'], cov=17%)
+  NEVER GUESS A VERSION NUMBER. If an install fails, the usual cause is that the newest published release targets a newer runtime than the SDK installed here - so pinning an older release is right, but you must look up which releases exist instead of inventing one. Query the package feed for the actual version list, then choose from it. Version schemes vary and are not always three-part: a package m
+
+[blazor_wasm / Prepare the decompilation toolchain #7]  (41w, sig=['installs', 'pick', 'choosing', 'release', 'newest', 'unavailable'], cov=0%)
+  Check what runtime you actually have before choosing that version, and pick a release built for it rather than the newest one. Two failed installs of the same package mean your version string is wrong, not that the package is unavailable.
+
+[blazor_wasm / Prepare the decompilation toolchain #8]  (49w, sig=['vulnerabilities', 'succeeded', 'seventh', 'trying', 'sixth', 'spent'], cov=0%)
+  HARD LIMIT: at most SIX install attempts across ALL routes for the entire assessment. Count them. On the sixth failure stop trying to install anything and go to the fallback below. A seventh attempt has never once succeeded and the budget spent here is taken directly from finding vulnerabilities.
+
+[blazor_wasm / Prepare the decompilation toolchain #9]  (59w, sig=['decompiler-shaped', 'managers', 'python', 'wasted', 'typed', 'clone'], cov=17%)
+  Two routes are forbidden because they cannot work and have wasted entire runs: (1) Python and JavaScript package managers do not carry a .NET decompiler - `pip install` of anything decompiler-shaped is always wrong, whatever the name looks like; (2) do not clone or build a decompiler from source. If you have typed either, stop and go to the fallback.
+
+[blazor_wasm / Prepare the decompilation toolchain #10]  (114w, sig=['little-endian', 'substitute', 'pointless', 'utf-16le', 'binutils', 'negative'], cov=0%)
+  REQUIRED FALLBACK, and it usually works: if no decompiler can be obtained, extract string literals directly from the assemblies as UTF-16. .NET stores literals in the #US metadata heap encoded UTF-16LE, so a default ASCII strings pass shows almost nothing and looks like the file holds no secrets - which is exactly the false negative that makes this step feel pointless. Use the little-endian 16-bit
+
+[blazor_wasm / Prepare the decompilation toolchain #11]  (26w, sig=['disassembler', 'fall', 'acceptable', 'fallback', 'obtained', 'decompiler'], cov=33%)
+  An IL disassembler is also an acceptable fallback if a C# decompiler cannot be obtained; say so in your findings if you had to fall back.
+
+[blazor_wasm / Retrieve the shipped assemblies #3]  (16w, sig=['content-hashed', 'builds', 'manifest', 'change', 'between', 'guessing'], cov=33%)
+  Take names from the manifest rather than guessing - they are usually content-hashed and change between builds.
+
+[blazor_wasm / Retrieve the shipped assemblies #4]  (23w, sig=['depending', 'settings', 'served', 'unwrap', 'normal', 'container'], cov=17%)
+  Assets may be served in different container formats depending on build settings; unwrap or convert to a normal assembly before decompiling if needed.
+
+[chain_findings / Chain findings into higher severity #4]  (31w, sig=['severe', 'contains', 'further', 'blobs', 'feed', 'chains'], cov=17%)
+  When a response contains further material (tokens, identifiers, encrypted blobs), feed it back in and repeat - chains are often several steps long, and the last step is usually the severe one.
+
+[chain_findings / Chain findings into higher severity #7]  (25w, sig=['distinction', 'affects', 'drives', 'since', 'technique', 'establish'], cov=33%)
+  Enumerate breadth once a chain works: establish whether it affects one object or every object, since that distinction drives severity more than the technique does.
+
+[chain_findings / Chain findings into higher severity #8]  (65w, sig=['record-holder', 'unanswered', 'possible', 'stopping', 'answers', 'determines'], cov=33%)
+  A RESULT PROVEN AGAINST ONE OBJECT IS A RESULT OF UNKNOWN SIZE. The moment a technique works on one account, record, file or record-holder, apply it to the others you can enumerate. Stopping at the first success answers 'is this possible' and leaves 'how much of the system does this reach' unanswered - and the second question is what determines severity and what a reader needs.
+
+[chain_findings / Chain findings into higher severity #9]  (57w, sig=['administrators', 'authority', 'operators', 'whichever', 'includes', 'sampling'], cov=0%)
+  Cover the privileged cases deliberately. If the population includes accounts or objects with more authority than the one you proved - administrators, operators, service or system accounts, records belonging to other tenants - test those specifically rather than sampling whichever came first. A technique that reaches an ordinary account and one that reaches an administrative account are different f
+
+[chain_findings / Chain findings into higher severity #10]  (54w, sig=['composition', 'unmeasured', 'affected', 'among', 'omit', 'population'], cov=0%)
+  Report the count and the composition: how many of the known population were tested, how many were affected, and which privileged ones were among them. If you could not enumerate the population, say what you did test and that the true breadth is unmeasured - that is a real limitation, not a detail to omit.
+
+[chain_findings / Inventory what is already known #1]  (66w, sig=['authoritative', 'gathered', 'nowhere', 'ran', 'complete', 'wrote'], cov=33%)
+  START FROM THE CONSOLIDATED NOTES. A consolidation pass ran immediately before this one and wrote every finding gathered so far to notes, including material recovered from phase logs that exists nowhere else. Read those notes FIRST and treat them as the authoritative input - they are the complete record, and anything you do not carry out of this phase is lost for the rest of the assessment.
+
+[chain_findings / Inventory what is already known #6]  (14w, sig=['cited', 'item', 'came'], cov=33%)
+  Note for each item where it came from, so evidence can be cited later.
+
+[chain_findings / Inventory what is already known #7]  (52w, sig=['outranks', 'limited', 'idea', 'deep', 'supports', 'going'], cov=0%)
+  BUDGET DISCIPLINE - you have a limited number of steps for the WHOLE assessment, not for one idea. Before going deep, rank the leads by how much evidence already supports them: material you hold in hand outranks a behaviour you observed, which outranks something suspected from a version number or a library name.
+
+[chain_findings / Inventory what is already known #8]  (36w, sig=['open-ended', 'justifies', 'ranked', 'rough', 'spend', 'depth'], cov=17%)
+  Work the ranked list in order and give each lead a rough step budget up front. Spend depth where evidence justifies it, and give a weak lead a few cheap probes rather than an open-ended investigation.
+
+[chain_findings / Inventory what is already known #12]  (27w, sig=['impressive-sounding', 'untouched', 'solidly', 'consume', 'better', 'let'], cov=17%)
+  Never let one lead consume the run while others are untouched. It is better to demonstrate three findings solidly than to fail to prove one impressive-sounding theory.
+
+[chain_findings / Report chains with evidence and impact #2]  (21w, sig=['abstract', 'concretely', 'capability', 'impact', 'many', 'obtained'], cov=33%)
+  State impact concretely - what data or capability was obtained, and for how many objects or accounts - rather than in the abstract.
+
+[chain_findings / Report chains with evidence and impact #4]  (45w, sig=['strict', 'library', 'number', 'level', 'follows', 'label'], cov=17%)
+  Label every finding with its proof level and be strict about it: DEMONSTRATED (you executed it and the response proves it - quote that response), INFERRED (follows from evidence but was not executed), or UNVERIFIED (suspected from a version number, library name or code pattern only).
+
+[chain_findings / Report chains with evidence and impact #5]  (58w, sig=['deployment', 'basis', 'execute', 'checked', 'vulnerability', 'advisory'], cov=33%)
+  Identifying a framework, library or version is NOT a vulnerability finding. A known issue in that component is UNVERIFIED until you execute it against this target and observe the effect. Do not write 'confirmed' on the basis of what software is present, and do not cite an advisory identifier unless you have checked it applies to this deployment.
+
+[chain_findings / Report chains with evidence and impact #6]  (49w, sig=['windows', 'unix', 'platform', 'merely', 'chose', 'shell'], cov=17%)
+  For code execution specifically, the proof is OUTPUT of a command you chose, returned by the target - not a payload you sent, and not an error that merely looks interesting. Match the payload to the actual platform; a Windows shell command against a Unix host proves nothing either way.
+
+[chain_findings / Report chains with evidence and impact #7]  (31w, sig=['credibility', 'investigate', 'destroys', 'overstating', 'theory', 'set'], cov=33%)
+  Set severity from what was DEMONSTRATED. An unproven critical theory is reported as a lead to investigate, never as a critical finding - overstating severity destroys the credibility of the whole report.
+
+[chain_findings / Report chains with evidence and impact #8]  (26w, sig=['actionable', 'cause', 'link', 'parameter', 'member', 'root'], cov=33%)
+  Name the specific root cause for each link in the chain (the assembly, type and member, or the endpoint and parameter) so it is directly actionable.
+
+[chain_findings / Report chains with evidence and impact #9]  (46w, sig=['additive', 'combine', 'replace', 'creates', 'chained', 'reaches'], cov=17%)
+  CARRY EVERY CONSOLIDATED FINDING FORWARD - not only the ones that chained. Chaining is additive: it creates new findings, it does not replace the inputs. A finding that did not combine with anything is still a finding, and the next phase can only review what reaches it.
+
+[chain_findings / Validate every finding against the live target #3]  (113w, sig=['reconstructing', 'character', 're-derive', 'measured', 'base64', 'gained'], cov=33%)
+  USE THE COPY YOU MEASURED. Read the literal from the source into a variable, print its length from that variable, and pass THAT SAME variable to the cipher - retyping the value into a second command is where a character is gained or lost, and the copy you measured is then not the copy you used. Prefer the source literal verbatim over reconstructing it through hex or base64; if you must convert, de
+
+[chain_findings / Validate every finding against the live target #4]  (105w, sig=['correctly-rejected', 'consistency', 'self-test', 'generated', 'transform', 'sensible'], cov=33%)
+  SELF-TEST YOUR REIMPLEMENTATION BEFORE TRUSTING ANY RESULT. An incorrect implementation and correctly-rejected material produce the same rejection, so a failed request tells you nothing until you have proven your own code. Do both checks: (i) ROUND TRIP - transform a known value forward then back and confirm you recover the original exactly. This proves internal consistency, and nothing more. (ii)
+
+[chain_findings / Validate every finding against the live target #5]  (53w, sig=['sanity-check', 'alignment', 'framing', 'strong', 'hint', 'derivation'], cov=0%)
+  Sanity-check the SHAPE of what you produce against a real sample from the target: length, block alignment, whether a prefix such as an IV or nonce is present, and the encoding. A structurally plausible output that still fails is a strong hint the key bytes or their derivation are wrong, not the framing.
+
+[chain_findings / Validate every finding against the live target #6]  (120w, sig=['unsupported', 'decryption', 'rejections', 'complaints', 'progress', 'unlikely'], cov=33%)
+  TREAT REJECTIONS AS AN ORACLE, AND AS EVIDENCE ABOUT YOUR REQUEST AT LEAST AS OFTEN AS ABOUT YOUR MATERIAL. Distinguish the failure stages: rejection during decryption or verification (your material or algorithm is wrong), acceptance followed by a parse or schema complaint (the crypto is RIGHT and your inner structure is wrong), and complaints about an unknown or unsupported operation (both are ri
+
+[chain_findings / Validate every finding against the live target #7]  (130w, sig=['placeholder', 'switch/case', 'comparisons', 'precaution', 'enumerated', 'dispatcher'], cov=33%)
+  ENUMERATE THE ACCEPTED VALUES FROM THE SOURCE FIRST - required, not a precaution. Before composing any request to a dispatcher, router, command or batch style endpoint, read the decompiled handler for what it actually accepts: switch/case labels, if-else comparisons, enum members, dictionary keys or its route table. Write that list down before sending anything. NEVER invent an operation name - a p
+
+[chain_findings / Validate every finding against the live target #10]  (74w, sig=['questions', 'settles', 'casing', 'issues', 'mirror', 'drive'], cov=17%)
+  OBSERVE THE APPLICATION DOING IT ITSELF. If a browser tool is available and the application has a user interface for the operation, drive that interface and capture the request it issues - route, method, headers, content type, every field name and its exact casing - then mirror it. A working example produced by the application is the most reliable specification obtainable, it costs one page load, 
+
+[chain_findings / Validate every finding against the live target #11]  (113w, sig=['discards', 'judging', 'poles', 'send', 'says', 'bad'], cov=17%)
+  ESTABLISH BOTH POLES BEFORE JUDGING A CREDENTIAL. A rejection says the request was not accepted; it does not say whether the credential, the field set, the route or the encoding was wrong, and without a reference for acceptance the only reading available is 'the material is bad' - which discards correct work. Get references first: read the route from source rather than guessing paths, since a gues
+
+[chain_findings / Validate every finding against the live target #13]  (20w, sig=['writes', 'safe', 'changes', 'accepted', 'read-only', 'returns'], cov=33%)
+  Prefer a safe read-only proof first (something that returns data or is accepted) over anything that writes or changes state.
+
+[chain_findings / Validate every finding against the live target #15]  (34w, sig=['concluded', 'discard', 'reimplementation', 'distinguish', 'validation', 'immediately'], cov=33%)
+  If validation fails, do not discard the finding immediately: check your reimplementation against the source, and distinguish 'my test was wrong' from 'the material is not accepted'. Say which one you concluded and why.
+
+[consolidate_findings / Normalise into one list #1]  (27w, sig=['compact', 'fits', 'though', 'sources', 'design', 're-read'], cov=33%)
+  Re-read the notes you have written. They are compact by design, so the whole set fits at once even though the sources they came from did not.
+
+[consolidate_findings / Normalise into one list #3]  (25w, sig=['describe', 'inflates', 'apparent', 'angles', 'underlying', 'entries'], cov=17%)
+  Merge duplicates. Different phases routinely describe the same underlying issue from different angles, and one issue split across several entries inflates the apparent finding count.
+
+[consolidate_findings / Process one source, record, then move on #3]  (56w, sig=['similar', 'matched', 'markers', 'regions', 'turned', 'above'], cov=17%)
+  For any file over ~40 KB, do not cat it. Search it with grep for the markers above and print matches with surrounding context (grep -n -C 3 or similar), then read only the regions that matched. Choose your own search terms from what the assessment has turned up - do not rely on a fixed list.
+
+[consolidate_findings / Process one source, record, then move on #4]  (34w, sig=['statements', 'attention', 'narration', 'completed', 'panels', 'ever'], cov=17%)
+  Pay particular attention to narration panels - the assistant frequently states a completed chain or a confirmed result in prose without ever recording it as a finding. Those statements are findings and must be captured.
+
+[consolidate_findings / Record to notes #3]  (45w, sig=['promising', 're-test', 'chase', 'exploitation', 'act', 'after'], cov=17%)
+  Do NOT re-test anything, do not attempt exploitation, and do not chase new leads here. If something looks promising but unproven, record it as a lead with the evidence that makes it one and move on - the phases after this one will act on it.
+
+[consolidate_findings / Record to notes #4]  (26w, sig=['spending', 'starves', 'investigation', 'soon', 'everything', 'design'], cov=17%)
+  Finish as soon as everything is recorded. This phase has a small budget by design; spending it on investigation starves the phases that do the work.
+
+[final_integrity_gate / Completeness check #2]  (76w, sig=['populated', 'secondary', 'relying', 'structured', 'pipeline', 'plainly'], cov=17%)
+  CHECK THE VERDICT RECORD IS ACTUALLY POPULATED before relying on it. If it is missing, or holds only a header with no verdicts, the review phase did not finish and you have no structured input. Say so plainly in your output and read the per-phase reports directly instead. An empty primary input is not a reason to report less; it is a reason to use the secondary one and record that the pipeline los
+
+[final_integrity_gate / Completeness check #3]  (78w, sig=['corresponding', 'mentions', 'previous', 'stopped', 'resolve', 'chasing'], cov=33%)
+  DO NOT RE-READ EVERY PER-PHASE REPORT OR PHASE LOG AS A MATTER OF COURSE. Consolidation and review have each already swept them; a third sweep is the single largest waste of this phase's budget and it is why previous runs stopped before finishing. Open a specific report or log only to resolve a NAMED gap - a finding the verdict record mentions without evidence, or a note with no corresponding verd
+
+[final_integrity_gate / Emit the final deliverable #2]  (62w, sig=['filename', 'paste', 'artefact', 'pointer', 'marked', 'cite'], cov=33%)
+  QUOTE THE EVIDENCE, NEVER CITE IT. For every finding marked DEMONSTRATED or CONFIRMED, paste the actual artefact into the report: the request that was sent, the response that came back, and any value that was recovered. A filename, a note name or a phase name is a pointer, not evidence - the reader cannot open your working directory, and a pointer proves nothing.
+
+[final_integrity_gate / Emit the final deliverable #3]  (48w, sig=['asserting', 'however', 'sounded', 'mark', 'confident', 'artefact'], cov=17%)
+  If you cannot find and quote the concrete artefact for a finding, you may not mark it DEMONSTRATED. Downgrade it to UNPROVEN and say what is missing. This applies however confident an earlier phase sounded: a phase asserting something is not the same as a phase showing it.
+
+[final_integrity_gate / Emit the final deliverable #4]  (81w, sig=['decrypting', 'implies', 'needing', 'taking', 'authenticating', 'consequence'], cov=0%)
+  CLAIM EXACTLY WHAT THE EVIDENCE SHOWS AND NOT ONE STEP MORE. The most common failure in this report is a demonstrated step being written up as the consequence it implies. Recovering a plaintext credential is not the same as authenticating with it; reaching an endpoint is not the same as extracting data from it; decrypting a token is not the same as taking over an account. Each of those is a separa
+
+[final_integrity_gate / Emit the final deliverable #5]  (45w, sig=['discredits', 'consequence', 'supports', 'sentence', 'authenticated', 'overstating'], cov=0%)
+  Before writing any impact sentence, find the quoted evidence that supports it. If the evidence shows a decrypt but no authenticated response, the finding is 'credential recovered', and the takeover is stated as the untested consequence it is. Overstating one finding discredits the entire report.
+
+[final_integrity_gate / Emit the final deliverable #6]  (22w, sig=['concretely', 'capability', 'order', 'across', 'impact', 'many'], cov=33%)
+  Order findings by demonstrated severity, and state impact concretely - what data or capability was obtained and across how many accounts or objects.
+
+[final_integrity_gate / Emit the final deliverable #8]  (51w, sig=['understating', 'directions', 'omitting', 'implicit', 'folding', 'asked'], cov=0%)
+  Write 'None identified' rather than omitting a section. A section left out cannot be told apart from a question never asked, and these two are where an assessment is most often wrong in both directions - understating by leaving a chain implicit, overstating by folding an untested step into the impact sentence.
+
+[final_integrity_gate / Evidence integrity check #1]  (53w, sig=['said', 'obtain', 'claimed', 'matches', 'refuted', 'responsible'], cov=33%)
+  CONTROL RESULT PRESENT - every finding claiming access, bypass or authentication must record the result of the same request made WITHOUT the credential, token, header or material said to be responsible. If that result is missing, obtain it now. If it matches the claimed result, the finding is REFUTED: the resource was already reachable.
+
+[web_discovery / Enumerate the surface #4]  (19w, sig=['dispatches', 'forwards', 'controls', 'batches', 'proxies', 'internally'], cov=33%)
+  Note any endpoint that dispatches, batches, proxies or forwards requests internally, as these bypass controls applied to direct routes.
+
+==============================================================================
+TOPICAL TECHNIQUES
+==============================================================================
+
+[a01_a07_access_auth / Authentication and session handling #1]  (7w, sig=['well-known', 'seeded', 'default', 'credentials'], cov=75%)
+  Test for default, seeded or well-known credentials.
+
+[a01_a07_access_auth / Authentication and session handling #2]  (18w, sig=['examine', 'derive', 'encode', 'representation', 'predictable', 'random'], cov=50%)
+  Examine the session representation: is it random, or does it encode or derive from something predictable or recoverable?
+
+[a01_a07_access_auth / Authentication and session handling #4]  (24w, sig=['protections', 'volumetric', 'automated', 'force', 'proving', 'assess'], cov=67%)
+  Assess protections against automated guessing, but do NOT run volumetric guessing here - note the absence of a control rather than proving it by force.
+
+[a01_a07_access_auth / Object and function level access #4]  (14w, sig=['http', 'exercise', 'uses', 'method', 'accepts', 'client'], cov=83%)
+  Exercise every HTTP method an endpoint accepts, not just the one the client uses.
+
+[a01_a07_access_auth / Object and function level access #5]  (27w, sig=['indirectly', 'bypasses', 'dispatch', 'indirect', 'import', 'direct'], cov=83%)
+  Probe endpoints that dispatch, batch, proxy or import: reaching a handler indirectly frequently bypasses checks applied to its direct route. Compare the direct and indirect result explicitly.
+
+[a01_a07_access_auth / Prove and bound the impact #2]  (19w, sig=['drives', 'technique', 'establish', 'breadth', 'object', 'severity'], cov=67%)
+  Establish breadth - one object or all of them, one account or every account. Breadth drives severity more than technique.
+
+[a01_a07_access_auth / Prove and bound the impact #3]  (13w, sig=['compromised', 'functions', 'grants', 'users', 'roles', 'privileged'], cov=83%)
+  Record what a compromised session actually grants: roles, privileged functions, other users' data.
+
+[a01_a07_access_auth / Verify before reporting #5]  (22w, sig=['non-destructive', 'delete', 'stay', 'lock', 'read-only', 'modify'], cov=83%)
+  Stay non-destructive: prefer read-only proof, do not modify or delete data, do not lock accounts, and stop once the point is demonstrated.
+
+[a02_misconfiguration / Exposed interfaces and content #3]  (14w, sig=['listings', 'installer', 'sample', 'place', 'left', 'default'], cov=67%)
+  Check for default, sample or installer content left in place, and for directory listings.
+
+[a02_misconfiguration / Prove impact, not presence #1]  (21w, sig=['hardening', 'enables', 'reporting', 'vulnerability', 'demonstrate', 'unless'], cov=83%)
+  A missing header is a hardening finding, not a vulnerability, unless you demonstrate what it enables. Say which you are reporting.
+
+[a02_misconfiguration / Response hardening and policy #2]  (15w, sig=['origins', 'null', 'cors', 'unexpected', 'cross-origin', 'permitted'], cov=83%)
+  Test CORS behaviour with unexpected and null origins, and check whether credentials are permitted cross-origin.
+
+[a02_misconfiguration / Response hardening and policy #4]  (7w, sig=['transport', 'tls', 'configuration', 'observable'], cov=75%)
+  Note TLS and transport configuration where observable.
+
+[a04_cryptographic / Assess how cryptography is used #2]  (22w, sig=['reversibly', 'storage', 'reversible', 'encoded', 'hashed', 'determine'], cov=83%)
+  Determine whether credentials are stored reversibly - encrypted or encoded rather than hashed. Reversible storage of a credential is a finding in itself.
+
+[a04_cryptographic / Assess how cryptography is used #4]  (12w, sig=['derived', 'predictable', 'random', 'assess', 'recoverable', 'tokens'], cov=67%)
+  Assess whether tokens are random or derived from something predictable or recoverable.
+
+[a04_cryptographic / Find embedded and exposed key material #4]  (29w, sig=['expecting', 'indirection', 'trace', 'hops', 'crypto', 'follow'], cov=50%)
+  Trace indirection: a crypto call usually references an identifier, not a literal. Follow it to the value, expecting several hops, and report the value rather than the variable name.
+
+[a04_cryptographic / Join the key to the material #3]  (16w, sig=['apply', 'opaque', 'hold', 'secret', 'account'], cov=80%)
+  Apply the secret to every opaque value you hold, for every account, not only the first.
+
+[a04_cryptographic / Join the key to the material #5]  (18w, sig=['implementation', 'round', 'trip', 'trusting', 'prove', 'decode'], cov=50%)
+  Prove your implementation before trusting a rejection: round trip a known value, and decode something the TARGET produced.
+
+[a04_cryptographic / Verify before reporting #1]  (49w, sig=['demonstration', 'identifying', 'software', 'follows', 'label', 'pattern'], cov=50%)
+  PROOF DISCIPLINE - label every finding DEMONSTRATED (you executed it and the response proves it, quote that response), INFERRED (follows from evidence but was not executed), or UNVERIFIED (suspected from a version, component or code pattern only). Identifying software is never a demonstration; never write 'confirmed' without having executed something.
+
+[a05_injection / Bound the impact #2]  (12w, sig=['benign', 'input', 'alongside', 'reported'], cov=75%)
+  Run the control test: the same request with benign input, reported alongside.
+
+[a05_injection / Confirm by differential behaviour #1]  (37w, sig=['demonstrating', 'controlled', 'disappears', 'boolean', 'timing', 'odd'], cov=67%)
+  Confirm an injection by demonstrating a controlled difference between two inputs - an error that appears and disappears, a boolean condition that changes the result, a timing difference you can repeat. A single odd response is not proof.
+
+[a05_injection / Confirm by differential behaviour #3]  (23w, sig=['identifiable', 'harmless', 'beyond', 'payloads', 'clearly', 'drop'], cov=50%)
+  Do not run destructive payloads, do not modify or drop data, and do not attempt command execution beyond a harmless, clearly identifiable proof.
+
+[a05_injection / Confirm by differential behaviour #4]  (38w, sig=['platform', 'chose', 'match', 'execution', 'returned', 'claimed'], cov=50%)
+  For claimed code or command execution the proof is OUTPUT of a command you chose, returned by the target - not a payload you sent and not an error that looks interesting. Match the payload to the actual platform.
+
+[a05_injection / Identify injection candidates #1]  (21w, sig=['candidate', 'normally', 'body', 'sets', 'parameter', 'inventory'], cov=67%)
+  Work from the inventory: every parameter, header, cookie and body field is a candidate, including those only the client normally sets.
+
+[a05_injection / Identify injection candidates #3]  (21w, sig=['detection', 'provoke', 'syntax', 'reversible', 'difference', 'parse'], cov=50%)
+  Prefer detection that is safe and reversible: syntax that would provoke a parse difference or an error, rather than anything destructive.
+
+[a05_injection / Verify before reporting #1]  (49w, sig=['demonstration', 'identifying', 'software', 'follows', 'label', 'pattern'], cov=50%)
+  PROOF DISCIPLINE - label every finding DEMONSTRATED (you executed it and the response proves it, quote that response), INFERRED (follows from evidence but was not executed), or UNVERIFIED (suspected from a version, component or code pattern only). Identifying software is never a demonstration; never write 'confirmed' without having executed something.
+
+[a05_injection / Verify before reporting #5]  (22w, sig=['non-destructive', 'delete', 'stay', 'lock', 'read-only', 'modify'], cov=50%)
+  Stay non-destructive: prefer read-only proof, do not modify or delete data, do not lock accounts, and stop once the point is demonstrated.
+
+[a08_integrity / Test carefully and honestly #1]  (33w, sig=['discriminator', 'deserializer', 'types', 'permitted', 'produces', 'learn'], cov=67%)
+  If a deserializer accepts a type discriminator, first read the recovered source to learn the exact discriminator and the types actually permitted. Guessing a discriminator produces an 'unknown type' error that proves nothing.
+
+[a08_integrity / Test carefully and honestly #2]  (30w, sig=['gadget', 'merely', 'invoke', 'demonstrate', 'invocation', 'way'], cov=67%)
+  A type that merely exists is not a gadget: a gadget chain must INVOKE something. If you cannot demonstrate invocation, the finding is UNVERIFIED and must be reported that way.
+
+[a08_integrity / Verify before reporting #5]  (22w, sig=['non-destructive', 'delete', 'stay', 'lock', 'read-only', 'modify'], cov=50%)
+  Stay non-destructive: prefer read-only proof, do not modify or delete data, do not lock accounts, and stop once the point is demonstrated.
+
+[a09_logging_alerting / Exposed logs and leaked material #3]  (12w, sig=['disclose', 'belongs', 'log', 'responses'], cov=75%)
+  Check whether error responses disclose material that belongs only in a log.
+
+[a09_logging_alerting / Observable reaction to security events #4]  (21w, sig=['reaction', 'observable', 'outside', 'logged', 'absence', 'exactly'], cov=67%)
+  Report absence of an observable reaction as exactly that: not observed from outside, which is not the same as not logged.
+
+[a10_exceptional / Does failure open or close? #2]  (18w, sig=['interpreter', 'reveals', 'oracle', 'detail', 'injection', 'testing'], cov=50%)
+  Where an error reveals interpreter or framework detail, record it as an oracle for injection and integrity testing.
+
+[a10_exceptional / Does failure open or close? #3]  (10w, sig=['well-formed', 'alongside', 'reported'], cov=67%)
+  Run the control test: the same request well-formed, reported alongside.
+
+[a10_exceptional / Probe boundaries and malformed input #2]  (21w, sig=['resources', 'oversized', 'exhaust', 'pursue', 'within', 'enough'], cov=50%)
+  Try oversized values within reason - enough to test a limit, not enough to exhaust resources. Do not pursue denial of service.
+
+[adversarial_review / Attempt to refute each claim #3]  (26w, sig=['require', 'chosen', 'execution', 'returned', 'claimed', 'payload'], cov=100%)
+  For claimed code execution, require output of a chosen command returned by the target. A payload that was sent, or an interesting error, is not execution.
+
+[adversarial_review / Attempt to refute each claim #5]  (22w, sig=['overstated', 'refute', 'precisely', 'part', 'confirm', 'holds'], cov=50%)
+  Where a claim is correct but overstated, say so precisely: confirm the part that holds and refute the part that does not.
+
+[adversarial_review / Attempt to refute each claim #6]  (19w, sig=['breadth', 'object', 'severity', 'actually', 'account'], cov=60%)
+  Check severity against what was actually demonstrated and against breadth - one object or all, one account or every account.
+
+[adversarial_review / Return a verdict per claim #4]  (17w, sig=['additional', 'settle', 'unproven', 'means', 'exactly', 'access'], cov=67%)
+  UNPROVEN means you could not settle it: state exactly what additional access or step would settle it.
+
+[adversarial_review / Return a verdict per claim #5]  (14w, sig=['standard', 'add', 'omitted', 'draft'], cov=75%)
+  Add any finding you confirmed that the draft omitted, with the same evidence standard.
+
+[adversarial_review / Return a verdict per claim #6]  (14w, sig=['surviving', 'performed', 'merges', 'corrected', 'severity', 'list'], cov=67%)
+  Give a corrected severity for every surviving finding, and list the merges you performed.
+
+[adversarial_review / Return a verdict per claim #7]  (72w, sig=['settled', 'decided', 'append', 'create', 'complete', 'partial'], cov=67%)
+  WRITE EACH VERDICT AS YOU REACH IT, not once every claim is settled. Create the file when you settle your FIRST claim and append each further verdict as it is decided. This phase can stop at any point, and a file written only at the end is the first thing lost when it does - a partial record of real verdicts is worth far more than a complete one that was never written.
+
+[adversarial_review / Take the draft apart #4]  (62w, sig=['operator', 'defect', 'supported', 'pipeline', 'plainly', 'process'], cov=67%)
+  Treat every missing entry as a finding in its own right and recover it - it reached consolidation on evidence, so it is supported until you disprove it. Say plainly in your output that it was dropped between phases; that is a defect in the assessment process and the operator needs to know the pipeline lost it, not just that the finding exists.
+
+[blazor_wasm / Decompile to source before searching #1]  (19w, sig=['retrieving', 'triage', 'action', 'after', 'grep', 'decompile'], cov=50%)
+  Decompile each assembly as the NEXT action after retrieving it. Do not search, grep or triage the binaries first.
+
+[blazor_wasm / Decompile to source before searching #3]  (36w, sig=['remember', 'form', 'invocation', 'sources', 'know', 'silently'], cov=50%)
+  Know whether your invocation produced a directory of sources or a single file, and remember which - later searching a path as if it were the other form silently returns nothing and looks like the decompile failed.
+
+[blazor_wasm / Decompile to source before searching #6]  (33w, sig=['entry-point', 'obviously', 'sits', 'referenced', 'retrieved', 'shared'], cov=50%)
+  Decompile EVERY application assembly retrieved, not just the first or the most obviously named. The entry-point client assembly often holds only UI code while the interesting material sits in a referenced shared library.
+
+[blazor_wasm / Exploit server trust in client material #3]  (21w, sig=['attacker-controlled', 'caller', 'unauthenticated', 'exercise', 'protected', 'compare'], cov=50%)
+  Exercise the endpoint with attacker-controlled input protected by the recovered material, and compare against what an unauthenticated caller gets without it.
+
+[blazor_wasm / Exploit server trust in client material #5]  (22w, sig=['documented', 'contract', 'inspect', 'expose', 'absent', 'public'], cov=67%)
+  Inspect responses for data the public API does not otherwise expose - credentials, tokens, internal identifiers, or fields absent from the documented contract.
+
+[blazor_wasm / Fingerprint the client-side .NET delivery #2]  (18w, sig=['fingerprinted', 'filenames', 'stems', 'asset', 'patterns', 'hash'], cov=50%)
+  Asset names are frequently fingerprinted with a content hash, so match on stems and patterns, not exact filenames.
+
+[blazor_wasm / Fingerprint the client-side .NET delivery #4]  (47w, sig=['somehow', 'fetched', 'boot', 'javascript', 'manifest', 'whatever'], cov=50%)
+  Find the assembly inventory by whatever route exists: a boot manifest file, a boot config embedded in or fetched by the runtime JavaScript, or the loader script itself. If one route does not exist on this target, try the next; the loader must reference the assets somehow.
+
+[blazor_wasm / Hunt secrets in the decompiled source #6]  (45w, sig=['definition', 'expect', 'indirection', 'trace', 'hops', 'crypto'], cov=83%)
+  TRACE INDIRECTION. A crypto call usually references an identifier rather than a literal. That is a lead, not an answer: search for that identifier's definition and repeat until you reach the actual value. Expect several hops, and report the value, not the variable name.
+
+[blazor_wasm / Hunt secrets in the decompiled source #7]  (36w, sig=['thousands', 'truncated', 'looking', 'lines', 'hit', 'surrounding'], cov=50%)
+  Do not read whole decompiled files looking for secrets - they run to thousands of lines and output is truncated long before the interesting line. Search for candidates, then read only the surrounding lines of each hit.
+
+[blazor_wasm / Prepare the decompilation toolchain #2]  (51w, sig=['alternatives', 'evaluate', 'hunting', 'help', 'sink', 'toolchain'], cov=50%)
+  If a decompiler is present, immediately prove it actually runs (invoke its help or version). If it works, the toolchain is DONE: stop, record it, and move to the next phase. Do not install anything and do not evaluate alternatives. Toolchain hunting is the single largest time sink in this assessment.
+
+[blazor_wasm / Retrieve the shipped assemblies #1]  (18w, sig=['manifests', 'contents', 'head', 'tells', 'real', 'returns'], cov=67%)
+  Read manifests with a real GET. A HEAD request returns headers only and tells you nothing about contents.
+
+[blazor_wasm / Retrieve the shipped assemblies #5]  (42w, sig=['re-download', 'leading', 'directories', 'downloads', 'repeated', 'download'], cov=67%)
+  Verify each download is a real assembly and not an error page or empty file - check size and leading bytes. Keep everything in ONE working directory and do not re-download assemblies you already have; repeated downloads into new directories waste the budget.
+
+[chain_findings / Chain findings into higher severity #2]  (23w, sig=['previously', 'successes', 'surfaces', 'expected', 'turns', 'errored'], cov=50%)
+  Look specifically for surfaces that were previously refused, errored, or returned less data than expected - recovered material often turns exactly those into successes.
+
+[chain_findings / Chain findings into higher severity #3]  (40w, sig=['watch', 'internally', 'dispatch', 'indirect', 'import', 'direct'], cov=50%)
+  Watch for dispatch, batch, proxy or import style endpoints that forward requests internally: reaching a handler by that route can bypass the checks applied to its direct route. Compare what the direct route returns against what the indirect route returns.
+
+[chain_findings / Chain findings into higher severity #6]  (44w, sig=['receive', 'matching', 'decrypt', 'try', 'decode', 'opaque'], cov=83%)
+  Try to decrypt or decode anything opaque you receive using the material you already recovered; matching a value back to a known algorithm is frequently the whole finding. Do this for every account or object you hold a value for, not just the first.
+
+[chain_findings / Inventory what is already known #2]  (26w, sig=['entries', 'playbook', 'consolidated', 'number', 'down', 'end'], cov=67%)
+  Count the consolidated entries and write the number down. You will be required to account for every one of them at the end of this playbook.
+
+[chain_findings / Inventory what is already known #9]  (57w, sig=['returning', 'grinding', 'roughly', 'abandon', 'fresh', 'information'], cov=67%)
+  STOP RULE: if roughly 8-10 consecutive steps on one lead produce no NEW evidence - no new access, no new data, no change in the error you get back - abandon it, record what you tried and what it would take to confirm, and move to the next lead. Returning later with fresh information is fine; grinding is not.
+
+[chain_findings / Inventory what is already known #11]  (30w, sig=['repeating', 'reveal', 'answer', 'signal', 'thing', 'attempt'], cov=67%)
+  Before repeating any search, say what NEW thing the next attempt could reveal that the last one could not. If there is no answer, that is the signal to stop.
+
+[chain_findings / Report chains with evidence and impact #3]  (19w, sig=['contrast', 'chained', 'establish', 'impact', 'obtained', 'show'], cov=67%)
+  Establish impact by contrast: show the same result cannot be obtained without the recovered material or the chained route.
+
+[chain_findings / Report chains with evidence and impact #12]  (27w, sig=['discarding', 'validate', 'carried', 'failing', 'labelled', 'silently'], cov=50%)
+  Findings you could not validate are carried forward too, labelled UNVERIFIED with what you tried. Failing to prove something is a result; silently discarding it is not.
+
+[chain_findings / Validate every finding against the live target #9]  (67w, sig=['sure', 'url', 'published', 'reliable', 'guess', 'built'], cov=50%)
+  Say where the shape came from and how sure you are of it. A field list read from a request type in source, or from a published specification, is reliable. A field list inferred from a URL or a guess is not, and a request built from one that fails has not tested anything. Record what you found so a later phase does not repeat the search.
+
+[chain_findings / Validate every finding against the live target #12]  (95w, sig=['interpretable', 'decrypted', 'complaint', 'retyping', 'yet', 'malformed'], cov=50%)
+  With both references, a rejection is interpretable. If your attempt does not even match the FAILURE shape - a different status, a different error, a complaint about a missing field - then your request is malformed and the credential has not been tested yet. Only a response matching the failure shape exactly is evidence about the credential itself. State which of the two you observed. Take the cred
+
+[consolidate_findings / Inventory the sources #2]  (28w, sig=['per-phase', 'retrieved', 'unpacked', 'reports', 'files', 'disk'], cov=67%)
+  List, but do not open: the per-phase reports for this assessment, the phase log files, and the artifacts on disk (retrieved binaries, decompiled or unpacked source, captured responses).
+
+[consolidate_findings / Inventory the sources #4]  (25w, sig=['searched', 'sizes', 'grep', 'whole', 'list'], cov=80%)
+  Report the file list and their sizes. Anything over about 40 KB must be searched with grep rather than read whole in the next phase.
+
+[consolidate_findings / Inventory the sources #5]  (23w, sig=['opening', 'cat', 'know', 'log', 'exists', 'whole'], cov=100%)
+  Do NOT cat a log or a report here. The whole point of this phase is to know what exists before opening anything.
+
+[consolidate_findings / Normalise into one list #5]  (18w, sig=['flattening', 'distinction', 'asserted', 'separate', 'carry', 'forward'], cov=50%)
+  Separate what has been demonstrated from what is asserted, and carry that distinction forward rather than flattening it.
+
+[consolidate_findings / Process one source, record, then move on #2]  (55w, sig=['conclusion', 'combining', 'narrated', 'decoded', 'things', 'reads'], cov=50%)
+  READ THE PHASE LOGS. This is the channel nothing else reads and the reason this phase exists. Search them for evidence that was stated but never recorded: recovered values, decoded output, tokens and credentials, status codes that changed, headers observed to be missing, error text, and any conclusion the assistant narrated about combining two things.
+
+[consolidate_findings / Process one source, record, then move on #6]  (19w, sig=['processed', 'yields', 're-read', 'move'], cov=100%)
+  If a source yields nothing, say so and move on. Do not re-read a file you have already processed.
+
+[consolidate_findings / Record to notes #1]  (27w, sig=['normalised', 'reliably', 'receive', 'channel', 'including', 'tool'], cov=67%)
+  Record every normalised finding using the notes tool, one note per finding, including its evidence and control result. Notes are the only channel later phases reliably receive.
+
+[final_integrity_gate / Completeness check #5]  (56w, sig=['comparison', 'vanish', 'trawl', 'individually', 'observations', 'permissive'], cov=50%)
+  Check the notes for low-severity observations that never reached a verdict - missing security headers, permissive cross-origin policy, verbose errors and stack traces, version disclosure. These vanish because each is individually minor and nobody carries them forward. The notes already hold them, so this is a comparison against the verdict record, not another trawl through the logs.
+
+[final_integrity_gate / Completeness check #6]  (40w, sig=['missed', 'labelled', 'during', 'untested', 'applied', 'either'], cov=83%)
+  Check that any material recovered during the assessment was actually applied to something. A secret, token or credential that was recovered and never used is either an untested lead that must be labelled as such, or a missed critical finding.
+
+[final_integrity_gate / Emit the final deliverable #9]  (45w, sig=['mentioned', 'described', 'neither', 'section', 'see', 'compounding'], cov=50%)
+  The compounding section is where a chain belongs. If material recovered in one finding was applied to a surface described in another, both findings say so and both quote the recovered value. A chain mentioned in neither is a chain the reader will not see.
+
+[final_integrity_gate / Emit the final deliverable #11]  (30w, sig=['coverage', 'honestly', 'assessed', 'categories', 'category', 'omitted'], cov=67%)
+  State coverage honestly: which categories were assessed, which produced no findings, and which could not be assessed from outside. A category with nothing found is reported as such, not omitted.
+
+[final_integrity_gate / Emit the final deliverable #13]  (25w, sig=['fixable', 'exposure', 'precisely', 'cause', 'separately', 'parameter'], cov=50%)
+  Name the root cause of each finding precisely - file, type and member for embedded material; endpoint and parameter for exposure - so each is separately fixable.
+
+[final_integrity_gate / Evidence integrity check #5]  (40w, sig=['theory', 'matches', 'breadth', 'explicitly', 'demonstration', 'object'], cov=50%)
+  SEVERITY MATCHES DEMONSTRATION - severity is set by what was DEMONSTRATED, not by what is suspected. State breadth explicitly: one object or all of them, one account or every account. An unproven critical theory is a lead, not a critical finding.
+
+[final_integrity_gate / Evidence integrity check #6]  (27w, sig=['deleting', 'transcription', 'fix', 'downgrade', 'corrected', 'obtain'], cov=83%)
+  Correct anything that fails a check rather than deleting it - downgrade the proof level, fix the transcription, or obtain the missing evidence, and say what was corrected.
+
+[web_discovery / Collect the client payload #1]  (14w, sig=['scripts', 'maps', 'configuration', 'webassembly', 'downloads', 'download'], cov=83%)
+  Download what the client downloads: scripts, bundles, source maps, compiled binaries, WebAssembly, configuration blobs.
+
+[web_discovery / Collect the client payload #2]  (30w, sig=['minified', 'searched', 'compiled', 'binary', 'bundle', 'unpacked'], cov=67%)
+  Compiled or minified client code must be unpacked or decompiled before it can be searched. A clean search over a binary or a minified bundle is NOT evidence of absence.
+
+[web_discovery / Fingerprint the stack #3]  (26w, sig=['reverse', 'spa', 'particular', 'determines', 'example', 'bundle'], cov=50%)
+  Record the stack explicitly: it determines which stack- specific playbook should run next (for example a client-side .NET or SPA bundle, or a particular reverse proxy).
+
+[web_discovery / Fingerprint the stack #4]  (16w, sig=['locate', 'documentation', 'openapi', 'graphql', 'introspection', 'style'], cov=100%)
+  Identify API style and locate any metadata, schema or documentation endpoint (OpenAPI, GraphQL introspection, framework metadata).
+
+==============================================================================
+WITHIN-PLAYBOOK NEAR-DUPLICATES (Jaccard >= 0.20) - Rule 1 targets
+==============================================================================
+4 within-playbook pairs (222 cross-playbook pairs excluded as runtime-free)
+
+  0.25  consolidate_findings
+      [TOPICAL ] Inventory the sources#4: Report the file list and their sizes. Anything over about 40 KB must be searched with grep rather than read whole in the next phase.
+      [TOPICAL ] Inventory the sources#5: Do NOT cat a log or a report here. The whole point of this phase is to know what exists before opening anything.
+  0.24  chain_findings
+      [RESTATED] Inventory what is already known#3: Read the saved notes and any findings recorded in this workspace, and list the artifacts already on disk (retrieved binaries, decompiled source, captured responses).
+      [RESTATED] Inventory what is already known#4: Read the decompiled source and captured output you already have rather than fetching anything again.
+  0.24  a01_a07_access_auth
+      [RESTATED] Prove and bound the impact#1: For every claimed bypass, run and report the control test: the same request without the material or identity. A finding without a control result is not a finding.
+      [NO-TRACE] Verify before reporting#4: Record findings to notes as you go, with the endpoint, the request, the response and the control result, so later phases and the report can use them.
+  0.21  a01_a07_access_auth
+      [RESTATED] Prove and bound the impact#1: For every claimed bypass, run and report the control test: the same request without the material or identity. A finding without a control result is not a finding.
+      [RESTATED] Verify before reporting#2: RUN THE CONTROL TEST. Before claiming any access or bypass, repeat the request WITHOUT the credential, token, header or material you believe is responsible. If the result
+
+==============================================================================
+STRONGEST DELETE CANDIDATES
+  NO-TRACE *and* a within-playbook near-duplicate of a technique that
+  DID leave a trace - the rule survives the deletion, the tokens do not.
+==============================================================================
+
+  DROP  a01_a07_access_auth/Verify before reporting#4  (27w, jaccard 0.24)
+        Record findings to notes as you go, with the endpoint, the request, the response and the control result, so later phases and the report can use them.
+  KEEP  a01_a07_access_auth/Prove and bound the impact#1 [RESTATED]
+        For every claimed bypass, run and report the control test: the same request without the material or identity. A finding without a control result is not a finding.
+
+  -> 1 techniques deletable on this combined test
+
+==============================================================================
+CALIBRATION - rules known to have changed behaviour must NOT read NO-TRACE
+==============================================================================
+  'STOP AND JOIN THEM'       -> RESTATED  n=4 runs=1 [a04_cryptographic/Join the key to the material#2]
+  'STOP AND JOIN THEM'       -> RESTATED  n=4 runs=1 [chain_findings/Chain findings into higher severity#5]
+  'wide encoding'            -> NO-TRACE  n=0 runs=0 [blazor_wasm/Decompile to source before searching#2]
+  'provider'                 -> NO-TRACE  n=0 runs=0 [blazor_wasm/Hunt secrets in the decompiled source#5]
+  'provider'                 -> NO-TRACE  n=0 runs=0 [a04_cryptographic/Find embedded and exposed key material#5]
+  'provider'                 -> RESTATED  n=5 runs=1 [chain_findings/Validate every finding against the live target#8]
+  'WITHOUT the credential'   -> RESTATED  n=5 runs=1 [a01_a07_access_auth/Verify before reporting#2]
+  'WITHOUT the credential'   -> NO-TRACE  n=0 runs=0 [a02_misconfiguration/Verify before reporting#2]
+  'WITHOUT the credential'   -> NO-TRACE  n=0 runs=0 [a04_cryptographic/Verify before reporting#2]
+  'control test'             -> RESTATED  n=6 runs=1 [web_discovery/Enumerate the surface#3]
+  'control test'             -> RESTATED  n=5 runs=1 [a01_a07_access_auth/Prove and bound the impact#1]
+  'control test'             -> RESTATED  n=5 runs=1 [a01_a07_access_auth/Verify before reporting#2]
+  'notes'                    -> RESTATED  n=4 runs=5 [web_discovery/Write the inventory#1]
+  'notes'                    -> NO-TRACE  n=0 runs=0 [a01_a07_access_auth/Verify before reporting#4]
+  'notes'                    -> NO-TRACE  n=0 runs=0 [a02_misconfiguration/Verify before reporting#4]

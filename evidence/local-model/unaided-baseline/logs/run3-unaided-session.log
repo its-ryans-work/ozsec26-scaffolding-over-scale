@@ -1,0 +1,339 @@
+
+╭────────────────────────────────── Starting ──────────────────────────────────╮
+│ PENTESTAGENT - Non-interactive Mode                                          │
+│                                                                              │
+│ Target: http://127.0.0.1:5000                                                │
+│ Model: openai/qwen3.6-27b-fable                                              │
+│ Mode: Agent                                                                  │
+│ Runtime: Local                                                               │
+│ Max loops: 30                                                                │
+│ Task: Perform a security assessment of the web application at                │
+│ http://127.0.0.1:5000. Enumerate the application, identify its technology    │
+│ stack and framework, and find exploitable vulnerabilities. Report concrete   │
+│ findings with supporting evidence.                                           │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+[00:00] Initializing...
+
+╭──────────────────────────────── PentestAgent ────────────────────────────────╮
+│ Plan:                                                                        │
+│                                                                              │
+│  1 Access and enumerate the web application at http://127.0.0.1:5000 to map  │
+│    its functionality, endpoints, and features                                │
+│  2 Identify the application's technology stack and framework through         │
+│    headers, source code inspection, and fingerprinting                       │
+│  3 Test for exploitable vulnerabilities and document concrete findings with  │
+│    supporting evidence                                                       │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+╭──────────────────────────────── PentestAgent ────────────────────────────────╮
+│ Starting the security assessment of http://127.0.0.1:5000. I'll work through │
+│ the plan systematically.                                                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:09] $ browser (1)
+         [*] Browser error: BrowserType.launch: Executable doesn't exist ...
+
+[00:09] $ terminal (2)
+         curl -I http://127.0.0.1:5000 2>/dev/null | head -30
+         [+] OK
+
+╭──────────────────────────────── PentestAgent ────────────────────────────────╮
+│ I see the app is running on ServiceStack. Let me get the main page and       │
+│ inspect the technology stack.                                                │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:12] $ browser (3)
+         [*] Browser error: BrowserType.launch: Executable doesn't exist ...
+
+[00:16] $ terminal (4)
+         curl -s http://127.0.0.1:5000/index.html 2>/dev/null | head -100
+         [+] OK
+
+[00:16] $ terminal (5)
+         curl -s http://127.0.0.1:5000/swagger/index.html 2>/dev/null | head -50
+         [+] OK
+
+[00:16] $ terminal (6)
+         curl -s http://127.0.0.1:5000/metadata.json 2>/dev/null | python3 -m 
+json.tool 2...
+         [+] OK
+
+[00:20] $ terminal (7)
+         curl -s http://127.0.0.1:5000/metadata 2>/dev/null | head -200
+         [+] OK
+
+[00:20] $ terminal (8)
+         curl -s http://127.0.0.1:5000/metadata?format=json 2>/dev/null | 
+python3 -m json...
+         [+] OK
+
+[00:20] $ terminal (9)
+         curl -s http://127.0.0.1:5000/swagger/v1/swagger.json 2>/dev/null | 
+python3 -m j...
+         [+] OK
+
+[00:23] $ terminal (10)
+         curl -s http://127.0.0.1:5000/swagger/v1/swagger.json 2>/dev/null | 
+python3 -m j...
+         [+] OK
+
+[00:28] $ notes (11)
+         [*] Error: At least one of 'services' or 'endpoints' or 'technol...
+
+[00:33] $ notes (12)
+         [*] Created note 'app_endpoints' (finding, confirmed)...
+
+[00:39] $ terminal (13)
+         curl -s http://127.0.0.1:5000/swagger/v1/swagger.json 2>/dev/null | 
+python3 -c "...
+         [+] OK
+
+╭──────────────────────────────── PentestAgent ────────────────────────────────╮
+│ Great, I've mapped the endpoints. Now let me identify the tech stack more    │
+│ thoroughly and then test for vulnerabilities.                                │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:44] $ terminal (14)
+         curl -sI http://127.0.0.1:5000/index.html 2>/dev/null
+         [+] OK
+
+[00:44] $ terminal (15)
+         curl -s http://127.0.0.1:5000/metadata?format=json 2>/dev/null | 
+python3 -c "
+im...
+         [+] OK
+
+[00:44] $ terminal (16)
+         curl -s http://127.0.0.1:5000/metadata 2>/dev/null | grep -oE 
+'href="[^"]*"' | h...
+         [+] OK
+
+╭──────────────────────────────── PentestAgent ────────────────────────────────╮
+│ Great - I've mapped the application. Let me complete step 1 and move to tech │
+│ stack identification.                                                        │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:50] $ finish (17)
+         [*] Step 1 complete Result: Enumerated VulnBlazor application vi...
+
+╭──────────────────────────────── PentestAgent ────────────────────────────────╮
+│ Now identifying the technology stack and framework.                          │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:58] $ terminal (18)
+         curl -s http://127.0.0.1:5000/swagger/v1/swagger.json 2>/dev/null | 
+python3 -c "...
+         [+] OK
+
+[01:02] $ finish (19)
+         [*] Step 2 complete Result: Identified tech stack: ServiceStack ...
+
+╭──────────────────────────────── PentestAgent ────────────────────────────────╮
+│ Now testing for exploitable vulnerabilities. Let me start with several tests │
+│ in parallel.                                                                 │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[01:15] $ terminal (20)
+         curl -s http://127.0.0.1:5000/hello/World 2>/dev/null
+         [+] OK
+
+[01:15] $ terminal (21)
+         curl -s http://127.0.0.1:5000/todos 2>/dev/null
+         [+] OK
+
+[01:15] $ terminal (22)
+         curl -s http://127.0.0.1:5000/users/id/1 2>/dev/null
+         [+] OK
+
+[01:15] $ terminal (23)
+         curl -s http://127.0.0.1:5000/users/info/1 2>/dev/null
+         [+] OK
+
+[01:15] $ terminal (24)
+         curl -s http://127.0.0.1:5000/bookings 2>/dev/null
+         [+] OK
+
+[01:15] $ terminal (25)
+         curl -s http://127.0.0.1:5000/coupons 2>/dev/null
+         [+] OK
+
+╭──────────────────────────────── PentestAgent ────────────────────────────────╮
+│ Great findings! Now let me extract the JSON data and test more critical      │
+│ endpoints:                                                                   │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[02:19] $ terminal (26)
+         curl -s "http://127.0.0.1:5000/hello/World.json" 2>/dev/null
+         [+] OK
+
+[02:19] $ terminal (27)
+         curl -s "http://127.0.0.1:5000/todos.json" 2>/dev/null
+         [+] OK
+
+[02:19] $ terminal (28)
+         curl -s "http://127.0.0.1:5000/coupons.json" 2>/dev/null
+         [+] OK
+
+[02:19] $ terminal (29)
+         curl -s "http://127.0.0.1:5000/admin/dashboard.json" 2>/dev/null
+         [+] OK
+
+[02:19] $ terminal (30)
+         curl -s "http://127.0.0.1:5000/admin/users.json" 2>/dev/null
+         [+] OK
+
+[02:19] $ terminal (31)
+         curl -s "http://127.0.0.1:5000/admin/database.json" 2>/dev/null
+         [+] OK
+
+╭──────────────────────────────── PentestAgent ────────────────────────────────╮
+│ Good - coupons and todos are accessible. Let me test the booking system and  │
+│ authentication:                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[03:29] $ terminal (32)
+         curl -s "http://127.0.0.1:5000/api/CreateBooking" -X POST -H 
+"Content-Type: appl...
+         [+] OK
+
+[03:29] $ terminal (33)
+         curl -s "http://127.0.0.1:5000/api/BatchRequest" -X POST -H 
+"Content-Type: appli...
+         [+] OK
+
+[03:29] $ terminal (34)
+         curl -s "http://127.0.0.1:5000/api/CreateTodo" -X POST -H 
+"Content-Type: applica...
+         [+] OK
+
+[03:29] $ terminal (35)
+         curl -s "http://127.0.0.1:5000/api/Authenticate" -X POST -H 
+"Content-Type: appli...
+         [+] OK
+
+[03:29] $ terminal (36)
+         curl -s "http://127.0.0.1:5000/api/Authenticate" -X POST -H 
+"Content-Type: appli...
+         [+] OK
+
+[03:29] $ terminal (37)
+         curl -s "http://127.0.0.1:5000/api/Authenticate" -X POST -H 
+"Content-Type: appli...
+         [+] OK
+
+╭──────────────────────────────── PentestAgent ────────────────────────────────╮
+│ CreateTodo works without auth. Let me test authentication more thoroughly    │
+│ and look for vulnerabilities:                                                │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[04:45] $ terminal (38)
+         curl -s "http://127.0.0.1:5000/api/Authenticate" -X POST -H 
+"Content-Type: appli...
+         [+] OK
+
+[04:45] $ terminal (39)
+         curl -s "http://127.0.0.1:5000/api/Authenticate" -X POST -H 
+"Content-Type: appli...
+         [+] OK
+
+[04:45] $ terminal (40)
+         curl -s "http://127.0.0.1:5000/api/DeleteTodo?id=1" -X DELETE 
+2>/dev/null
+         [+] OK
+
+[04:45] $ terminal (41)
+         curl -s "http://127.0.0.1:5000/api/UpdateTodo" -X PUT -H "Content-Type:
+applicat...
+         [+] OK
+
+[04:45] $ terminal (42)
+         curl -s "http://127.0.0.1:5000/api/Coupon?code=admin" 2>/dev/null
+         [+] OK
+
+[04:45] $ terminal (43)
+         curl -s "http://127.0.0.1:5000/api/Coupon?code=test" 2>/dev/null
+         [+] OK
+
+╭──────────────────────────────── PentestAgent ────────────────────────────────╮
+│ Good finding! UpdateTodo worked without authentication (IDOR). Let me test   │
+│ more endpoints and vulnerabilities:                                          │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[06:12] $ terminal (44)
+         curl -s "http://127.0.0.1:5000/api/GetAllTodos" 2>/dev/null
+         [+] OK
+
+[06:12] $ terminal (45)
+         curl -s "http://127.0.0.1:5000/api/UserProfile" 2>/dev/null
+         [+] OK
+
+[06:12] $ terminal (46)
+         curl -s "http://127.0.0.1:5000/api/Customer" 2>/dev/null
+         [+] OK
+
+[06:12] $ terminal (47)
+         curl -s "http://127.0.0.1:5000/api/CreateBooking" -X POST -H 
+"Content-Type: appl...
+         [+] OK
+
+[06:12] $ terminal (48)
+         curl -s "http://127.0.0.1:5000/api/GetAllBookings" 2>/dev/null
+         [+] OK
+
+[06:12] $ terminal (49)
+         curl -s "http://127.0.0.1:5000/api/BatchRequest" -X POST -H 
+"Content-Type: appli...
+         [+] OK
+
+╭──────────────────────────────── PentestAgent ────────────────────────────────╮
+│ Let me continue testing more endpoints and check for specific                │
+│ vulnerabilities:                                                             │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[07:37] $ terminal (50)
+         curl -s "http://127.0.0.1:5000/api/GetTodo?id=1" 2>/dev/null
+         [+] OK
+
+[07:37] $ terminal (51)
+         curl -s "http://127.0.0.1:5000/api/DeleteTodo?id=1" -X DELETE 
+2>/dev/null
+         [+] OK
+
+[07:37] $ terminal (52)
+         curl -s "http://127.0.0.1:5000/api/SendEmail" -X POST -H "Content-Type:
+applicat...
+         [+] OK
+
+[07:37] $ terminal (53)
+         curl -s "http://127.0.0.1:5000/api/GetUser?id=1" 2>/dev/null
+         [+] OK
+
+[07:37] $ terminal (54)
+         curl -s "http://127.0.0.1:5000/api/GetAllUsers" 2>/dev/null
+         [+] OK
+
+[07:37] Max loops limit reached (30)
+
+╭──────────────────────────────── Interrupted ─────────────────────────────────╮
+│ STOPPED (max loops reached)                                                  │
+│                                                                              │
+│ Duration: 7m 37s                                                             │
+│ Loops: 30/30                                                                 │
+│ Tools: 54                                                                    │
+│ Tokens: 218,147                                                              │
+│ Findings: 2                                                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Report saved: loot/reports/http_127.0.0.1_5000_20260731_135317.md

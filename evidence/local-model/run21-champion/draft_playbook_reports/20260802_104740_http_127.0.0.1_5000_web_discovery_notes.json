@@ -1,0 +1,381 @@
+{
+  "tech-stack-fingerprint": {
+    "content": "Tech stack fingerprint for ACorp (Vuln Blazor) - ASP.NET Core Blazor WebAssembly app with ServiceStack backend, Vue.js client library, GraphQL API, and Swagger UI. Running on Kestrel/.NET 10/macOS. Auth via ASP.NET Core Identity with antiforgery protection. Secure routes under /secure/ prefix.",
+    "category": "finding",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000",
+      "url": "http://127.0.0.1:5000",
+      "services": [
+        {
+          "port": 5000,
+          "product": "Kestrel",
+          "version": "ASP.NET Core"
+        },
+        {
+          "port": 5000,
+          "product": "ServiceStack",
+          "version": "10.08"
+        }
+      ],
+      "technologies": [
+        {
+          "name": "ASP.NET Core",
+          "version": "NET10"
+        },
+        {
+          "name": "ServiceStack",
+          "version": "10.08"
+        },
+        {
+          "name": "Blazor WebAssembly",
+          "version": "unknown"
+        },
+        {
+          "name": "Vue.js",
+          "version": "unknown"
+        },
+        {
+          "name": "GraphQL",
+          "version": "unknown"
+        },
+        {
+          "name": "Swagger UI",
+          "version": "unknown"
+        },
+        {
+          "name": "macOS",
+          "version": "unknown"
+        }
+      ],
+      "endpoints": [
+        {
+          "path": "/",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/Account/Login",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/graphql",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/swagger",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/secure/bookings",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/secure/coupons",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/counter",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/weather",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/todomvc",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/profile",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/about",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/deploy",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/privacy",
+          "methods": [
+            "GET"
+          ]
+        }
+      ]
+    }
+  },
+  "auth-session-analysis": {
+    "content": "Authentication and session analysis for http://127.0.0.1:5000 (Vuln Blazor)\n\nAUTHENTICATION MECHANISM:\n- Type: ASP.NET Core Identity (form-based)\n- Backend: ServiceStack with Identity authentication realm\n- Server: Kestrel (ASP.NET Core)\n- No OAuth/external providers configured (placeholder present but no services)\n\nCOOKIE NAMES AND PROPERTIES:\n- .AspNetCore.Antiforgery.[GUID]: Antiforgery token cookie (httponly, samesite=strict, no Secure flag)\n- .AspNetCore.Cookies: Session/authentication cookie (set after login, properties not fully observed)\n\nSESSION REPRESENTATION:\n- ASP.NET Core Identity cookie-based authentication\n- Uses opaque session cookies (not JWT)\n- Claims-based identity via ASP.NET Core Identity framework\n\nCSRF PROTECTION:\n- Present: __RequestVerificationToken hidden field in all forms\n- POST requests without valid antiforgery token trigger InvalidOperationException in ServiceStack\n- Tested: POST to /login without token caused server error\n\nAUTHENTICATION ENDPOINTS:\n- /Account/Login: GET (login form), POST (authenticate with email/password)\n- /Account/Register: GET (registration form), POST (create account with email/password/confirmPassword)\n- /Account/Logout: POST (logout)\n- /Account/ForgotPassword: GET (form), POST (password reset request)\n- /Account/ResendEmailConfirmation: GET (form), POST (resend confirmation)\n- /Account/Manage: Account management pages (ChangePassword, ResetAuthenticator, ExternalLogins, etc.)\n- /Account/AccessDenied: Access denied page (200 OK)\n- /Account/ExternalLogin: External login callback (302 redirect)\n- /Account/ExternalLoginCallback: External login callback (302 redirect)\n- /Account/ConfirmEmail: Email confirmation (302 redirect)\n- /auth: 302 redirect to /Account/Login with WWW-Authenticate header\n- /auth/logout: 302 redirect (logout handler)\n- /Auth/Logout: 302 redirect (logout handler)\n\nPROTECTED RESOURCES:\n- /secure/bookings: Redirects to /Account/Login?ReturnUrl=... when unauthenticated\n- Profile, Bookings, Coupons sections in navigation suggest authenticated-only areas\n\nAUTH FORM FIELDS:\n- Login: Input.Email, Input.Password, Input.RememberMe (checkbox)\n- Register: Input.Email, Input.Password, Input.ConfirmPassword\n- ForgotPassword: Input.Email\n- All forms include: _handler (hidden), __RequestVerificationToken (hidden)\n\nAUTH HEADERS:\n- WWW-Authenticate: identity realm=\"/auth/identity\" (on /auth and protected endpoints)\n- No Bearer/Token auth endpoints found (/api/auth/*, /oauth/token all return 404)\n\nSECURITY OBSERVATIONS:\n- CSRF protection is properly implemented\n- No JWT/token-based auth exposed via API endpoints\n- No external authentication services configured\n- ServiceStack middleware processes requests before ASP.NET Core Identity handlers",
+    "category": "finding",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "technologies": [
+        {
+          "name": "ASP.NET Core Identity",
+          "version": "unknown"
+        },
+        {
+          "name": "ServiceStack",
+          "version": "unknown"
+        },
+        {
+          "name": "Kestrel",
+          "version": "unknown"
+        }
+      ],
+      "endpoints": [
+        {
+          "path": "/Account/Login",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/Account/Register",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/Account/Logout",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/Account/ForgotPassword",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/Account/ResendEmailConfirmation",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/Account/Manage",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/Account/AccessDenied",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/auth",
+          "methods": [
+            "GET"
+          ]
+        }
+      ]
+    }
+  },
+  "endpoint-inventory": {
+    "content": "Endpoint inventory for http://127.0.0.1:5000 (VulnBlazor)\n\nPUBLIC SPA ROUTES (GET 200, no auth required):\n- / (root) - Main page, 21906 bytes\n- /index.html - Blazor WASM entry point, 765 bytes\n- /about - About page, 24615 bytes\n- /weather - Weather page, 28300 bytes\n- /counter - Counter page, 22517 bytes\n- /deploy - Deploy page, 52049 bytes\n- /privacy - Privacy page, 26596 bytes\n- /coupons - Coupons page, 20660 bytes\n- /todomvc - TodoMVC page, 28300 bytes\n- /Account/Login - Login form page, 25394 bytes\n- /metadata - ServiceStack metadata HTML page, 17877 bytes\n- /locode - ServiceStack metadata page, 172720 bytes\n\nAUTHENTICATED SPA ROUTES (302 redirect without auth):\n- /secure/bookings - Redirects without auth session\n- /secure/coupons - Redirects without auth session\n- /profile - Redirects without auth session\n\nHEALTH CHECK:\n- /up - Health check endpoint, returns \"Healthy\" (7 bytes)\n\nSERVICESTACK API ENDPOINTS (from /api discovery):\nPUBLIC (GET 200):\n- /api/Hello - Simple test endpoint\n- /api/GetUserId - Returns anonymous user ID (200, returns userId)\n- /api/QueryTodos - Query todos (200, returns list)\n- /api/QueryBookings - Query bookings (200, returns list)\n- /api/QueryCoupons - Query coupons (200, returns list)\n- /api/QueryProducts - Query products (200, returns list)\n- /api/QueryLocCodes - Query location codes (200, returns list)\n\nAUTH REQUIRED (401 without auth):\n- /api/Authenticate - POST login endpoint\n- /api/QueryUsers - 401 without auth\n- /api/GetUserInfo - 404 (likely needs auth)\n- /api/CreateBooking - 401 without auth\n- /api/CreateTodo - 400 (missing params, no auth check)\n- /api/UpdateTodo - 405 (wrong method)\n- /api/DeleteTodos - 405 (wrong method)\n\nSTATIC ASSET ROUTES (302 redirect with trailing slash):\n- /js -> /js/\n- /css -> /css/\n- /lib -> /lib/\n- /c -> /c/\n- /img -> /img/\n- /cs -> /cs/\n\nPARAMETERS OBSERVED:\n- /Account/Login form fields: Input.Email, Input.Password, Input.RememberMe, __RequestVerificationToken\n- ServiceStack API uses RESTful paths and supports JSON/XML\n- Authentication via ASP.NET Core Identity with ServiceStack integration\n\nNOTES:\n- Application is ASP.NET Core Blazor WebAssembly SPA with ServiceStack backend\n- Server: Kestrel\n- No robots.txt or sitemap.xml found\n- Catch-all route returns SPA shell for unknown paths\n- /up is a health check endpoint",
+    "category": "finding",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000",
+      "url": "http://127.0.0.1:5000",
+      "services": [
+        {
+          "port": 5000,
+          "product": "Kestrel",
+          "version": ""
+        }
+      ],
+      "technologies": [
+        {
+          "name": "ASP.NET Core",
+          "version": ""
+        },
+        {
+          "name": "Blazor WebAssembly",
+          "version": ""
+        },
+        {
+          "name": "ServiceStack",
+          "version": ""
+        }
+      ],
+      "endpoints": [
+        {
+          "path": "/",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/up",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/Hello",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/Authenticate",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/api/GetUserId",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/QueryTodos",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/QueryBookings",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/QueryCoupons",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/QueryUsers",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/api/CreateBooking",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/api/CreateTodo",
+          "methods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "/Account/Login",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/secure/bookings",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/secure/coupons",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/profile",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/metadata",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/locode",
+          "methods": [
+            "GET"
+          ]
+        }
+      ]
+    }
+  },
+  "client-assets-inventory": {
+    "content": "Client-side asset inventory for ACorp Blazor app (http://127.0.0.1:5000)\n\nDOWNLOADED FILES:\n- /tmp/client-assets/index.html - Blazor WASM entry point (765 bytes)\n- /tmp/client-assets/blazor.webassembly.js - Blazor WASM runtime\n- /tmp/client-assets/blazor.web.js - Blazor web runtime with SignalR/transport\n- /tmp/client-assets/app.css - Application CSS\n- /tmp/client-assets/wasm/dotnet.wasm - .NET runtime (84595 bytes)\n- /tmp/client-assets/wasm/ACorpBlazor.wasm - Server WASM (23040 bytes)\n- /tmp/client-assets/wasm/ACorpBlazor.Client.wasm - Client WASM (10240 bytes)\n- /tmp/client-assets/mjs/servicestack-vue.mjs - ServiceStack Vue client library\n- /tmp/client-assets/decompiled/ACorpBlazor.Client/ACorpBlazor.Client.decompiled.cs - Decompiled C# (11123 bytes)\n\nAPI ENDPOINTS DISCOVERED (from JS analysis):\n- /api/ - Base API path\n- /ApiPrefs/ - API preferences\n- /auth/logout - Logout endpoint\n- /metadata/app.json - Application metadata\n- /signin - Sign-in page\n- ServiceStack CRUD operations: Query, QueryInto, Create, Update, Patch, Delete\n\nAUTH PATTERNS:\n- ASP.NET Core Identity authentication\n- ServiceStack Authenticate service\n- OAuth support (authProviders)\n- Role/permission-based access control (requiresAuth, requiredRoles, requiredPermissions)\n- Bearer token handling in HTTP client\n\nTECH STACK:\n- ASP.NET Core Blazor WebAssembly (.NET 10.0)\n- ServiceStack framework\n- Vue.js (ServiceStack Vue client library)\n- SignalR for real-time communication",
+    "category": "artifact",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "evidence_path": "/tmp/client-assets/",
+      "technologies": [
+        {
+          "name": "Blazor WebAssembly",
+          "version": ".NET 10.0"
+        },
+        {
+          "name": "ServiceStack",
+          "version": "unknown"
+        },
+        {
+          "name": "Vue.js",
+          "version": "unknown"
+        }
+      ]
+    }
+  }
+}

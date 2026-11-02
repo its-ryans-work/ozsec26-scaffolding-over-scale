@@ -1,0 +1,137 @@
+"""A04:2025 Cryptographic Failures (A02:2021), which asks directly whether
+'default crypto keys [are] in use, weak crypto keys generated or re-used'
+and whether keys are 'checked into source code repositories'.
+CWE-321 hard-coded cryptographic key, CWE-259 hard-coded password."""
+
+from .base_playbook import BasePlaybook, Phase
+
+
+class CryptographicPlaybook(BasePlaybook):
+    name = "a04_cryptographic"
+    description = (
+        "OWASP A04 Cryptographic Failures: embedded and reused keys, weak or "
+        "homemade cryptography, reversible credential storage, predictable "
+        "tokens, and sensitive material returned where it should not be. "
+        "Includes the join step that turns a recovered key into account "
+        "access. "
+    )
+    mode = "agent"
+    max_loops = 60
+
+    phases = [
+        Phase(
+            name="Find embedded and exposed key material",
+            objective=(
+                "Anything shipped to a client is public. "
+            ),
+            techniques=[
+                "Search decompiled or unpacked client artifacts - never the "
+                "raw binaries or minified bundles, which hide literals. ",
+                "Search along independent axes and iterate, designing "
+                "patterns yourself: BY NAME (identifiers suggesting secrets), "
+                "BY DECLARATION (compile-time constants and static fields), "
+                "BY SHAPE (long unbroken high-entropy or base64/hex-like "
+                "literals), BY USE (cryptographic and auth APIs and what is "
+                "passed to them), BY CONFIG (endpoints, connection strings). ",
+                "A name-based search is NOT evidence of absence: real secrets "
+                "are often obfuscated so no dictionary word appears, and are "
+                "declared under neutral names. The axes that ignore naming "
+                "are the ones that find those. ",
+                "Trace indirection: a crypto call usually references an "
+                "identifier, not a literal. Follow it to the value, expecting "
+                "several hops, and report the value rather than the variable "
+                "name. ",
+                "Secret scanners are worth running as an extra signal but "
+                "detect mostly known provider credential formats; a clean "
+                "scanner result must never be reported as 'no secrets "
+                "present'. ",
+            ],
+        ),
+        Phase(
+            name="Assess how cryptography is used",
+            objective=(
+                "Weak use of good primitives is as damaging as weak "
+                "primitives. "
+            ),
+            techniques=[
+                "Identify algorithms, modes, key sizes and IV or nonce "
+                "handling, and whether integrity is protected as well as "
+                "confidentiality. ",
+                "Determine whether credentials are stored reversibly - "
+                "encrypted or encoded rather than hashed. Reversible storage "
+                "of a credential is a finding in itself. ",
+                "For hashed material identify the algorithm and cost. Modern "
+                "salted adaptive hashing should be reported as adequate; fast "
+                "or unsalted hashing is a finding regardless of whether you "
+                "crack it. ",
+                "Assess whether tokens are random or derived from something "
+                "predictable or recoverable. ",
+            ],
+        ),
+        Phase(
+            name="Join the key to the material",
+            objective=(
+                "The step that converts two moderate findings into a critical "
+                "one. "
+            ),
+            techniques=[
+                "Before using a recovered secret: strip whitespace and "
+                "quotes, print its length and bytes, and assert the length is "
+                "valid for the algorithm. An invalid length means an "
+                "extraction bug, not a wrong secret - go back and re-read the "
+                "literal. ",
+                "STOP AND JOIN THEM - the moment you hold BOTH a secret AND "
+                "any opaque stored value (encrypted token, protected field, "
+                "cookie, unexplained blob), attempt to decode that value with "
+                "that secret as your NEXT action, before writing either up. "
+                "Reported separately they read as 'a key leaked' and 'some "
+                "data leaked'; joined they are frequently FULL ACCOUNT "
+                "TAKEOVER. Assume the join works and disprove it. ",
+                "Apply the secret to every opaque value you hold, for every "
+                "account, not only the first. ",
+                "Reimplement the owner's routine exactly from recovered "
+                "source, and enumerate accepted operations from that source "
+                "before composing requests. Never invent an operation name: "
+                "it is rejected as unknown even when the material is correct. ",
+                "Prove your implementation before trusting a rejection: round "
+                "trip a known value, and decode something the TARGET "
+                "produced. ",
+                "If a plaintext credential results, hand it to authentication "
+                "testing - recovering it is not the end of the chain. ",
+            ],
+        ),
+        Phase(
+            name="Verify before reporting",
+            objective=(
+                "Apply the same evidence standard to every finding, so "
+                "results are comparable across categories."
+            ),
+            techniques=[
+                "PROOF DISCIPLINE - label every finding DEMONSTRATED (you "
+                "executed it and the response proves it, quote that "
+                "response), INFERRED (follows from evidence but was not "
+                "executed), or UNVERIFIED (suspected from a version, "
+                "component or code pattern only). Identifying software is "
+                "never a demonstration; never write 'confirmed' without "
+                "having executed something. ",
+                "RUN THE CONTROL TEST. Before claiming any access or bypass, "
+                "repeat the request WITHOUT the credential, token, header or "
+                "material you believe is responsible. If the result is the "
+                "same, you have proven nothing - the resource was already "
+                "reachable. State the control result alongside the finding. "
+                "This single omission is the most common source of false "
+                "critical findings. ",
+                "BUDGET DISCIPLINE - rank leads by evidence strength "
+                "(material in hand > observed behaviour > suspicion from a "
+                "version string) and give each a step budget. STOP RULE: "
+                "about 8-10 consecutive steps on one lead with no new "
+                "evidence means move on, recording what you tried. ",
+                "Record findings to notes as you go, with the endpoint, the "
+                "request, the response and the control result, so later "
+                "phases and the report can use them. ",
+                "Stay non-destructive: prefer read-only proof, do not modify "
+                "or delete data, do not lock accounts, and stop once the "
+                "point is demonstrated. ",
+            ],
+        ),
+    ]

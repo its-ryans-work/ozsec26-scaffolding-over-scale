@@ -1,0 +1,367 @@
+{
+  "stack_fingerprint": {
+    "content": "Stack Fingerprint for http://127.0.0.1:5000\n\nSERVER:\n- Web Server: Kestrel (ASP.NET Core default)\n- API Framework: ServiceStack 10.08\n- Runtime: .NET 10 (NET10) on macOS\n- App Type: Blazor Server (ASP.NET Core)\n\nFRONTEND:\n- Blazor Web App with enhanced navigation\n- Vue.js integrated via @servicestack/vue\n- Import maps: app.mjs, @servicestack/client, vue, @servicestack/vue\n\nAUTHENTICATION:\n- ASP.NET Core antiforgery cookie: .AspNetCore.Antiforgery.COMsORkYXoQ (httponly, samesite=strict)\n- Blazor Server Component State: base64-encoded token in HTML comments\n- Auth endpoints: /Account/Login, /Account/Register\n- Protected routes: /secure/bookings, /secure/coupons\n\nENDPOINTS:\n- Public: /, /about, /deploy, /privacy, /counter, /weather, /todomvc\n- Auth: /Account/Login, /Account/Register\n- Protected: /secure/bookings, /secure/coupons\n- User: /profile\n\nINFO DISCLOSURE:\n- X-Powered-By: ServiceStack/10.08 NET10/macOS/net10 (full stack exposed)\n- Blazor-Web-Initializers HTML comment reveals HotReload assembly\n- Blazor Server Component State token in HTML comments\n- Development environment check in error UI code\n\nSECURITY HEADERS:\n- Present: X-Frame-Options:SAMEORIGIN, CSP:frame-ancestors 'self', Cache-Control:no-cache,no-store, Pragma:no-cache\n- Missing: X-Content-Type-Options, Referrer-Policy, Permissions-Policy, COEP, CORP, COOP",
+    "category": "finding",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000",
+      "url": "http://127.0.0.1:5000",
+      "services": [
+        {
+          "port": 5000,
+          "product": "Kestrel",
+          "version": ""
+        }
+      ],
+      "technologies": [
+        {
+          "name": "Blazor Server",
+          "version": ""
+        },
+        {
+          "name": "ASP.NET Core",
+          "version": "10.0"
+        },
+        {
+          "name": "ServiceStack",
+          "version": "10.08"
+        },
+        {
+          "name": ".NET",
+          "version": "10"
+        },
+        {
+          "name": "Vue.js",
+          "version": ""
+        }
+      ],
+      "endpoints": [
+        {
+          "path": "/",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/about",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/deploy",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/privacy",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/counter",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/weather",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/todomvc",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/Account/Login",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/Account/Register",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        },
+        {
+          "path": "/secure/bookings",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/secure/coupons",
+          "methods": [
+            "GET"
+          ]
+        },
+        {
+          "path": "/profile",
+          "methods": [
+            "GET"
+          ]
+        }
+      ]
+    }
+  },
+  "api_documentation": {
+    "content": "API Documentation for VulnBlazor (http://127.0.0.1:5000)\n\nNUCLEI SCAN FINDINGS:\n- Swagger API exposed: /swagger/index.html (CRITICAL)\n- ASP.NET Core Development Environment exposed: /Error (HIGH)\n\nOPENAPI/SWAGGER SPEC:\n- Location: /swagger/v1/swagger.json (85KB)\n- Title: VulnBlazor v1.0\n- Format: OpenAPI 3.0.4\n- Total endpoints: 31 paths\n\nALL API ENDPOINTS (from OpenAPI spec):\n\nAUTH & ACCOUNT:\nPOST /auth/{provider} - Sign In (external provider)\nGET /auth - Auth info\nPOST /auth - Sign In\nPOST /Account/PerformExternalLogin\nPOST /Account/Logout\nPOST /Account/Manage/LinkExternalLogin\nPOST /Account/Manage/DownloadPersonalData\nPOST /api/Authenticate\n\nUSERS:\nGET /users/id/{Id}\nGET /users/info/{UserId}\nGET /api/GetUserId\nGET /api/GetUserInfo\nGET /api/QueryUsers\n\nTODOS:\nGET /todos - Query (params: Id, Ids, TextContains, Skip, Take, OrderBy, OrderByDesc, Include, Fields, Meta)\nPOST /todos - Create\nDELETE /todos - Delete (param: Ids)\nPUT /todos/{Id} - Update\nGET /api/QueryTodos\nPOST /api/CreateTodo\nPUT /api/UpdateTodo\nDELETE /api/DeleteTodos\n\nBOOKINGS:\nGET /bookings - Find Bookings (params: Id, Skip, Take, OrderBy, OrderByDesc, Include, Fields, Meta)\nPOST /bookings - Create Booking\nGET /bookings/{Id} - Find by ID\nPATCH /booking/{Id} - Update Booking\nDELETE /booking/{Id} - Delete Booking\nGET /api/QueryBookings\nPOST /api/CreateBooking\nPATCH /api/UpdateBooking\nDELETE /api/DeleteBooking\n\nCOUPONS:\nGET /coupons - Find Coupons (params: Id, Skip, Take, OrderBy, OrderByDesc, Include, Fields, Meta)\nGET /api/QueryCoupons\n\nMISC:\nPOST /api/batch - Batch request (action, payload)\nGET /hello/{Name} - Hello endpoint\nGET /api/Hello\nPOST /api/BatchRequest\n\nGRAPHQL CHECK:\n- /graphql: HTTP 400 (possibly GraphQL but returned error)\n- /api/graphql: HTTP 404\n- /graph: HTTP 400\n\nOTHER API DOCS CHECKED (all 404):\n- /swagger/v2/swagger.json\n- /api/v1/swagger.json\n- /api/v2/swagger.json\n- /docs.json\n- /api-docs/v1/api-docs\n- /openapi.json\n\nCOMMON REST PATHS CHECKED (all 404):\n- /api/users, /api/auth, /api/login, /api/register, /api/health, /api/status",
+    "category": "artifact",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "url": "http://127.0.0.1:5000",
+      "evidence_path": "/tmp/a04_blazor/swagger_v1.json",
+      "technologies": [
+        {
+          "name": "ASP.NET Core",
+          "version": "NET10"
+        },
+        {
+          "name": "ServiceStack",
+          "version": "10.08"
+        },
+        {
+          "name": "Blazor Server",
+          "version": "unknown"
+        }
+      ]
+    }
+  },
+  "endpoints_inventory": {
+    "content": "PHASE 2 - ENDPOINTS INVENTORY for http://127.0.0.1:5000\n\n=== DIRECTORY BRUTE-FORCING RESULTS ===\n\nGOBUSTER (dirb/common.txt, 4055 responses):\n- Baseline: 3974/4055 (98%) returned 200 at 21904-21919 bytes (SPA fallback)\n- 81 distinct signals found (auth redirects, API paths, static resources)\n- Key auth-protected paths (302 to /Account/Login): /Admin, /admin, /ADMIN, /auth, /profile\n- API docs: /swagger-ui/ (200), /api-docs (200)\n- Static: /favicon.ico, /js/, /css/, /mjs/, /img/\n\nFFUF (dirb/common.txt, filtered baseline):\n- Confirmed auth redirects for: /admin, /Admin, /ADMIN, /auth, /profile\n- Confirmed API paths: /metadata, /api-docs, /swagger-ui/\n- Confirmed public pages: /about, /privacy, /weather, /up, /ui\n\n=== COMMON STATIC FILES ===\n- /robots.txt: 404 (not present)\n- /sitemap.xml: 404 (not present)\n- /api/docs: 404\n- /api/swagger.json: 405 (method not allowed - exists but restricted)\n- /api/v1/openapi.json: 404\n- /openapi.json: 404\n\n=== API DOCUMENTATION ===\n- /swagger-ui/: 200 (ServiceStack Vue UI)\n- /api-docs: 200 (ServiceStack API docs)\n- /metadata: 200 (ServiceStack metadata, 17KB)\n\n=== PUBLIC ENDPOINTS (no auth required) ===\n- / : 200 (home page, Blazor SPA)\n- /About : 200 (about page)\n- /Privacy : 200 (privacy page)\n- /weather : 200 (weather forecast page)\n- /up : 200 (health check, returns \"Healthy\")\n- /ui : 200 (UI entry point)\n- /Account/Login : 200 (login page, public)\n- /Account/Register : 200 (registration page, public)\n- /Account/Logout : 200 (logout endpoint)\n\n=== AUTH-PROTECTED ENDPOINTS (302 redirect to /Account/Login) ===\n- /Admin : 302 -> /Account/Login?ReturnUrl=%2FAdmin\n- /admin : 302 -> /Account/Login?ReturnUrl=%2Fadmin\n- /ADMIN : 302 -> /Account/Login?ReturnUrl=%2FADMIN\n- /auth : 302 -> /Account/Login?ReturnUrl=%2fauth\n- /profile : 302 -> /Account/Login?ReturnUrl=%2Fprofile\n\n=== API ENDPOINTS WITH HTTP METHODS ===\n- /todos: GET=200, POST=400, OPTIONS=405 (public query, POST needs auth)\n- /bookings: GET=200, POST=302 (auth required), OPTIONS=405\n- /coupons: GET=200, POST=400, OPTIONS=405\n\n=== ENDPOINTS WITH URL PARAMETERS ===\n- /todos?Take=5 : 200 (pagination parameter)\n- /todos?TextContains=test : 200 (filter parameter)\n- /bookings?Take=5 : 200 (pagination parameter)\n- /coupons?Take=5 : 200 (pagination parameter)\n- /weather?count=5 : 200 (parameter accepted)\n\n=== OPTIONS METHOD SUPPORT ===\n- /up : 200 (supports OPTIONS - CORS configured)\n- All other tested endpoints: 405 (OPTIONS not allowed)\n\n=== SERVICESTACK-SPECIFIC PATHS ===\n- /metadata : 200 (ServiceStack metadata page, 17KB)\n- /metadata.json : 404\n- /metadata/types.json : 404\n- /metadata/services.json : 404\n- /metadata/swagger.json : 404\n- /metadata/apphost.json : 404\n- /metadata/diagnostic.json : 404\n- /metadata/authproviders.json : 404\n\n=== STATIC RESOURCES ===\n- /js/ : JavaScript directory\n- /css/ : CSS directory\n- /mjs/ : ES modules directory (app.mjs)\n- /img/ : Images directory\n- /favicon.ico : Favicon",
+    "category": "finding",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000",
+      "url": "http://127.0.0.1:5000"
+    }
+  },
+  "client_artifacts": {
+    "content": "CLIENT ARTIFACTS INVENTORY for VulnBlazor (http://127.0.0.1:5000)\n\n=== DOWNLOADED CLIENT ASSETS ===\nLocation: /tmp/client_assets/\n\nJS FILES:\n- /tmp/client_assets/framework/blazor.web.2i0r6wwb69.js (200KB) - Blazor Web Assembly runtime\n- /tmp/client_assets/js/servicestack-blazor.js (15KB) - ServiceStack Blazor integration\n- /tmp/client_assets/js/highlight.js (108KB) - Syntax highlighter library\n- /tmp/client_assets/js/ReconnectModal.w97mql0d9w.razor.js (2KB) - Reconnection modal component\n\nCSS FILES:\n- /tmp/client_assets/css/app.css (84KB) - Main application styles\n- /tmp/client_assets/css/typography.css (15KB) - Typography styles\n- /tmp/client_assets/css/highlight.css (3KB) - Syntax highlighter styles\n- /tmp/client_assets/css/ACorpBlazor.styles.css (0 bytes) - Empty\n\n=== SERVER BINARY ARTIFACTS ===\nLocation: /tmp/a04_blazor/\n- ACorpBlazor.dll (23KB) - Server-side Blazor application DLL (NOT YET DECOMPILED)\n- ACorpBlazor.Client.dll (10KB) - Client-side Blazor DLL (NOT YET DECOMPILED)\n\n=== API DOCUMENTATION ===\n- /tmp/a04_blazor/swagger_v1.json (85KB) - Full OpenAPI 3.0.4 spec with 31 endpoints\n\n=== IMPORT MAPS & DEPENDENCIES ===\n- app.mjs - Main application module\n- @servicestack/client - ServiceStack client library\n- @servicestack/vue - Vue.js integration\n- vue - Vue.js framework",
+    "category": "artifact",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "url": "http://127.0.0.1:5000"
+    }
+  },
+  "attack_surface_inventory": {
+    "content": "ATTACK SURFACE INVENTORY - VulnBlazor (http://127.0.0.1:5000)\n\n=== TECHNOLOGY STACK ===\nWeb Server: Kestrel (ASP.NET Core)\nAPI Framework: ServiceStack 10.08\nRuntime: .NET 10 (NET10) on macOS\nApp Type: Blazor Server with Vue.js integration\n\n=== AUTHENTICATION ===\nProvider: ServiceStack Auth with external OAuth (Google, GitHub)\nSession: cookie-based auth\nProtected Paths: /Admin (302 to /Account/Login)\nCRITICAL: Only 3 of 36 API endpoints require auth per OpenAPI spec\n\n=== 31 PATHS / 36 ENDPOINTS (from Swagger) ===\n\nAUTH ENDPOINTS (all PUBLIC):\n- POST /api/Authenticate [PUBLIC]\n- GET /auth [PUBLIC]\n- POST /auth [PUBLIC] - Sign In\n- POST /auth/{provider} [PUBLIC] - Sign In\n- POST /Account/Logout [PUBLIC]\n- POST /Account/PerformExternalLogin [PUBLIC]\n- POST /Account/Manage/LinkExternalLogin [PUBLIC]\n- POST /Account/Manage/DownloadPersonalData [PUBLIC]\n\nBOOKING API:\n- GET /bookings [PUBLIC] - Find Bookings\n- POST /bookings [AUTH] - Create Booking\n- GET /bookings/{Id} [PUBLIC] - Find Booking\n- PATCH /booking/{Id} [AUTH] - Update Booking\n- DELETE /booking/{Id} [AUTH] - Delete Booking\n- GET /coupons [PUBLIC] - Find Coupons\n\nTODO API (all PUBLIC):\n- GET /todos [PUBLIC]\n- POST /todos [PUBLIC]\n- DELETE /todos [PUBLIC]\n- PUT /todos/{Id} [PUBLIC]\n\nUSER API (all PUBLIC):\n- GET /api/QueryUsers [PUBLIC]\n- GET /api/GetUserId [PUBLIC]\n- GET /api/GetUserInfo [PUBLIC]\n- GET /users/id/{Id} [PUBLIC]\n- GET /users/info/{UserId} [PUBLIC]\n\nCRUD APIs (all PUBLIC):\n- POST /api/CreateBooking [PUBLIC]\n- POST /api/CreateTodo [PUBLIC]\n- DELETE /api/DeleteBooking [PUBLIC]\n- DELETE /api/DeleteTodos [PUBLIC]\n- PUT /api/UpdateTodo [PUBLIC]\n- PATCH /api/UpdateBooking [PUBLIC]\n- GET /api/QueryBookings [PUBLIC]\n- GET /api/QueryCoupons [PUBLIC]\n- GET /api/QueryTodos [PUBLIC]\n\nBATCH/HELLO:\n- POST /api/BatchRequest [PUBLIC]\n- POST /api/batch [PUBLIC]\n- GET /api/Hello [PUBLIC]\n- GET /hello/{Name} [PUBLIC]\n\n=== WEB ROUTES ===\n- /Account/Login [GET,POST] - Login page\n- /Account/Register [GET,POST] - Registration page\n- /secure/bookings [GET] - Protected bookings view\n- /secure/coupons [GET] - Protected coupons view\n- /profile [GET] - User profile\n\n=== EXPOSED RESOURCES ===\n- /swagger/index.html - Swagger UI (CRITICAL)\n- /swagger/v1/swagger.json - Full API spec (85KB)\n- /Error - ASP.NET Core dev environment page (HIGH)\n- /Admin - Redirects to login (protected)\n\n=== AUTH SUMMARY ===\nTotal endpoints: 36\nPUBLIC: 33 (92%)\nREQUIRES AUTH: 3 (8%)\n\n=== CLIENT ASSETS ===\nLocation: /tmp/client_assets/\n- JS: blazor.web.2i0r6wwb69.js (200KB), servicestack-blazor.js (15KB), highlight.js (108KB), ReconnectModal.w97mql0d9w.razor.js (2KB)\n- CSS: app.css (84KB), typography.css (15KB), highlight.css (3KB)\n\n=== SERVER BINARIES (NOT YET DECOMPILED) ===\n- /tmp/a04_blazor/ACorpBlazor.dll (23KB)\n- /tmp/a04_blazor/ACorpBlazor.Client.dll (10KB)\n\n=== KEY FINDINGS ===\n1. CRITICAL: Swagger API exposed at /swagger/v1/swagger.json\n2. CRITICAL: 33 of 36 API endpoints marked PUBLIC (massive auth bypass potential)\n3. HIGH: ASP.NET Core dev environment exposed at /Error\n4. HIGH: CreateBooking, DeleteBooking exposed as PUBLIC via /api/ endpoints\n5. MEDIUM: ServiceStack 10.08 on .NET 10 (check for CVEs)\n6. Pending: DLL decompilation for server-side logic analysis",
+    "category": "info",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {}
+  },
+  "a01_idor_user_info_password_hashes": {
+    "content": "DEMONSTRATED: GetUserInfo endpoint (/users/info/{UserId}) returns passwordHash for any user without authentication. Sequential integer enumeration via /users/id/{Id} yields UUIDs. Full user profiles including password hashes, lastSeenTokens, emails exposed.\n\nControl test: No auth headers sent - responses identical.\n\nRecords retrieved:\n- ID=1 -> UUID=029d65c2-bd85-483f-8ef2-6f5f87e9bf84, email=employee@email.com, hash=AQAAAAIAAYagAAAAECFk0FWL5Rh81XaVdZ+HWn7B7JYVLk18PvGnEkcoHQ77CVIED3ANpQa+yyW8yLGD0g==\n- ID=2 -> UUID=2e8d62af-7ff1-45bd-a697-a0ed5dbe2c42, email=manager@email.com, hash=AQAAAAIAAYagAAAAEDtv3AnDyy+FSShbAh3rDEsXiLZwobN6QCTOmebyOMcJcbpNxlJZfqdLOVX48C5Trw==\n- ID=3 -> UUID=c07f7eec-2ad0-4315-94a1-75dce4fb9a72, email=admin@email.com, hash=AQAAAAIAAYagAAAAEDSm7yqlBHkAx2+DVBwolH+kYQXY2yxic0nwjLMC2PysS2sjpGCxOz09GYWuFlDbLA==\n- ID=4 -> UUID=fe8882d0-5e69-4acb-bf62-521353bca36d, email=test@email.com, hash=AQAAAAIAAYagAAAAEA9/lv59NiuxFq5qjLmZkZMdMz/jrns3L5+5zCJt0S+WD3oCvWbhEc0WzgN1FWoIog==\n\nEvidence: curl -s http://127.0.0.1:5000/users/info/{uuid}.json (no auth) returns full record including passwordHash field.",
+    "category": "vulnerability",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "url": "http://127.0.0.1:5000/users/info/{UserId}",
+      "weaknesses": [
+        {
+          "id": "A01-Broken-Access-Control",
+          "description": "Missing authorization on user info endpoint exposes password hashes for all users"
+        },
+        {
+          "id": "CWE-284",
+          "description": "Improper Access Control - no authentication required to read sensitive user data"
+        }
+      ]
+    }
+  },
+  "a02_exposed_health_check": {
+    "content": "DEMONSTRATED: Health check endpoint /up accessible without authentication. Response: \"Healthy\" (7 bytes). Control test: identical response with and without auth token/session. Impact: attacker can monitor service availability and confirm target is live.",
+    "category": "info",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "url": "http://127.0.0.1:5000/up"
+    }
+  },
+  "a02_exposed_metadata": {
+    "content": "DEMONSTRATED: ServiceStack metadata page accessible without authentication. Exposes full API surface: 15 operations (Account, Authenticate, Bookings, Coupons, Todos, Users, etc.) with request/response types. Control test: no auth required, identical response with/without credentials. Impact: attacker gains complete API documentation for reconnaissance and attack planning.",
+    "category": "info",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "url": "http://127.0.0.1:5000/metadata"
+    }
+  },
+  "a02_exposed_swagger_spec": {
+    "content": "DEMONSTRATED: OpenAPI/Swagger specification exposed without authentication. 85KB JSON file documenting 31 API paths with request/response schemas, parameters, and examples. Control test: no auth required, identical response with/without credentials. Impact: attacker gains complete API blueprint for reconnaissance and attack planning.",
+    "category": "info",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "url": "http://127.0.0.1:5000/swagger/v1/swagger.json"
+    }
+  },
+  "a02_exposed_swagger_ui": {
+    "content": "DEMONSTRATED: Interactive Swagger UI accessible without authentication at /swagger/index.html (735 bytes). Control test: no auth required, identical response with/without credentials. Impact: attacker can explore and test API endpoints interactively without needing to parse raw OpenAPI spec.",
+    "category": "info",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "url": "http://127.0.0.1:5000/swagger/index.html"
+    }
+  },
+  "a04_telemetrycodec_aes_key": {
+    "content": "DEMONSTRATED: TelemetryCodec class in ACorpBlazor.dll contains embedded AES key. Algorithm: AES-CBC with PKCS7 padding, random IV per encryption. Key: \"Vu1nB1az0r$ecretKey!2026@@@@@@@@\". Format: base64(IV[16] + ciphertext). Key is present in server DLL but TelemetryCodec.Encode/Decode are NOT called anywhere in decompiled server code (grep returned 0 matches). Status: INFERRED vulnerability - key exists but no encrypted material found yet. Source: /tmp/a04_blazor/decompiled/ACorpBlazor/ACorpBlazor.decompiled.cs lines 628-695",
+    "category": "vulnerability",
+    "confidence": "high",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "weaknesses": [
+        {
+          "id": "CWE-798",
+          "description": "Use of Hard-coded Cryptographic Key"
+        }
+      ]
+    }
+  },
+  "workspace_file_inventory": {
+    "content": "WORKSPACE FILE INVENTORY for VulnBlazor assessment\n\nDRAFT PLAYBOOK REPORTS (20 files):\n- 20260805_160225_http_127.0.0.1_5000_web_discovery.md (15KB) + notes.json (14KB)\n- 20260805_162208_http_127.0.0.1_5000_blazor_wasm.md (91KB) + notes.json (14KB)\n- 20260805_164313_http_127.0.0.1_5000_a01_a07_access_auth.md (78KB) + notes.json (16KB)\n- 20260805_165416_http_127.0.0.1_5000_a02_misconfiguration.md (86KB) + notes.json (18KB)\n- 20260805_170106_http_127.0.0.1_5000_a04_cryptographic.md (58KB) + notes.json (19KB)\n- 20260805_171935_http_127.0.0.1_5000_a05_injection.md (75KB) + notes.json (19KB)\n- 20260805_173732_http_127.0.0.1_5000_a08_integrity.md (78KB) + notes.json (19KB)\n- 20260805_174228_http_127.0.0.1_5000_a09_logging_alerting.md (39KB) + notes.json (19KB)\n- 20260805_175158_http_127.0.0.1_5000_a10_exceptional.md (40KB) + notes.json (19KB)\n\nPHASE TOOL-LOGS (9 files):\n- a01_a07_access_auth/tool-log.md (154KB) + TODO.md (1KB)\n- a02_misconfiguration/tool-log.md (91KB) + TODO.md (2KB)\n- a04_cryptographic/tool-log.md (74KB) + TODO.md (0.5KB)\n- a05_injection/tool-log.md (234KB) + TODO.md (1KB)\n- a08_integrity/tool-log.md (206KB) + TODO.md (0.9KB)\n- a09_logging_alerting/tool-log.md (108KB) + TODO.md (0.4KB)\n- a10_exceptional/tool-log.md (235KB) + TODO.md (0.3KB)\n- blazor_wasm/tool-log.md (115KB) + TODO.md (1KB)\n- consolidate_findings/tool-log.md (59KB) + TODO.md (0.5KB)\n\nWEB DISCOVERY AGENT NOTES (8 files):\n- agent-0.md through agent-5.md, inventory.md, TODO.md\n\nSERVER BINARIES & DECOMPILATION:\n- /tmp/a04_blazor/ACorpBlazor.dll (23KB)\n- /tmp/a04_blazor/ACorpBlazor.Client.dll (10KB)\n- /tmp/a04_blazor/decompiled/ACorpBlazor/ACorpBlazor.decompiled.cs (24KB)\n- /tmp/a04_blazor/decompiled/ACorpBlazor.Client/ACorpBlazor.Client.decompiled.cs (11KB)\n\nCLIENT ASSETS (/tmp/client_assets/):\n- blazor.web.2i0r6wwb69.js (200KB), servicestack-blazor.js (15KB), highlight.js (108KB), ReconnectModal.w97mql0d9w.razor.js (2KB)\n- app.css (84KB), typography.css (15KB), highlight.css (3KB), ACorpBlazor.styles.css (0B)\n\nEXISTING NOTES (11 entries):\n- Vulnerabilities: a01_idor_user_info_password_hashes, a04_telemetrycodec_aes_key\n- Findings: stack_fingerprint, endpoints_inventory\n- Artifacts: api_documentation, client_artifacts\n- Info: attack_surface_inventory, a02_exposed_health_check, a02_exposed_metadata, a02_exposed_swagger_spec, a02_exposed_swagger_ui",
+    "category": "info",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1"
+    }
+  },
+  "a06_missing_security_headers": {
+    "content": "DEMONSTRATED: HTTP responses lack several security headers. Present: X-Frame-Options: SAMEORIGIN, CSP: frame-ancestors 'self', Cache-Control: no-cache, no-store, Pragma: no-cache. Missing: X-Content-Type-Options, Referrer-Policy, Permissions-Policy, COEP, CORP, COOP. Control test: header inspection confirmed absence. Impact: increases risk of MIME-type sniffing, referrer leakage, and cross-origin data leakage attacks.",
+    "category": "finding",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000"
+    }
+  },
+  "a09_dev_environment_exposed": {
+    "content": "DEMONSTRATED: ASP.NET Core Development Environment exposed at /Error endpoint. Returns HTTP 200 with development environment UI. HTML comments reveal Blazor-Web-Initializers with HotReload assembly references. Control test: HTTP 200 on /Error without auth. Impact: development environment exposure can lead to detailed stack traces, internal paths, and configuration details being leaked during errors.",
+    "category": "finding",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000",
+      "url": "http://127.0.0.1:5000/Error"
+    }
+  },
+  "a06_cors_on_health_check": {
+    "content": "DEMONSTRATED: Health check endpoint /up supports OPTIONS method with CORS configured, while other endpoints return 405 for OPTIONS. Control test: OPTIONS request to /up returns 200 with CORS headers. Impact: if CORS headers are overly permissive, this endpoint could be accessed from malicious cross-origin contexts.",
+    "category": "finding",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000",
+      "url": "http://127.0.0.1:5000/up"
+    }
+  },
+  "a06_blazor_state_token_in_html": {
+    "content": "DEMONSTRATED: Base64-encoded Blazor Server Component State token found in HTML comments. Control test: token present in HTML source without authentication. Impact: if not properly scoped or signed, this could aid in session manipulation or state hijacking.",
+    "category": "finding",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000"
+    }
+  },
+  "a04_aes_cbc_no_authenticated_encryption": {
+    "content": "INFERRED: TelemetryCodec implements AES encryption using CipherMode.CBC (mode=1) and PaddingMode.PKCS7 (padding=2) with random IV concatenated to ciphertext, but no MAC or HMAC for integrity verification. Source: decompiled ACorpBlazor.dll lines 636-649. Impact: encryption scheme vulnerable to padding oracle attacks and ciphertext tampering.",
+    "category": "finding",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000"
+    }
+  },
+  "a09_x_powered_by_disclosure": {
+    "content": "DEMONSTRATED: X-Powered-By header explicitly reveals full technology stack: ServiceStack/10.08 NET10/macOS/net10. Control test: header present in all responses. Impact: simplifies version-specific vulnerability research for attackers.",
+    "category": "finding",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000"
+    }
+  },
+  "a01_excessive_api_exposure": {
+    "content": "DEMONSTRATED: OpenAPI spec at /swagger/v1/swagger.json lists 36 endpoints. Only 3 endpoints require authentication. Public GET requests to /todos, /bookings, /coupons return HTTP 200 with data. Auth endpoints (/api/Authenticate, /auth, /Account/Manage/DownloadPersonalData) publicly accessible without prior session validation. Control test: HTTP 200 on data endpoints without auth. Impact: attackers can enumerate, read, and potentially manipulate bookings, coupons, and user data without credentials.",
+    "category": "finding",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000",
+      "url": "http://127.0.0.1:5000/swagger/v1/swagger.json"
+    }
+  },
+  "a01_public_coupons_endpoint": {
+    "content": "DEMONSTRATED: /api/QueryCoupons endpoint returns sensitive business data (discount codes) without authentication. Control test: unauthenticated GET returns HTTP 200 with coupon data. Example: {\"id\": \"BOOK5\", \"description\": \"5% off\", \"discount\": 5}. Impact: business logic data exposed to anonymous users.",
+    "category": "finding",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000"
+    }
+  },
+  "a02_routing_conflict_batch_api": {
+    "content": "DEMONSTRATED: /api/batch.json endpoint exists but triggers AmbiguousMatchException on POST due to routing conflict between POST /api/batch.{format} and POST /api/{name}.json. Control test: POST request returns 500 with stack trace. Impact: endpoint currently unexploitable but reveals internal routing configuration.",
+    "category": "finding",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000"
+    }
+  },
+  "a07_antiforgery_token_enforcement": {
+    "content": "DEMONSTRATED: Login endpoint (/Account/Login) correctly enforces ASP.NET Core antiforgery tokens. Control test: POST without antiforgery token rejected with message \"A valid antiforgery token was not provided with the request.\" Impact: positive control - CSRF protection operational on this endpoint.",
+    "category": "finding",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "port": "5000"
+    }
+  },
+  "chain_consolidated_inventory": {
+    "content": "CONSOLIDATED INVENTORY - 22 notes processed\n\n=== CAPABILITIES (things we can USE to do things) ===\n\nC1. AES KEY: \"Vu1nB1az0r$ecretKey!2026@@@@@@\" (TelemetryCodec)\n    - Algorithm: AES-CBC, PKCS7 padding, IV[16] + ciphertext, base64-encoded\n    - Source: /tmp/a04_blazor/decompiled/ACorpBlazor/ACorpBlazor.decompiled.cs line 628\n    - Status: Key present in DLL but TelemetryCodec.Encode/Decode NOT called anywhere in decompiled server code (grep returned 0 matches)\n    - Capability: Can decrypt any base64(IV+ciphertext) material if found\n\nC2. PASSWORD HASHES (4 users via IDOR):\n    - ID=1, UUID=029d65c2-bd85-483f-8ef2-6f5f87e9bf84, email=employee@email.com, hash=AQAAAAIAAYagAAAAECFk0FWL5Rh81XaVdZ+HWn7B7JYVLk18PvGnEkcoHQ77CVIED3ANpQa+yyW8yLGD0g==\n    - ID=2, UUID=2e8d62af-7ff1-45bd-a697-a0ed5dbe2c42, email=manager@email.com, hash=AQAAAAIAAYagAAAAEDtv3AnDyy+FSShbAh3rDEsXiLZwobN6QCTOmebyOMcJcbpNxlJZfqdLOVX48C5Trw==\n    - ID=3, UUID=c07f7eec-2ad0-4315-94a1-75dce4fb9a72, email=admin@email.com, hash=AQAAAAIAAYagAAAAEDSm7yqlBHkAx2+DVBwolH+kYQXY2yxic0nwjLMC2PysS2sjpGCxOz09GYWuFlDbLA==\n    - ID=4, UUID=fe8882d0-5e69-4acb-bf62-521353bca36d, email=test@email.com, hash=AQAAAAIAAYagAAAAEA9/lv59NiuxFq5qjLmZkZMdMz/jrns3L5+5zCJt0S+WD3oCvWbhEc0WzgN1FWoIog==\n    - Source: GET /users/info/{uuid}.json (no auth required)\n    - Capability: Crack hashes to obtain credentials for authenticated endpoints\n\nC3. USER UUID ENUMERATION:\n    - Sequential integer IDs (1,2,3,4) map to UUIDs via /users/id/{Id}\n    - Capability: Enumerate all users if more exist beyond ID=4\n\nC4. PUBLIC API ACCESS (33 of 36 endpoints):\n    - All Query endpoints: GET /todos, /bookings, /coupons, /api/QueryUsers, /api/QueryBookings, /api/QueryTodos, /api/QueryCoupons\n    - All Write endpoints: POST /todos, PUT /todos/{Id}, DELETE /todos, POST /api/CreateTodo, PUT /api/UpdateTodo, DELETE /api/DeleteTodos\n    - Booking writes: POST /api/CreateBooking, PATCH /api/UpdateBooking, DELETE /api/DeleteBooking (no auth required - Swagger marks them PUBLIC)\n    - Capability: Read/modify data without authentication\n\nC5. OPENAPI SPEC: /swagger/v1/swagger.json (85KB)\n    - Complete API surface with schemas, parameters, examples\n\nC6. SERVICESTACK METADATA: /metadata (17KB)\n    - Full API operation documentation\n\n=== MATERIAL (opaque values with their producing requests) ===\n\nM1. Blazor Server Component State Token:\n    - Value: Base64-encoded token in HTML comments (<Blazor-Web-Initializers>)\n    - Producing request: GET / (no auth)\n    - Status: Purpose unknown, could relate to session/state management\n\nM2. Antiforgery Cookie:\n    - Name: .AspNetCore.Antiforgery.COMsORkYXoQ\n    - Flags: httponly, samesite=strict\n    - Producing request: Any GET to site\n    - Note: Login endpoint enforces antiforgery tokens\n\nM3. BatchRequest structure:\n    - Endpoint: POST /api/batch or POST /api/batch.json\n    - Fields: Action (string), Payload (string)\n    - Status: /api/batch.json returns 500 AmbiguousMatchException on POST (routing conflict)\n    - Related: BatchEnvelope class has Ts (timestamp) and Data (string) fields\n    - Hypothesis: TelemetryCodec may encrypt batch Data field, but no calls found in decompiled code\n\nM4. X-Powered-By header:\n    - Value: \"ServiceStack/10.08 NET10/macOS/net10\"\n    - Producing request: All responses\n\nM5. Password Hashes (ASP.NET Core format):\n    - Format: AQAAAAIAAYag prefix (indicates ASP.NET Core Identity PBKDF2)\n    - Producing request: GET /users/info/{uuid}.json (no auth)\n\nM6. Coupon data (public):\n    - Example: {\"id\": \"BOOK5\", \"description\": \"5% off\", \"discount\": 5}\n    - Producing request: GET /coupons or GET /api/QueryCoupons (no auth)\n\nM7. Booking data (public read):\n    - Producing request: GET /bookings (no auth)\n\nM8. Todo data (public read/write):\n    - Producing request: GET /todos (no auth), POST /todos (no auth)\n\n=== NOTES COUNT ===\nTotal: 22 entries\n- Vulnerabilities: 2 (a01_idor_user_info_password_hashes, a04_telemetrycodec_aes_key)\n- Findings: 12 (stack_fingerprint, endpoints_inventory, a06_missing_security_headers, a09_dev_environment_exposed, a06_cors_on_health_check, a06_blazor_state_token_in_html, a04_aes_cbc_no_authenticated_encryption, a09_x_powered_by_disclosure, a01_excessive_api_exposure, a01_public_coupons_endpoint, a02_routing_conflict_batch_api, a07_antiforgery_token_enforcement)\n- Artifacts: 2 (api_documentation, client_artifacts)\n- Info: 6 (attack_surface_inventory, a02_exposed_health_check, a02_exposed_metadata, a02_exposed_swagger_spec, a02_exposed_swagger_ui, workspace_file_inventory)\n\n=== KEY GAP ===\n- TelemetryCodec AES key exists but no encrypted material has been found that uses it\n- No calls to TelemetryCodec.Encode/Decode in decompiled server code\n- Hypothesis: key may be used in code not captured by decompilation, or reserved for future use",
+    "category": "info",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1"
+    }
+  }
+}

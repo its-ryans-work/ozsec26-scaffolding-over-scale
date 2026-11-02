@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(//Users/ryanchaplin/.claude/**)",
+      "Glob(//Users/ryanchaplin/.claude/**)",
+      "Grep(//Users/ryanchaplin/.claude/**)",
+
+      "Read(//Users/ryanchaplin/Documents/Dev/VulnBlazor/**)",
+      "Glob(//Users/ryanchaplin/Documents/Dev/VulnBlazor/**)",
+      "Grep(//Users/ryanchaplin/Documents/Dev/VulnBlazor/**)",
+
+      "Read(//Users/ryanchaplin/Documents/Dev/VulnBlazorClaude/**)",
+      "Glob(//Users/ryanchaplin/Documents/Dev/VulnBlazorClaude/**)",
+      "Grep(//Users/ryanchaplin/Documents/Dev/VulnBlazorClaude/**)",
+
+      "Read(//Users/ryanchaplin/Documents/Dev/pentestagent/**)",
+      "Glob(//Users/ryanchaplin/Documents/Dev/pentestagent/**)",
+      "Grep(//Users/ryanchaplin/Documents/Dev/pentestagent/**)",
+
+      "Read(//Users/ryanchaplin/Documents/Dev/blazor-fuzzer/**)",
+      "Read(//Users/ryanchaplin/Documents/Dev/blazor-fuzzer-node2/**)",
+
+      "Read(//private/tmp/claude-501/**)",
+      "Glob(//private/tmp/claude-501/**)",
+      "Grep(//private/tmp/claude-501/**)",
+
+      "Read(//Users/ryanchaplin/Documents/Brain/**)",
+      "Glob(//Users/ryanchaplin/Documents/Brain/**)",
+      "Grep(//Users/ryanchaplin/Documents/Brain/**)",
+
+      "Bash(ssh:*)",
+      "Bash(scp:*)",
+      "Bash(rsync:*)"
+    ]
+  }
+}

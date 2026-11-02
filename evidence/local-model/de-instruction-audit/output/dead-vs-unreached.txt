@@ -1,0 +1,162 @@
+[sensitivity] phases engaged: 38 (majority test) vs 45 (any-sibling test) of 49
+
+104 NO-TRACE techniques, classified:
+
+  DEAD           45
+  UNREACHED      51
+  PRECONDITION    8
+
+==============================================================================
+UNREACHED - do NOT delete; the phase never ran. Relocate or re-budget.
+==============================================================================
+    9  chain_findings/Validate every finding against the live target  (phase 2 of 4)
+    8  adversarial_review/Return a verdict per claim  (phase 3 of 3)
+    7  chain_findings/Report chains with evidence and impact  (phase 4 of 4)
+    5  a09_logging_alerting/Verify before reporting  (phase 3 of 3)
+    5  a10_exceptional/Verify before reporting  (phase 3 of 3)
+    4  a02_misconfiguration/Verify before reporting  (phase 4 of 4)
+    4  a08_integrity/Verify before reporting  (phase 3 of 3)
+    3  a01_a07_access_auth/Verify before reporting  (phase 4 of 4)
+    3  a04_cryptographic/Find embedded and exposed key material  (phase 1 of 4)
+    3  a04_cryptographic/Verify before reporting  (phase 4 of 4)
+
+==============================================================================
+DEAD - the phase demonstrably ran and these still left no trace. Delete.
+==============================================================================
+
+  a01_a07_access_auth/Authentication and session handling#3  (20w)
+    Test whether a session survives logout, whether it expires, and whether it can be fixed or reused from another context.
+
+  a04_cryptographic/Assess how cryptography is used#3  (30w)
+    For hashed material identify the algorithm and cost. Modern salted adaptive hashing should be reported as adequate; fast or unsalted hashing is a finding regardless of whether you crack it.
+
+  a04_cryptographic/Join the key to the material#1  (41w)
+    Before using a recovered secret: strip whitespace and quotes, print its length and bytes, and assert the length is valid for the algorithm. An invalid length means an extraction bug, not a wrong secret - go back and re-read the literal.
+
+  a04_cryptographic/Join the key to the material#6  (20w)
+    If a plaintext credential results, hand it to authentication testing - recovering it is not the end of the chain.
+
+  a05_injection/Verify before reporting#2  (59w)
+    RUN THE CONTROL TEST. Before claiming any access or bypass, repeat the request WITHOUT the credential, token, header or material you believe is responsible. If the result is the same, you have proven nothing - the resource was already reachable. State the control result alongside the finding. This s
+
+  a05_injection/Verify before reporting#4  (27w)
+    Record findings to notes as you go, with the endpoint, the request, the response and the control result, so later phases and the report can use them.
+
+  a08_integrity/Test carefully and honestly#3  (30w)
+    Presence of a vulnerable-looking component or version is not an integrity finding. Do not cite an advisory identifier unless you have executed it against this target and observed the effect.
+
+  a09_logging_alerting/Observable reaction to security events#3  (21w)
+    Do NOT generate volume to test alerting - a handful of events is sufficient and anything more risks denial of service.
+
+  adversarial_review/Attempt to refute each claim#4  (33w)
+    For any claim resting on a component, version or advisory identifier, require that it was executed against this target with the effect observed. Otherwise it is UNPROVEN regardless of how plausible it is.
+
+  blazor_wasm/Decompile to source before searching#2  (42w)
+    Raw-binary searching is unreliable because .NET stores string literals in metadata in a wide encoding that ASCII-oriented tools miss, and because constants are inlined in ways raw bytes do not show. A clean result over a binary is NOT evidence of absence.
+
+  blazor_wasm/Decompile to source before searching#4  (32w)
+    Verify the output really is source before trusting it. A zero exit code can hide a failure when output was redirected into a file, leaving the error text in place of code.
+
+  blazor_wasm/Decompile to source before searching#5  (78w)
+    If a decompile appears to fail, FIX AND RETRY immediately rather than abandoning decompilation - typical causes are a missing output directory, an unset environment variable, or an error swallowed by a pipe. Do not settle for searching binaries INSTEAD of decompiling while a decompiler is still obta
+
+  blazor_wasm/Exploit server trust in client material#4  (19w)
+    Consider the full range of trust a client secret can carry: authentication, authorisation, signing, encryption, or addressing internal functionality.
+
+  blazor_wasm/Exploit server trust in client material#6  (15w)
+    Establish impact by contrast: show the same result cannot be obtained without the recovered material.
+
+  blazor_wasm/Fingerprint the client-side .NET delivery#5  (33w)
+    The same exposure applies to other client-side .NET delivery (hybrid app web assets, WASM UI frameworks, ClickOnce, legacy plugin archives, or any exposed build-output directory). If IL is reachable by any route, continue.
+
+  blazor_wasm/Hunt secrets in the decompiled source#3  (62w)
+    ITERATE. Treat each pass as a hypothesis: run it, look at what came back, then broaden, narrow or re-target based on the actual results. Keep going until a pass yields no new candidates. If an axis returns too much noise, constrain it (scope to application assemblies rather than large third-party on
+
+  blazor_wasm/Hunt secrets in the decompiled source#4  (59w)
+    CRITICAL - a name-based search is NOT evidence of absence. Real embedded secrets are often obfuscated so that no dictionary word appears in the value, and are commonly declared under neutral names like Profile, Default, Config or Seed. The axes that ignore naming are the ones that find these, which 
+
+  blazor_wasm/Hunt secrets in the decompiled source#5  (47w)
+    Purpose-built secret scanners may be available and are worth running as an extra signal, but they largely detect known credential formats belonging to known providers. They routinely report nothing for bespoke keys in decompiled code. A clean scanner result must never be reported as 'no secrets pres
+
+  blazor_wasm/Retrieve the shipped assemblies#3  (17w)
+    Take names from the manifest rather than guessing - they are usually content-hashed and change between builds.
+
+  blazor_wasm/Retrieve the shipped assemblies#4  (23w)
+    Assets may be served in different container formats depending on build settings; unwrap or convert to a normal assembly before decompiling if needed.
+
+  chain_findings/Chain findings into higher severity#4  (32w)
+    When a response contains further material (tokens, identifiers, encrypted blobs), feed it back in and repeat - chains are often several steps long, and the last step is usually the severe one.
+
+  chain_findings/Chain findings into higher severity#7  (25w)
+    Enumerate breadth once a chain works: establish whether it affects one object or every object, since that distinction drives severity more than the technique does.
+
+  chain_findings/Chain findings into higher severity#8  (66w)
+    A RESULT PROVEN AGAINST ONE OBJECT IS A RESULT OF UNKNOWN SIZE. The moment a technique works on one account, record, file or record-holder, apply it to the others you can enumerate. Stopping at the first success answers 'is this possible' and leaves 'how much of the system does this reach' unanswere
+
+  chain_findings/Chain findings into higher severity#9  (59w)
+    Cover the privileged cases deliberately. If the population includes accounts or objects with more authority than the one you proved - administrators, operators, service or system accounts, records belonging to other tenants - test those specifically rather than sampling whichever came first. A techn
+
+  chain_findings/Chain findings into higher severity#10  (55w)
+    Report the count and the composition: how many of the known population were tested, how many were affected, and which privileged ones were among them. If you could not enumerate the population, say what you did test and that the true breadth is unmeasured - that is a real limitation, not a detail to
+
+  chain_findings/Inventory what is already known#6  (14w)
+    Note for each item where it came from, so evidence can be cited later.
+
+  chain_findings/Inventory what is already known#7  (53w)
+    BUDGET DISCIPLINE - you have a limited number of steps for the WHOLE assessment, not for one idea. Before going deep, rank the leads by how much evidence already supports them: material you hold in hand outranks a behaviour you observed, which outranks something suspected from a version number or a 
+
+  chain_findings/Inventory what is already known#8  (36w)
+    Work the ranked list in order and give each lead a rough step budget up front. Spend depth where evidence justifies it, and give a weak lead a few cheap probes rather than an open-ended investigation.
+
+  chain_findings/Inventory what is already known#12  (27w)
+    Never let one lead consume the run while others are untouched. It is better to demonstrate three findings solidly than to fail to prove one impressive-sounding theory.
+
+  consolidate_findings/Normalise into one list#1  (27w)
+    Re-read the notes you have written. They are compact by design, so the whole set fits at once even though the sources they came from did not.
+
+  consolidate_findings/Normalise into one list#3  (25w)
+    Merge duplicates. Different phases routinely describe the same underlying issue from different angles, and one issue split across several entries inflates the apparent finding count.
+
+  consolidate_findings/Process one source, record, then move on#3  (57w)
+    For any file over ~40 KB, do not cat it. Search it with grep for the markers above and print matches with surrounding context (grep -n -C 3 or similar), then read only the regions that matched. Choose your own search terms from what the assessment has turned up - do not rely on a fixed list.
+
+  consolidate_findings/Process one source, record, then move on#4  (35w)
+    Pay particular attention to narration panels - the assistant frequently states a completed chain or a confirmed result in prose without ever recording it as a finding. Those statements are findings and must be captured.
+
+  consolidate_findings/Record to notes#3  (46w)
+    Do NOT re-test anything, do not attempt exploitation, and do not chase new leads here. If something looks promising but unproven, record it as a lead with the evidence that makes it one and move on - the phases after this one will act on it.
+
+  consolidate_findings/Record to notes#4  (26w)
+    Finish as soon as everything is recorded. This phase has a small budget by design; spending it on investigation starves the phases that do the work.
+
+  final_integrity_gate/Completeness check#2  (76w)
+    CHECK THE VERDICT RECORD IS ACTUALLY POPULATED before relying on it. If it is missing, or holds only a header with no verdicts, the review phase did not finish and you have no structured input. Say so plainly in your output and read the per-phase reports directly instead. An empty primary input is n
+
+  final_integrity_gate/Completeness check#3  (79w)
+    DO NOT RE-READ EVERY PER-PHASE REPORT OR PHASE LOG AS A MATTER OF COURSE. Consolidation and review have each already swept them; a third sweep is the single largest waste of this phase's budget and it is why previous runs stopped before finishing. Open a specific report or log only to resolve a NAME
+
+  final_integrity_gate/Emit the final deliverable#2  (63w)
+    QUOTE THE EVIDENCE, NEVER CITE IT. For every finding marked DEMONSTRATED or CONFIRMED, paste the actual artefact into the report: the request that was sent, the response that came back, and any value that was recovered. A filename, a note name or a phase name is a pointer, not evidence - the reader 
+
+  final_integrity_gate/Emit the final deliverable#3  (48w)
+    If you cannot find and quote the concrete artefact for a finding, you may not mark it DEMONSTRATED. Downgrade it to UNPROVEN and say what is missing. This applies however confident an earlier phase sounded: a phase asserting something is not the same as a phase showing it.
+
+  final_integrity_gate/Emit the final deliverable#4  (81w)
+    CLAIM EXACTLY WHAT THE EVIDENCE SHOWS AND NOT ONE STEP MORE. The most common failure in this report is a demonstrated step being written up as the consequence it implies. Recovering a plaintext credential is not the same as authenticating with it; reaching an endpoint is not the same as extracting d
+
+  final_integrity_gate/Emit the final deliverable#5  (45w)
+    Before writing any impact sentence, find the quoted evidence that supports it. If the evidence shows a decrypt but no authenticated response, the finding is 'credential recovered', and the takeover is stated as the untested consequence it is. Overstating one finding discredits the entire report.
+
+  final_integrity_gate/Emit the final deliverable#6  (23w)
+    Order findings by demonstrated severity, and state impact concretely - what data or capability was obtained and across how many accounts or objects.
+
+  final_integrity_gate/Emit the final deliverable#8  (52w)
+    Write 'None identified' rather than omitting a section. A section left out cannot be told apart from a question never asked, and these two are where an assessment is most often wrong in both directions - understating by leaving a chain implicit, overstating by folding an untested step into the impac
+
+  final_integrity_gate/Evidence integrity check#1  (54w)
+    CONTROL RESULT PRESENT - every finding claiming access, bypass or authentication must record the result of the same request made WITHOUT the credential, token, header or material said to be responsible. If that result is missing, obtain it now. If it matches the claimed result, the finding is REFUTE
+
+  web_discovery/Enumerate the surface#4  (19w)
+    Note any endpoint that dispatches, batches, proxies or forwards requests internally, as these bypass controls applied to direct routes.
+
+  deleting these removes 1,831 of 10,526 technique words (17%)

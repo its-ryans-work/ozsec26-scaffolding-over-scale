@@ -1,0 +1,32 @@
+{
+  "secret_aes_key": {
+    "content": "CONFIRMED: Hardcoded AES-256 symmetric key in TelemetryCodec class: 'Vu1nB1az0r$ecretKey!2026@@@@@@@@' (32 bytes). Algorithm: AES-CBC (CipherMode=1), PKCS7 padding (PaddingMode=2). IV is randomly generated per encryption, prepended to ciphertext (IV + ciphertext), then Base64-encoded. Key is static const string, fully recoverable from decompiled client. Used for TelemetryCodec.Encode() and Decode() methods.",
+    "category": "credential",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "username": "TelemetryCodec",
+      "password": "Vu1nB1az0r$ecretKey!2026@@@@@@@@"
+    }
+  },
+  "crypto_impl_telemetry_codec": {
+    "content": "AES-256-CBC crypto implementation in TelemetryCodec class. Key: hardcoded const string 'Vu1nB1az0r$ecretKey!2026@@@@@@@@' (32 bytes). Mode: CBC (CipherMode=1), Padding: PKCS7 (PaddingMode=2). IV: randomly generated per encryption (GenerateIV()), prepended to ciphertext (16 bytes IV + ciphertext), then Base64-encoded. Decode: strips first 16 bytes as IV, decrypts remainder. No MAC/integrity protection. Key shipped in client assembly - fully exposed.",
+    "category": "vulnerability",
+    "confidence": "medium",
+    "status": "confirmed",
+    "metadata": {
+      "target": "127.0.0.1",
+      "weaknesses": [
+        {
+          "id": "CWE-798",
+          "description": "Use of Hard-coded Cryptographic Key"
+        },
+        {
+          "id": "CWE-327",
+          "description": "Use of a Broken or Risky Cryptographic Algorithm (no MAC/integrity)"
+        }
+      ]
+    }
+  }
+}

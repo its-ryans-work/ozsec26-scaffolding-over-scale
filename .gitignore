@@ -1,0 +1,63 @@
+# ---- .NET ----
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+artifacts/
+publish/
+
+# ---- Node ----
+node_modules/
+
+# ---- Lab runtime state ----
+# The target seeds these on first run. They hold Data Protection key material,
+# seeded password hashes and run logs: never commit them.
+target/VulnBlazor/App_Data/*
+!target/VulnBlazor/App_Data/.gitkeep
+!target/VulnBlazor/App_Data/README.md
+*.db
+*.db-shm
+*.db-wal
+*.db.bak*
+
+# ---- Harness runtime ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Host-specific MCP wiring; copy from mcp_servers.json.example
+harness/pentestagent/mcp_servers.json
+harness/pentestagent/.env
+harness/pentestagent/workspaces/
+harness/pentestagent/loot/*
+!harness/pentestagent/loot/.gitkeep
+
+# ---- Secrets, in general ----
+.env
+.env.local
+*.key
+*.pem
+*.crt
+secrets/
+# ASP.NET Core Data Protection keys
+key-*.xml
+
+# ---- Assessment output ----
+assessment-*/
+*.log
+!evidence/**/*.log
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+*~
+*.swp
+# Office lock files
+~$*

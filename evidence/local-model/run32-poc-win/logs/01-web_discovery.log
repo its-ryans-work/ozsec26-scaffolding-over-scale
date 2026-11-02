@@ -1,0 +1,469 @@
+Loaded playbook: web_discovery
+Description: First-pass discovery of a web application's attack surface: technology, endpoints, parameters, authentication mechanisms, and everything shipped to the client. Produces the inventory that the per-category playbooks are assessed against. Finds surface; does not attempt exploitation. 
+Mode: crew
+
+╭───────────────────────────────────────────── Starting ─────────────────────────────────────────────╮
+│ PENTESTAGENT - Non-interactive Mode                                                                │
+│                                                                                                    │
+│ Target: http://127.0.0.1:5000                                                                      │
+│ Model: openai/qwen3.6-27b-fable                                                                    │
+│ Mode: Crew                                                                                         │
+│ Runtime: Local                                                                                     │
+│ Max loops: 50                                                                                      │
+│ Task: First-pass discovery of a web application's attack surface: technology, endpoints,           │
+│ parameters, authentication mechanisms, and everything shipped to the client. Produces the          │
+│ inventory that the per-category playbooks are assessed against. Finds surface; does not attempt    │
+│ exploitation.                                                                                      │
+│                                                                                                    │
+│ Phase: Fingerprint the stack                                                                       │
+│ Objective: Identify what is running so later playbooks can be selected sensibly.                   │
+│ Techniques:                                                                                        │
+│   1. Identify server, framework and client technology from headers, cookies, error pages, asset    │
+│ names and response shapes.                                                                         │
+│   2. Note the authentication mechanism and session representation (cookie names, token formats,    │
+│ headers).                                                                                          │
+│   3. Record the stack explicitly: it determines which stack- specific playbook should run next     │
+│ (for example a client-side .NET or SPA bundle, or a particular reverse proxy).                     │
+│   4. Identify the API style and RETRIEVE every schema or documentation document published, not     │
+│ just the first one you find - a framework's human-readable API index and its machine-readable      │
+│ specification routinely disagree, and the spec is usually far larger. A schema document is not a   │
+│ finding to note and move on from; it is an inventory to consume. Resolve every operation it        │
+│ declares to the concrete request path and method a client would actually send, because frameworks  │
+│ commonly name operations separately from their routes, and record those paths - including the ones │
+│ no page links to.                                                                                  │
+│                                                                                                    │
+│ Phase: Enumerate the surface                                                                       │
+│ Objective: Map endpoints, parameters and inputs.                                                   │
+│ Techniques:                                                                                        │
+│   1. Enumerate routes and endpoints from metadata documents, client code, sitemaps and directory   │
+│ discovery.                                                                                         │
+│   2. Record every parameter and input point, including headers and cookies, and which are          │
+│ reflected in responses.                                                                            │
+│   3. For each endpoint note whether it responds without authentication, and what differs when      │
+│ authenticated. This baseline is what later control tests compare against - capture it carefully.   │
+│                                                                                                    │
+│ Phase: Collect the client payload                                                                  │
+│ Objective: Everything the browser receives is public and must be retrieved.                        │
+│ Techniques:                                                                                        │
+│   1. Download what the client downloads: scripts, bundles, source maps, compiled binaries,         │
+│ WebAssembly, configuration blobs.                                                                  │
+│   2. Compiled or minified client code must be unpacked or decompiled before it can be searched. A  │
+│ clean search over a binary or a minified bundle is NOT evidence of absence.                        │
+│   3. Record where artifacts were written so later playbooks reuse them rather than downloading     │
+│ again.                                                                                             │
+│                                                                                                    │
+│ Phase: Write the inventory                                                                         │
+│ Objective: Leave a durable, structured record.                                                     │
+│ Techniques:                                                                                        │
+│   1. Save to notes: technology stack, endpoints with auth status, parameters, client artifacts and │
+│ their paths, and any credential-bearing material observed.                                         │
+│   2. Do not attempt exploitation here. Flag candidates for the category playbooks instead, with    │
+│ the evidence that makes them candidates.                                                           │
+│                                                                                                    │
+│                                                                                                    │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+[MCP] Connected to kali with 24 tools
+MCP: 24 tool(s) from 1 server(s)
+[00:00] Initializing...
+[00:00] Crew orchestrator starting...
+
+╭──────────────────────────────────────── PentestAgent Plan ─────────────────────────────────────────╮
+│ Starting first-pass discovery on http://127.0.0.1:5000. I'll deploy parallel agents to fingerprint │
+│ the stack, enumerate endpoints, collect client assets, and discover API schemas simultaneously.    │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+[00:34] Orchestrator calling: spawn_agent
+[00:34] Spawned worker agent-0: TECHNOLOGY FINGERPRINTING - Target: http://127.0.0.1:5000
+
+1. Use terminal with curl to capture full HTTP response headers:
+   curl -I -v http://127.0.0.1:5000
+   curl -I -v http://127.0.0.1:5000/
+   
+2. Use whatweb to fingerprint the technology stack:
+   whatweb http://127.0.0.1:5000
+
+3. Use mcp_kali_nikto_scan to scan for server info, technologies, and known issues:
+   mcp_kali_nikto_scan target="http://127.0.0.1:5000"
+
+4. Use mcp_kali_shcheck_headers to identify security headers:
+   mcp_kali_shcheck_headers target="http://127.0.0.1:5000"
+
+5. Check for common API documentation endpoints:
+   curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5000/api/docs
+   curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5000/swagger
+   curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5000/swagger.json
+   curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5000/openapi.json
+   curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5000/graphql
+   curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5000/graphiql
+
+6. Capture cookies and auth indicators from initial requests.
+
+Report: Server software, framework, language, auth mechanisms observed, cookies, security headers, API
+doc endpoints found.
+[00:34] Orchestrator calling: spawn_agent
+[00:34] Spawned worker agent-1: ENDPOINT ENUMERATION - Target: http://127.0.0.1:5000
+
+1. Use mcp_kali_gobuster_scan for directory enumeration:
+   mcp_kali_gobuster_scan mode="dir" url="http://127.0.0.1:5000" 
+wordlist="/usr/share/wordlists/dirb/common.txt"
+
+2. Use mcp_kali_ffuf_fuzz to fuzz for endpoints:
+   mcp_kali_ffuf_fuzz url="http://127.0.0.1:5000/FUZZ" wordlist="/usr/share/wordlists/dirb/common.txt"
+
+3. Use terminal with curl to check common API patterns:
+   curl -s -o /dev/null -w "%{http_code} %{url_effective}\n" http://127.0.0.1:5000/api/
+   curl -s -o /dev/null -w "%{http_code} %{url_effective}\n" http://127.0.0.1:5000/api/v1/
+   curl -s -o /dev/null -w "%{http_code} %{url_effective}\n" http://127.0.0.1:5000/api/v2/
+   curl -s -o /dev/null -w "%{http_code} %{url_effective}\n" http://127.0.0.1:5000/admin
+   curl -s -o /dev/null -w "%{http_code} %{url_effective}\n" http://127.0.0.1:5000/login
+   curl -s -o /dev/null -w "%{http_code} %{url_effective}\n" http://127.0.0.1:5000/auth
+   curl -s -o /dev/null -w "%{http_code} %{url_effective}\n" http://127.0.0.1:5000/register
+   curl -s -o /dev/null -w "%{http_code} %{url_effective}\n" http://127.0.0.1:5000/users
+   curl -s -o /dev/null -w "%{http_code} %{url_effective}\n" http://127.0.0.1:5000/health
+   curl -s -o /dev/null -w "%{http_code} %{url_effective}\n" http://127.0.0.1:5000/status
+
+4. Use mcp_kali_nuclei_scan with web endpoints templates:
+   mcp_kali_nuclei_scan target="http://127.0.0.1:5000" tags="exposure,api"
+
+5. For each discovered endpoint, test with different HTTP methods (GET/POST/PUT/DELETE/PATCH) to see 
+what's supported.
+
+Report: Complete list of discovered endpoints with HTTP status codes and methods.
+[00:34] Orchestrator calling: spawn_agent
+[00:34] Spawned worker agent-2: CLIENT ASSET COLLECTION - Target: http://127.0.0.1:5000
+
+1. Use browser to navigate to http://127.0.0.1:5000 and capture the full page:
+   - browser action: navigate to http://127.0.0.1:5000
+   - browser action: screenshot
+   - browser action: get_content
+
+2. Parse the HTML to extract ALL client-side resource URLs:
+   - <script src="..."> tags
+   - <link href="..."> tags
+   - <img src="..."> tags
+   - Any JSON-LD or data attributes with URLs
+   - Inline JavaScript with fetch/AJAX calls
+
+3. Use terminal with curl to download all discovered JavaScript files to /tmp/discovery/js/:
+   mkdir -p /tmp/discovery/js /tmp/discovery/css /tmp/discovery/assets /tmp/discovery/wasm
+   
+4. Use mcp_kali_js_analyze on the main page HTML and any JS files:
+   mcp_kali_js_analyze target="http://127.0.0.1:5000"
+
+5. Look for source maps (.map files) - if found, use mcp_kali_sourcemapper_extract to reconstruct 
+original source.
+
+6. Check for WebAssembly files (.wasm) and download them.
+
+7. Check for manifest files:
+   curl -s http://127.0.0.1:5000/manifest.json
+   curl -s http://127.0.0.1:5000/service-worker.js
+
+8. For any minified/compiled bundles, attempt to extract readable content using strings and grep for 
+endpoints, API calls, secrets.
+
+Report: Complete inventory of client assets with local paths, technologies detected in client code, 
+embedded endpoints/API calls found.
+[00:34] Orchestrator calling: spawn_agent
+[00:34] Spawned worker agent-3: API SCHEMA & DOCUMENTATION DISCOVERY - Target: http://127.0.0.1:5000
+
+CRITICAL: Retrieve EVERY schema/document, not just the first one. Schemas are inventories to consume, 
+not notes to record.
+
+1. Check all common API documentation endpoints and save responses:
+   mkdir -p /tmp/discovery/api-docs
+   
+   For each endpoint, try GET and record response:
+   - http://127.0.0.1:5000/swagger
+   - http://127.0.0.1:5000/swagger.json
+   - http://127.0.0.1:5000/swagger-ui/
+   - http://127.0.0.1:5000/api-docs
+   - http://127.0.0.1:5000/api-docs.json
+   - http://127.0.0.1:5000/openapi.json
+   - http://127.0.0.1:5000/openapi.yaml
+   - http://127.0.0.1:5000/docs
+   - http://127.0.0.1:5000/redoc
+   - http://127.0.0.1:5000/graphql
+   - http://127.0.0.1:5000/graphiql
+   - http://127.0.0.1:5000/playground
+   - http://127.0.0.1:5000/schema
+   - http://127.0.0.1:5000/introspect
+
+2. For each successful schema document:
+   - Save the full content to /tmp/discovery/api-docs/
+   - Parse it to extract ALL operations with their actual HTTP methods and paths
+   - Frameworks name operations differently from routes - resolve to concrete paths
+   - Record parameters for each operation
+
+3. For GraphQL endpoints, send introspection query:
+   curl -X POST http://127.0.0.1:5000/graphql -H "Content-Type: application/json" \
+     -d '{"query":"{__schema{types{name fields{name args{name type{name}}}}}}"}'
+
+4. Look for API documentation linked from HTML meta tags, JSON-LD, or client-side code.
+
+5. Check for versioned APIs:
+   - /api/v1/swagger.json
+   - /api/v2/swagger.json
+   - /api/docs/v1
+   etc.
+
+Report: ALL schema documents found with full content saved, complete list of API operations with 
+methods/paths/parameters.
+[00:34] Worker agent-0 status: running
+[00:34] Worker agent-1 status: running
+[00:34] Worker agent-2 status: running
+[00:34] Worker agent-3 status: running
+
+╭──────────────────────────────────────── PentestAgent Plan ─────────────────────────────────────────╮
+│ Let me wait for all agents to complete their initial reconnaissance.                               │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+[01:14] Orchestrator calling: wait_for_agents
+[01:32] Worker agent-1 using tool: mcp_kali_gobuster_scan
+[01:44] Worker agent-0 using tool: terminal
+[02:01] Worker agent-2 using tool: browser
+[02:13] Worker agent-3 using tool: terminal
+[02:35] Worker agent-1 using tool: finish
+[02:52] Worker agent-0 using tool: finish
+[03:39] Worker agent-1 using tool: terminal
+[05:49] Worker agent-1 using tool: mcp_kali_ffuf_fuzz
+[06:19] Worker agent-2 using tool: terminal
+[07:26] Worker agent-2 using tool: finish
+[07:47] Worker agent-0 using tool: mcp_kali_nikto_scan
+[09:54] Worker agent-1 using tool: mcp_kali_nuclei_scan
+[10:09] Worker agent-0 using tool: mcp_kali_shcheck_headers
+[13:13] Worker agent-3 using tool: mcp_kali_web_capture
+[13:48] Worker agent-1 using tool: notes
+[15:28] Worker agent-0 using tool: mcp_kali_web_capture
+[16:15] Worker agent-1 complete (0 findings)
+[16:48] Worker agent-3 using tool: browser
+[26:30] Worker agent-2 using tool: mcp_kali_js_analyze
+[28:29] Worker agent-3 using tool: finish
+[32:10] Worker agent-3 using tool: notes
+[40:30] Worker agent-3 complete (0 findings)
+[51:47] Worker agent-2 complete (0 findings)
+[56:10] Worker agent-0 using tool: notes
+[77:29] Worker agent-0 warning: Max iterations reached
+
+╭──────────────────────────────────────── PentestAgent Plan ─────────────────────────────────────────╮
+│ Excellent initial results. I can see we have substantial findings. Now I need to:                  │
+│                                                                                                    │
+│  1 Read the detailed agent outputs to get the complete inventory                                   │
+│  2 Identify any gaps in coverage                                                                   │
+│  3 Ensure all API operations from schemas are fully resolved to concrete paths                     │
+│  4 Verify the client payload is complete                                                           │
+│                                                                                                    │
+│ Let me read the key agent outputs and check if we've fully consumed the schemas.                   │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+[77:45] Orchestrator calling: spawn_agent
+[77:45] Spawned worker agent-4: INVENTORY CONSOLIDATION & SCHEMA CONSUMPTION - Target: 
+http://127.0.0.1:5000
+
+Read the agent outputs and consolidate findings. CRITICAL: Fully consume the API schemas.
+
+1. Read the inventory file:
+   cat 
+/home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/web_discovery
+/inventory.md
+
+2. Read the API inventory:
+   cat /tmp/discovery/api-docs/api-inventory.json
+
+3. Read the OpenAPI spec to verify ALL operations are captured:
+   cat /tmp/discovery/api-docs/swagger-v1-swagger.json
+   OR
+   curl -s http://127.0.0.1:5000/swagger/v1/swagger.json | python3 -m json.tool
+
+4. Read the ServiceStack metadata:
+   cat /tmp/discovery/api-docs/metadata
+
+5. For EVERY operation in both schemas, verify:
+   - The exact HTTP method (GET/POST/PUT/DELETE/PATCH)
+   - The exact request path a client would use
+   - Whether auth is required
+   - Request parameters/body schema
+   - Response schema
+   
+6. Compare the ServiceStack metadata operations with the OpenAPI operations - they should align but 
+ServiceStack operations use different naming than routes. Map each ServiceStack operation name to its 
+actual route.
+
+7. Check what the client-side code (servicestack-blazor.js, servicestack-client.mjs) reveals about 
+additional endpoints or API calls not in the schemas.
+
+8. Test auth status for ALL discovered endpoints:
+   - Which return data without authentication?
+   - Which return 401/403/redirect without auth?
+   - Which redirect to /Account/Login?
+
+9. Create a comprehensive final inventory with:
+   - Technology stack (exact versions)
+   - ALL endpoints with methods, auth status, parameters
+   - All client assets with local paths
+   - Auth mechanism details (cookie names, token formats)
+   - Candidates for category playbooks (flagged, not exploited)
+
+Save the final inventory to notes with key "first_pass_inventory".
+[77:45] Worker agent-4 status: running
+
+╭──────────────────────────────────────── PentestAgent Plan ─────────────────────────────────────────╮
+│ Let me wait for agent-4 to complete the consolidation while also checking the existing notes for   │
+│ what was already captured.                                                                         │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+[77:56] Orchestrator calling: wait_for_agents
+[78:13] Worker agent-4 using tool: terminal
+[78:51] Worker agent-4 using tool: finish
+[80:42] Worker agent-4 using tool: notes
+[81:51] Worker agent-4 complete (0 findings)
+
+╭──────────────────────────────────────── PentestAgent Plan ─────────────────────────────────────────╮
+│ The consolidation is complete. Let me verify the notes were saved and check if there are any gaps  │
+│ by reading the final inventory.                                                                    │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+[82:07] Orchestrator calling: spawn_agent
+[82:07] Spawned worker agent-5: VERIFY AND ENRICH INVENTORY - Target: http://127.0.0.1:5000
+
+1. Read the saved notes to verify completeness:
+   notes action="read" key="first_pass_inventory"
+
+2. Read the agent-4 result for details:
+   cat 
+/home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/web_discovery
+/agent-4.md
+
+3. Cross-check: verify ALL 36 OpenAPI operations + 15 ServiceStack operations are documented with:
+   - Exact HTTP method
+   - Exact path
+   - Auth requirement
+   - Parameters
+
+4. Check if the ServiceStack endpoints use different routes than the OpenAPI spec. ServiceStack 
+typically uses /ss/{format}/{operation} pattern. Verify these are all documented:
+   curl -s http://127.0.0.1:5000/ss/json/QueryTodos | head -20
+   curl -s http://127.0.0.1:5000/ss/json/QueryBookings | head -20
+   curl -s http://127.0.0.1:5000/ss/html/metadata | head -50
+
+5. Test a few more ServiceStack endpoints to confirm the pattern:
+   curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5000/ss/json/CreateBooking
+   curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5000/ss/json/DeleteBooking
+   curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5000/ss/json/QueryUsers
+
+6. Check for any additional endpoints from the Blazor client that might not be in schemas by examining
+the browser network activity:
+   browser action: navigate to http://127.0.0.1:5000
+   browser action: get_content
+   Then search the HTML for any fetch/XHR URLs.
+
+7. Verify all client assets are properly documented with their local paths.
+
+Report: Confirmation that inventory is complete and accurate, or list of gaps to fill.
+[82:07] Worker agent-5 status: running
+[82:22] Orchestrator calling: wait_for_agents
+[82:36] Worker agent-5 using tool: notes
+[82:39] Worker agent-5 using tool: terminal
+[82:43] Worker agent-5 using tool: finish
+[83:55] Worker agent-5 using tool: browser
+[85:07] Worker agent-5 complete (0 findings)
+
+╭──────────────────────────────────────── PentestAgent Plan ─────────────────────────────────────────╮
+│ The inventory is verified as complete. Let me now update the notes with any additional findings    │
+│ from the verification, and ensure we have the complete picture documented. Let me also check if    │
+│ there are any remaining endpoints or details we might have missed.                                 │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+[85:18] Orchestrator calling: spawn_agent
+[85:18] Spawned worker agent-6: FINAL INVENTORY UPDATE - Target: http://127.0.0.1:5000
+
+Based on all agent findings, update the notes with a complete, structured inventory.
+
+1. Read current first_pass_inventory:
+   notes action="read" key="first_pass_inventory"
+
+2. Read agent-5 verification:
+   cat 
+/home/ryan/pentestagent/loot/assessments/20260805_091525_http_127.0.0.1_5000/scratchpads/web_discovery
+/agent-5.md
+
+3. Update the first_pass_inventory note with the following structure if any gaps exist:
+
+=== TECHNOLOGY STACK ===
+- Server: Kestrel
+- Framework: ASP.NET Core (antiforgery cookie present)
+- UI: Blazor WebAssembly (blazor-enhanced-nav header)
+- Backend API: ServiceStack v10.08 (X-Powered-By: ServiceStack/10.08)
+- API Docs: Swagger UI v5.32.6
+- Frontend libs: Vue.js, Tailwind CSS, Highlight.js
+
+=== AUTH MECHANISM ===
+- Cookie-based auth (antiforgery cookie)
+- Login endpoint: /Account/Login (302 redirect for unauthenticated)
+- Register endpoint: /Account/Register
+- Role-based: Employee, Manager, Admin roles observed
+
+=== API ENDPOINTS (OpenAPI - /api/*) ===
+List all 36 operations with method, path, auth status
+
+=== SERVICESTACK ENDPOINTS (/json/*) ===
+List all 15 operations with method, path, auth requirements
+
+=== BLAZOR SPA ROUTES ===
+Public: /about, /deploy, /privacy, /counter, /weather, /todomvc
+Auth: /secure/bookings, /secure/coupons, /profile
+
+=== CLIENT ASSETS ===
+List all downloaded assets with local paths
+
+=== DATA EXPOSED WITHOUT AUTH ===
+List sensitive data accessible without authentication
+
+=== PLAYBOOK CANDIDATES ===
+Flag items for category playbooks (auth bypass, XSS, info disclosure, etc.)
+
+4. Save the updated inventory to notes with key "first_pass_inventory"
+
+Report: Confirmation that the final inventory is complete and saved.
+[85:18] Worker agent-6 status: running
+[85:27] Orchestrator calling: wait_for_agents
+[85:43] Worker agent-6 using tool: notes
+[85:43] Worker agent-6 using tool: terminal
+[87:12] Worker agent-6 using tool: finish
+[87:25] Worker agent-6 complete (0 findings)
+
+╭──────────────────────────────────────── PentestAgent Plan ─────────────────────────────────────────╮
+│ Excellent. The first-pass discovery is complete with a comprehensive inventory saved. Let me       │
+│ verify the final state of all notes and then conclude.                                             │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+[87:36] Orchestrator calling: spawn_agent
+[87:36] Generating summary...
+[87:49] Synthesising report from notes...
+
+╭─────────────────────────────────────────── Interrupted ────────────────────────────────────────────╮
+│ STOPPED (max loops reached)                                                                        │
+│                                                                                                    │
+│ Duration: 88m 38s                                                                                  │
+│ Loops: 40/40                                                                                       │
+│ Tools: 31                                                                                          │
+│ Tokens: 6,174,882                                                                                  │
+│                                                                                                    │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+╭───────────────────────────────────────────── Summary ──────────────────────────────────────────────╮
+│ Target: http://127.0.0.1:5000 Status: Scanning in Progress                                         │
+│                                                                                                    │
+│ Summary: No specific vulnerabilities or results have been reported yet. The provided logs only     │
+│ indicate that 7 worker agents (agent-0 through agent-6) are actively executing 31 tools against    │
+│ the target.                                                                                        │
+│                                                                                                    │
+│ Security Concerns: Cannot be assessed at this time; actual scan output is required.                │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+Report saved: 
+loot/assessments/20260805_091525_http_127.0.0.1_5000/draft_playbook_reports/20260805_104408_http_127.0
+.0.1_5000_web_discovery.md
+Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0xffff8efa2a50>

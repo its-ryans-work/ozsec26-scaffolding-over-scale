@@ -1,0 +1,363 @@
+Loaded playbook: final_integrity_gate
+Description: Final gate before delivery. Confirms every finding recorded earlier either survives or is explicitly accounted for, and enforces a mechanical evidence standard: control results present, quoted secrets re-read and length-checked, algorithm claims citing source lines, execution claims showing returned output. Emits the final report.
+Mode: agent
+
+╭─────────────────────────────────────── Starting ───────────────────────────────────────╮
+│ PENTESTAGENT - Non-interactive Mode                                                    │
+│                                                                                        │
+│ Target: http://127.0.0.1:5000                                                          │
+│ Model: openai/qwen3.6-27b-fable                                                        │
+│ Mode: Agent                                                                            │
+│ Runtime: Local                                                                         │
+│ Max loops: 30                                                                          │
+│ Task: Final gate before delivery. Confirms every finding recorded earlier either       │
+│ survives or is explicitly accounted for, and enforces a mechanical evidence standard:  │
+│ control results present, quoted secrets re-read and length-checked, algorithm claims   │
+│ citing source lines, execution claims showing returned output. Emits the final report. │
+│                                                                                        │
+│ Phase: Completeness check                                                              │
+│ Objective: Nothing that was found earlier may vanish silently between phases.          │
+│ Techniques:                                                                            │
+│   1. Read the consolidated findings recorded in notes, the per-phase reports, and the  │
+│ output of the adversarial review.                                                      │
+│   2. Compare them. Every finding present before the chaining and review phases must    │
+│ appear in the reviewed set, be marked REFUTED with evidence, or be explicitly listed   │
+│ as dropped with the reason. Silent disappearance is not acceptable.                    │
+│   3. Re-read the phase logs once more for anything never recorded in any structured    │
+│ form. Low-severity observations - missing security headers, permissive cross-origin    │
+│ policy, verbose errors and stack traces, version disclosure - are the ones that        │
+│ vanish, because each is individually minor and nobody carries them forward.            │
+│   4. Check that any material recovered during the assessment was actually applied to   │
+│ something. A secret, token or credential that was recovered and never used is either   │
+│ an untested lead that must be labelled as such, or a missed critical finding.          │
+│                                                                                        │
+│ Phase: Evidence integrity check                                                        │
+│ Objective: Apply a mechanical standard to every surviving finding. These are checks,   │
+│ not judgements - each either passes or does not.                                       │
+│ Techniques:                                                                            │
+│   1. CONTROL RESULT PRESENT - every finding claiming access, bypass or authentication  │
+│ must record the result of the same request made WITHOUT the credential, token, header  │
+│ or material said to be responsible. If that result is missing, obtain it now. If it    │
+│ matches the claimed result, the finding is REFUTED: the resource was already           │
+│ reachable.                                                                             │
+│   2. QUOTED VALUES RE-READ AND LENGTH-CHECKED - for every secret, key or token quoted  │
+│ in the report, re-read it from the source artifact rather than from the draft, and     │
+│ assert its length is one the stated algorithm accepts. A value quoted at an impossible │
+│ length is a transcription error: correct it from the artifact. Check the quoted length │
+│ claim matches the value actually printed.                                              │
+│   3. ALGORITHM CLAIMS CITE SOURCE - any statement about a cipher, mode, padding, hash  │
+│ or key derivation must cite the line of recovered source that sets it. Do not accept   │
+│ an inferred mode; read it. Being right about the vulnerability and wrong about the     │
+│ mechanism produces incorrect remediation advice.                                       │
+│   4. EXECUTION CLAIMS SHOW RETURNED OUTPUT - any claimed code or command execution     │
+│ must show output of a command chosen by the tester, returned by the target. A payload  │
+│ that was sent, or an error that looks interesting, is not execution. Downgrade         │
+│ otherwise.                                                                             │
+│   5. SEVERITY MATCHES DEMONSTRATION - severity is set by what was DEMONSTRATED, not by │
+│ what is suspected. State breadth explicitly: one object or all of them, one account or │
+│ every account. An unproven critical theory is a lead, not a critical finding.          │
+│   6. Correct anything that fails a check rather than deleting it - downgrade the proof │
+│ level, fix the transcription, or obtain the missing evidence, and say what was         │
+│ corrected.                                                                             │
+│                                                                                        │
+│ Phase: Emit the final deliverable                                                      │
+│ Objective: One report, honest about proof and about coverage.                          │
+│ Techniques:                                                                            │
+│   1. Produce the final report with every finding carrying CONFIRMED, REFUTED or        │
+│ UNPROVEN, its evidence, and its control result.                                        │
+│   2. Order findings by demonstrated severity, and state impact concretely - what data  │
+│ or capability was obtained and across how many accounts or objects.                    │
+│   3. Report chains as ordered steps with the request and response at each link, so a   │
+│ reader can follow and reproduce them.                                                  │
+│   4. State coverage honestly: which categories were assessed, which produced no        │
+│ findings, and which could not be assessed from outside. A category with nothing found  │
+│ is reported as such, not omitted.                                                      │
+│   5. List explicitly what was corrected or dropped during this gate and why, so the    │
+│ reader can see the report was checked rather than assembled.                           │
+│   6. Name the root cause of each finding precisely - file, type and member for         │
+│ embedded material; endpoint and parameter for exposure - so each is separately         │
+│ fixable.                                                                               │
+│                                                                                        │
+│                                                                                        │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+[00:00] Initializing...
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Plan:                                                                                  │
+│                                                                                        │
+│  1 Read and consolidate findings from notes, per-phase reports, and adversarial        │
+│    review; compare across phases to identify missing findings, unrecorded              │
+│    observations, and unused recovered materials; mark each as carried forward, REFUTED │
+│    with evidence, or explicitly dropped with reason                                    │
+│  2 For each surviving finding, verify control results are present, re-read and         │
+│    length-check all quoted secrets from source artifacts, confirm algorithm claims     │
+│    cite source lines, ensure execution claims show returned output, and validate       │
+│    severity matches what was demonstrated; correct any failures by downgrading, fixing │
+│    transcription, or obtaining missing evidence                                        │
+│  3 Produce the final report with all findings marked CONFIRMED/REFUTED/UNPROVEN with   │
+│    evidence and control results, ordered by demonstrated severity with concrete        │
+│    impact, chains documented with requests/responses, honest coverage statements,      │
+│    explicit corrections/drops with reasons, and precise root causes named              │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Starting the final gate. First, I'll read all saved notes and check for phase reports. │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:22] $ notes (1)
+         [*] Notes (4 entries):  ## Artifact   ...
+
+[00:22] $ terminal (2)
+         ls -la loot/reports/ loot/artifacts/ loot/notes.json 2>/dev/null; echo "---"; 
+ls...
+         [+] OK
+
+[00:28] $ notes (3)
+         [*]  (credential, medium, confirmed) CONFIRMED: ...
+
+[00:28] $ notes (4)
+         [*]  (credential, medium, confirmed) DEMONSTRATE...
+
+[00:28] $ notes (5)
+         [*]  (vulnerability, medium, confir...
+
+[00:28] $ notes (6)
+         [*]  (artifact, high, confirmed) Malfo...
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Now I'll verify the findings mechanically by re-reading from the source artifacts and  │
+│ checking for missing evidence.                                                         │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[00:36] $ terminal (7)
+         grep -n 
+"Vu1nB1az0r\|TelemetryCodec\|CipherMode\|PaddingMode\|AES\|GenerateIV\|K...
+         [+] OK
+
+[00:36] $ terminal (8)
+         grep -n "LastSeenToken\|p@55wOrd\|employee" 
+/tmp/client-assets/decompiled/ACorpB...
+         [+] OK
+
+[00:36] $ terminal (9)
+         find loot/reports/ -type f 2>/dev/null; ls -la loot/*.md loot/*.txt loot/*.json 
+...
+         [-] Exit 2
+
+[00:40] $ terminal (10)
+         echo -n 'Vu1nB1az0r$ecretKey!2026@@@@@@@@' | wc -c
+         [+] OK
+
+[00:40] $ terminal (11)
+         sed -n '625,700p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[00:40] $ terminal (12)
+         sed -n '980,1080p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylt...
+         [+] OK
+
+[00:47] $ terminal (13)
+         curl -s "http://127.0.0.1:5000/bookings/null.json" 2>&1 | head -80
+         [+] OK
+
+[00:47] $ terminal (14)
+         curl -s "http://127.0.0.1:5000/users/info/1.json" 2>&1 | head -40
+         [+] OK
+
+[00:47] $ terminal (15)
+         curl -s "http://127.0.0.1:5000/auth/login.json" -X POST -H "Content-Type: 
+applic...
+         [+] OK
+
+[00:55] $ terminal (16)
+         curl -s "http://127.0.0.1:5000/bookings/1.json" 2>&1 | head -40
+         [+] OK
+
+[00:55] $ terminal (17)
+         curl -s 
+"http://127.0.0.1:5000/users/info/029d65c2-bd85-483f-8ef2-6f5f87e9bf84.j...
+         [+] OK
+
+[01:10] $ terminal (18)
+         python3 << 'EOF'
+import base64
+from Crypto.Cipher import AES
+from Crypto.Util.Pa...
+         [-] Exit 1
+
+[01:10] $ terminal (19)
+         python3 << 'EOF'
+import base64
+from Crypto.Cipher import AES
+from Crypto.Util.Pa...
+         [-] Exit 1
+
+[01:10] $ terminal (20)
+         python3 << 'EOF'
+import base64
+from Crypto.Cipher import AES
+from Crypto.Util.Pa...
+         [-] Exit 1
+
+[01:10] $ terminal (21)
+         python3 << 'EOF'
+import base64
+from Crypto.Cipher import AES
+from Crypto.Util.Pa...
+         [-] Exit 1
+
+[01:22] $ terminal (22)
+         python3 << 'EOF'
+import base64
+from Crypto.Cipher import AES
+from Crypto.Util.Pa...
+         [-] Exit 1
+
+[01:31] $ terminal (23)
+         python3 << 'EOF'
+import base64
+from Crypto.Cipher import AES
+from Crypto.Util.Pa...
+         [-] Exit 1
+
+[01:39] $ terminal (24)
+         python3 << 'EOF'
+import base64
+from Crypto.Cipher import AES
+from Crypto.Util.Pa...
+         [-] Exit 1
+
+[01:49] $ terminal (25)
+         python3 << 'PYEOF'
+import base64
+from Crypto.Cipher import AES
+from Crypto.Util....
+         [-] Exit 1
+
+[01:57] $ terminal (26)
+         grep -n "DefaultProfile\|ProfileBytes" 
+/tmp/client-assets/decompiled/ACorpBlazor...
+         [+] OK
+
+[02:08] $ terminal (27)
+         sed -n '630p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyltacp.d...
+         [+] OK
+
+[02:08] $ terminal (28)
+         sed -n '630p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyltacp.d...
+         [+] OK
+
+[02:20] $ terminal (29)
+         key=$(sed -n '630p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyl...
+         [+] OK
+
+[02:20] $ terminal (30)
+         key=$(sed -n '630p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtyl...
+         [+] OK
+
+[02:38] $ terminal (31)
+         # Control test: bookings without auth
+echo "=== Control: bookings without auth =...
+         [+] OK
+
+[02:38] $ terminal (32)
+         # Check for other endpoints - security headers, CORS, etc
+echo "=== Security Hea...
+         [+] OK
+
+[02:38] $ terminal (33)
+         # Check all other users for LastSeenToken
+for uid in 2 3 4 5; do
+  echo "=== Use...
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Now I have all the evidence. Let me verify the crypto details and check for any        │
+│ additional findings from the decompiled source.                                        │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[03:04] $ terminal (34)
+         sed -n '628,700p' 
+/tmp/client-assets/decompiled/ACorpBlazor/ACorpBlazor.6tqtylta...
+         [+] OK
+
+[03:04] $ terminal (35)
+         # Check for any other secrets, tokens, or hardcoded values in the decompiled 
+cod...
+         [+] OK
+
+[03:04] $ terminal (36)
+         # Check what the client assembly reveals
+grep -nE "(const|Secret|Token|Key|Passw...
+         [+] OK
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ I have all evidence. Now completing Step 1 and moving to Step 2.                       │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[03:14] $ finish (37)
+         [*] Step 1 complete Result: Read and consolidated all 4 saved no...
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Now executing Step 2: mechanical evidence checks on each finding.                      │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[03:51] $ terminal (38)
+         # CONTROL TESTS: Verify each finding's claim requires the credential/material
+
+e...
+         [+] OK
+
+[04:07] $ finish (39)
+         [*] Step 2 complete Result: Mechanical evidence checks completed...
+
+╭───────────────────────────────────── PentestAgent ─────────────────────────────────────╮
+│ Now producing the final report.                                                        │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+[05:25] $ terminal (40)
+         cat > loot/reports/FINAL_REPORT.md << 'REPORT_EOF'
+# ACorp Blazor Hotel Manageme...
+         [-] Exit 1
+
+[05:37] $ terminal (41)
+         mkdir -p loot/reports loot/artifacts/screenshots loot/artifacts/screenshots
+         [+] OK
+
+[06:27] $ terminal (42)
+         cat > loot/reports/FINAL_REPORT.md << 'REPORT_EOF'
+# ACorp Blazor Hotel Manageme...
+         [+] OK
+
+[08:15] $ finish (43)
+         [*] Step 3 complete Result: Final report produced at loot/report...
+
+[08:15] Max loops limit reached (30)
+[08:15] Synthesising report from notes...
+
+╭───────────────────────────────────── Interrupted ──────────────────────────────────────╮
+│ STOPPED (max loops reached)                                                            │
+│                                                                                        │
+│ Duration: 9m 8s                                                                        │
+│ Loops: 30/30                                                                           │
+│ Tools: 43                                                                              │
+│ Tokens: 385,547                                                                        │
+│ Findings: 5                                                                            │
+╰────────────────────────────────────────────────────────────────────────────────────────╯
+Report saved: 
+loot/assessments/20260802_100431_http_127.0.0.1_5000/final_deliverable/20260802_145715_htt
+p_127.0.0.1_5000_final_integrity_gate.md

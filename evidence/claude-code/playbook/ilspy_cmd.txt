@@ -1,0 +1,1 @@
+ILSPY_INVOCATION=DOTNET_ROLL_FORWARD=LatestMajor dotnet /Users/ryanchaplin/.dotnet/tools/.store/ilspycmd/10.0.1.8346/ilspycmd/10.0.1.8346/tools/net10.0/any/ilspycmd.dll
