@@ -1,7 +1,7 @@
 # Findings
 
 The transferable part. These are written to apply to **real** ServiceStack and Blazor
-applications — the target is disposable, the detection techniques are not.
+applications. The target is disposable, the detection techniques are not.
 
 The vulnerabilities in [`../target/`](../target/) are intentional and are training
 material, not disclosures. What makes them worth writing up is that each is a real-world
@@ -15,13 +15,13 @@ the technique transfers even though this target does not.
 
 ## The three that matter most
 
-**Attribute authorization in ServiceStack is per request DTO — not per file, not per
+**Attribute authorization in ServiceStack is per request DTO, not per file, not per
 service class.** In the target, `QueryUsers` is correctly gated with `[ValidateIsAdmin]`
 while `GetUserId` and `GetUserInfo`, in the same file, carry no auth attributes at all.
 This is the realistic mistake: the one obvious "list users" operation gets locked down and
 the sibling lookups are left open. **When reviewing any attribute-routed API, enumerate
 every request DTO individually.** Never infer that a service class is covered because a
-representative endpoint is gated — and `/types/metadata.json` gives you that DTO list for
+representative endpoint is gated, and `/types/metadata.json` gives you that DTO list for
 free, with routes, verbs and auth attributes.
 
 **Treat every assembly under `/_framework` as public.** A Blazor app using `InteractiveAuto`
@@ -42,7 +42,7 @@ in the playbook's `blazor_wasm` phase.
 These notes were written against an earlier revision of the target and describe the batch
 endpoint as a usable AES-CBC padding oracle. **It no longer is.** The shipped code collapses
 every failure in the payload path to one indistinguishable response, logging detail
-server-side only — see the hardening section of [`../target/README.md`](../target/README.md).
+server-side only. See the hardening section of [`../target/README.md`](../target/README.md).
 
 The finding is left in because the flaw class is real and common, and because the fix is the
 instructive part: hiding the `CryptographicException` is not enough. A distinct "invalid
